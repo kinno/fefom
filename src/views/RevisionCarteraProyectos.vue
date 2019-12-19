@@ -4,27 +4,25 @@
       <v-flex xs12 md12>
         <material-card
           color="green"
-         title="Techos Financieros"
+          title="Revisión de Cartera de Proyectos"
           text=""
           class="mt-8"
         >
-          <techos-financieros-component></techos-financieros-component>
+          <cartera-proyectos-component></cartera-proyectos-component>
         </material-card>
       </v-flex>
     </v-layout>
   </v-container>
 </template>
+
 <script>
-
-import TechosFinancierosComponent from '../components/app/TechosFinancierosComponent'
+import CarteraProyectosComponent from "../components/app/RevisionCarteraComponent";
 export default {
-    components:{
-        TechosFinancierosComponent
-    },
-    data(){
-        return{
-
-        }
-    }
-}
+  components: {
+    CarteraProyectosComponent
+  },
+  data() {
+    return {};
+  }
+};
 </script>

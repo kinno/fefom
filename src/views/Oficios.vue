@@ -4,27 +4,25 @@
       <v-flex xs12 md12>
         <material-card
           color="green"
-         title="Techos Financieros"
+          title="Control de Oficios"
           text=""
           class="mt-8"
         >
-          <techos-financieros-component></techos-financieros-component>
+         <oficios-component></oficios-component>
         </material-card>
       </v-flex>
     </v-layout>
   </v-container>
 </template>
+
 <script>
-
-import TechosFinancierosComponent from '../components/app/TechosFinancierosComponent'
+import OficiosComponent from "../components/app/OficiosComponent";
 export default {
-    components:{
-        TechosFinancierosComponent
-    },
-    data(){
-        return{
-
-        }
-    }
-}
+  components: {
+    OficiosComponent
+  },
+  data() {
+    return {};
+  }
+};
 </script>

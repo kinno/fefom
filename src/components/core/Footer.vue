@@ -2,7 +2,8 @@
   <v-footer
     id="core-footer"
     absolute
-    height="82"
+    height="50"
+    color="grey lighten-2"
   >
     <div class="footer-items">
       <span

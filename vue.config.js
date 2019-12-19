@@ -1,7 +1,12 @@
 module.exports = {
-  devServer: {
-    disableHostCheck: true,
+  devServer:{
+    host: 'localhost',
     hot:true,
-    host: '0.0.0.0'
-  }
-}
+    port: 8080,  
+    open: 'Chrome',
+    historyApiFallback: true,
+   
+  },
+
+  
+};

@@ -5,7 +5,7 @@
         cols="12"
         lg="4"
       >
-        <material-chart-card
+        <!-- <material-chart-card
           :data="dailySalesChart.data"
           :options="dailySalesChart.options"
           color="info"
@@ -396,7 +396,7 @@
               </v-list>
             </v-tab-item>
           </v-tabs-items>
-        </material-card>
+        </material-card> -->
       </v-col>
     </v-row>
   </v-container>
