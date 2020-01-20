@@ -1,8 +1,48 @@
 <template>
   <v-container fluid class="pa-0">
+    <v-row v-if="estatus !== 'En Edición'">
+      <v-col cols="12" md="3" offset-md="4" class="column">
+        <v-text-field
+          v-model="estatus"
+          outlined
+          readonly
+          label="Estatus de la Sección"
+          type="text"
+        >
+          <template v-slot:prepend>
+            <v-icon :color="iconos_estatus.color">{{
+              iconos_estatus.icon
+            }}</v-icon>
+          </template>
+        </v-text-field>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="12" md="10" offset-md="1" class="column">
+        <v-text-field
+          v-if="user.tipo_usuario == 1"
+          value=""
+          label="Unidad Responsable:"
+          dense
+          v-model="unidad_responsable"
+          :disabled="true"
+          outlined
+        ></v-text-field>
+      </v-col>
+    </v-row>
+    <v-row>
+      <v-col cols="12" md="10" offset-md="1" class="column">
+        <v-text-field
+          v-if="user.tipo_usuario == 1"
+          value=""
+          label="Nombre del PPI:"
+          dense
+          v-model="id_cartera_proyecto"
+          :disabled="true"
+          outlined
+        ></v-text-field>
         <v-select
+          v-else
           v-model="id_cartera_proyecto"
           :items="proyectos"
           item-text="nombre_proyecto"
@@ -12,12 +52,23 @@
           outlined
           dense
           required
+          :disabled="!visible"
         ></v-select>
       </v-col>
     </v-row>
     <v-row>
       <v-col cols="12" md="6" class="column">
+        <v-text-field
+          v-if="user.tipo_usuario == 1"
+          value=""
+          label="Tipo de PPI:"
+          dense
+          v-model="id_tipo_ppi"
+          :disabled="true"
+          outlined
+        ></v-text-field>
         <v-select
+          v-else
           v-model="id_tipo_ppi"
           :items="tipo_ppi"
           item-text="tipo"
@@ -26,6 +77,7 @@
           return-object
           outlined
           dense
+          :disabled="!visible"
         ></v-select>
       </v-col>
       <v-col cols="12" md="6" class="column">
@@ -34,6 +86,7 @@
           label="Subclasificación de PPI:"
           dense
           v-model="subclasificacion_ppi"
+          :disabled="!visible"
         ></v-text-field>
       </v-col>
     </v-row>
@@ -42,6 +95,15 @@
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Monto total de inversión</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('monto_total_inversion')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -64,6 +126,7 @@
                   dense
                   prepend-inner-icon="mdi-currency-usd"
                   v-model="monto_sin_iva"
+                  :disabled="!visible"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -78,6 +141,7 @@
                   dense
                   prepend-inner-icon="mdi-currency-usd"
                   v-model="monto_estudios"
+                  :disabled="!visible"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -89,8 +153,13 @@
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Fuentes de financiamiento</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('fuentes_financiamiento')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -100,6 +169,7 @@
                   v-model="fuenteSeleccionada.fuente"
                   label="Fuente de Financiamiento:"
                   dense
+                  :disabled="!visible"
                 ></v-text-field>
               </v-col>
               <v-col cols="2">
@@ -110,6 +180,7 @@
                   type="number"
                   outlined
                   label="%"
+                  :disabled="!visible"
                 ></v-text-field>
               </v-col>
               <v-col cols="3">
@@ -118,10 +189,11 @@
                   dense
                   outlined
                   label="Monto (incluye IVA)"
+                  :disabled="!visible"
                 ></v-text-field>
               </v-col>
               <v-col cols="1">
-                <v-btn class="" color="green">
+                <v-btn class="" color="green" v-if="visible">
                   <v-icon>mdi-plus</v-icon>
                 </v-btn>
               </v-col>
@@ -153,6 +225,15 @@
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Horizonte de evaluación</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('horizonte_evaluacion')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -164,6 +245,7 @@
                   type="number"
                   outlined
                   label="Meses de ejecución"
+                  :disabled="!visible"
                 ></v-text-field>
               </v-col>
               <v-col cols="12" md="4" class="column">
@@ -187,6 +269,7 @@
                   transition="scale-transition"
                   offset-y
                   min-width="290px"
+                  :disabled="!visible"
                 >
                   <template v-slot:activator="{ on }">
                     <v-text-field
@@ -197,6 +280,7 @@
                       readonly
                       outlined
                       v-on="on"
+                      :disabled="!visible"
                     ></v-text-field>
                   </template>
                   <v-date-picker
@@ -205,6 +289,7 @@
                     locale="Es"
                     no-title
                     scrollable
+                    :disabled="!visible"
                   >
                     <v-spacer></v-spacer>
                     <v-btn text color="primary" @click="menu = false"
@@ -239,8 +324,13 @@
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Calendario de inversión</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('calendario_inversion')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -249,6 +339,7 @@
               <v-col cols="12" md="3" class="column">
                 <div class="my-2">
                   <v-btn
+                    v-if="visible"
                     text
                     color="green brighten-5"
                     @click="agregarCalendario"
@@ -265,7 +356,7 @@
                   hide-default-footer
                   class="tablaAlternativas"
                 >
-                  <template v-slot:item.anio="props">
+                  <template v-slot:item.anio="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.anio"
                       @save="save"
@@ -289,11 +380,12 @@
                           maxlength="280"
                           counter="280"
                           class="mt-5"
+                          :disabled="!visible"
                         ></v-textarea>
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.monto="props">
+                  <template v-slot:item.monto="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.monto"
                       @save="saveCalendarioMonto(props.item.monto, props.item)"
@@ -315,6 +407,7 @@
                           maxlength="280"
                           counter="280"
                           class="mt-5"
+                          :disabled="!visible"
                         ></v-textarea>
                       </template>
                     </v-edit-dialog>
@@ -350,6 +443,15 @@
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Localización geográfica</v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn
+            v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('localizacion_geografica')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -360,9 +462,10 @@
                   outlined
                   rows="10"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="600"
+                  counter="600"
                   v-model="localizacion_geografica"
+                  :disabled="!visible"
                 ></v-textarea>
               </v-col>
               <v-col cols="12" md="7">
@@ -398,6 +501,7 @@
                       <v-card-actions>
                         <v-spacer></v-spacer>
                         <v-btn
+                          v-if="visible"
                           color="red"
                           text
                           @click="eliminaImagen(ruta_imagen_localizacion)"
@@ -411,6 +515,7 @@
                 <v-row>
                   <v-col cols="10" class="column">
                     <v-file-input
+                      v-if="visible"
                       dense
                       outlined
                       v-model="imagenNueva"
@@ -433,14 +538,16 @@
 import { EventBus } from "../../utils/event-bus";
 import moment from "moment";
 export default {
-  props: ['ficha_tecnica'],
-  beforeMount(){
-    if(this.ficha_tecnica.id_anexo_uno!== null){
-     
-      this.id_anexo_uno = this.ficha_tecnica.id_anexo_uno
-       this.buscarAnexoUno()
-    }else{
-      
+  props: ["ficha_tecnica"],
+  beforeMount() {
+    this.user = JSON.parse(localStorage.getItem("user"));
+    if (this.ficha_tecnica.estatus == 2 || this.ficha_tecnica.estatus == 3) {
+      this.visible = false;
+    }
+    if (this.ficha_tecnica.id_anexo_uno !== null) {
+      this.id_anexo_uno = this.ficha_tecnica.id_anexo_uno;
+      this.buscarAnexoUno();
+    } else {
     }
     //  EventBus.$on("cargaAnexoUno", data => {
     //    alert();
@@ -450,15 +557,24 @@ export default {
     // });
   },
   mounted() {
-    this.user = JSON.parse(localStorage.getItem("user"));
-    this.initialize();
+    if (this.user.tipo_usuario !== 1) {
+      this.initialize();
+    }
     this.showTab = false;
     EventBus.$on("guardarFicha", data => {
       this.guardarAnexoUno(data);
-      // console.log("Guardar Anexo 1", data.id_ficha_tecnica)
     });
-    
-   
+
+    //FEFOM
+    EventBus.$on("validarSeccion", data => {
+      this.validarAnexoUno(data);
+    });
+    EventBus.$on("emitirObservaciones", data => {
+      this.registrarObservaciones(data);
+    });
+    EventBus.$on("guardarObservaciones", data => {
+      this.guardarObservaciones(data);
+    });
   },
   computed: {
     fechaInicioFormato() {
@@ -478,7 +594,10 @@ export default {
   },
   data: () => ({
     user: null,
+    iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
+    unidad_responsable: null,
     id_cartera_proyecto: null,
+    visible: true,
     ejercicioSeleccionado: "2020",
     tipo_ppi: [],
     proyectos: [],
@@ -490,7 +609,8 @@ export default {
     AnioSeleccionado: null,
     montoAnioSeleccionado: 0.0,
     id_anexo_uno: null,
-    estatus: null,
+    estatus: "En Edición",
+    observaciones: [],
     id_tipo_ppi: null,
     subclasificacion_ppi: null,
     monto_con_iva: 0.0,
@@ -550,16 +670,17 @@ export default {
         .format("YYYY-MM");
     },
     id_cartera_proyecto: function(val) {
-     
-      if(typeof val !== 'number'){
-        this.fuentes_financiamiento = [];
-        this.monto_con_iva = val.monto;
-        this.monto_sin_iva = parseFloat(val.monto / 1.16).toFixed(2);
-        this.fuentes_financiamiento.push({
-          fuente: `ESTATAL (FEFOM-${this.ejercicioSeleccionado})`,
-          porcentaje: 100,
-          monto: val.monto
-        });
+      if (this.user.tipo_usuario !== 1) {
+        if (typeof val !== "number") {
+          this.fuentes_financiamiento = [];
+          this.monto_con_iva = val.monto;
+          this.monto_sin_iva = parseFloat(val.monto / 1.16).toFixed(2);
+          this.fuentes_financiamiento.push({
+            fuente: `ESTATAL (FEFOM-${this.ejercicioSeleccionado})`,
+            porcentaje: 100,
+            monto: val.monto
+          });
+        }
       }
     }
   },
@@ -589,31 +710,65 @@ export default {
         })
         .catch(err => {});
     },
-    buscarAnexoUno(){
+    buscarAnexoUno() {
+      EventBus.$emit("abreLoading");
       this.$http
         .post("/ficha_tecnica/buscar_anexo_uno", {
           id_anexo_uno: this.id_anexo_uno
         })
         .then(response => {
+          EventBus.$emit("cierraLoading");
           if (response.status == 200) {
+            console.log(response.data[0]);
             var data = response.data[0];
             this.fuentes_financiamiento = [];
-           this.id_anexo_uno = data.id_anexo_uno
-           this.id_cartera_proyecto = data.id_cartera_proyecto
-           this.id_tipo_ppi = data.id_tipo_ppi
-           this.subclasificacion_ppi = data.subclasificacion_ppi
-           this.monto_con_iva = data.monto_con_iva
-           this.monto_sin_iva = parseFloat(data.monto_sin_iva).toFixed(2)
-           this.monto_estudios = parseFloat(data.monto_estudios).toFixed(2)
-           this.fuentes_financiamiento = JSON.parse(data.fuentes_financiamiento)
-           this.fecha_inicio_ejecucion =  moment(data.fecha_inicio_ejecucion).format("YYYY-MM")
-           this.meses_ejecucion = data.meses_ejecucion
-          this.calendario_inversion =  JSON.parse(data.calendario_inversion)
-    
-          // totalCalendario: 0,
-          this.localizacion_geografica = data.localizacion_geografica
-          this.ruta_imagen_localizacion = data.ruta_imagen_localizacion
-          
+            this.id_anexo_uno = data.id_anexo_uno;
+            this.id_cartera_proyecto = data.id_cartera_proyecto;
+            this.id_tipo_ppi = data.id_tipo_ppi;
+            if (this.user.tipo_usuario == 1) {
+              this.id_cartera_proyecto = data.nombre_proyecto;
+              this.id_tipo_ppi = data.tipo;
+              this.unidad_responsable = data.descripcion;
+            }
+            this.subclasificacion_ppi = data.subclasificacion_ppi;
+            this.monto_con_iva = data.monto_con_iva;
+            this.monto_sin_iva = parseFloat(data.monto_sin_iva).toFixed(2);
+            this.monto_estudios = parseFloat(data.monto_estudios).toFixed(2);
+            this.fuentes_financiamiento = JSON.parse(
+              data.fuentes_financiamiento
+            );
+            this.fecha_inicio_ejecucion = moment(
+              data.fecha_inicio_ejecucion
+            ).format("YYYY-MM");
+            this.meses_ejecucion = data.meses_ejecucion;
+            this.calendario_inversion = JSON.parse(data.calendario_inversion);
+
+            // totalCalendario: 0,
+            this.localizacion_geografica = data.localizacion_geografica;
+            this.ruta_imagen_localizacion = data.ruta_imagen_localizacion;
+            data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
+
+            switch (data.estatus) {
+              case 2:
+                this.iconos_estatus = {
+                  color: "green lighten-1",
+                  icon: "mdi-check-bold"
+                };
+                this.estatus = "Aceptada";
+                break;
+              case 3:
+                this.iconos_estatus = {
+                  color: "red lighten-1",
+                  icon: "mdi-comment-alert"
+                };
+                this.estatus = "Errores y Observaciones";
+                this.mostrarObservaciones()
+                break;
+              default:
+                break;
+            }
           } else {
             console.log("Error", response.err);
           }
@@ -678,6 +833,9 @@ export default {
         this.calendario_inversion.splice(index, 1);
         this.snack = true;
         this.snackColor = "red lighten-1";
+        this.totalCalendario - val < 0
+          ? (this.totalCalendario = 0.0)
+          : this.totalCalendario - val;
         this.snackText =
           "Error: La suma de los montos ha superado el monto del proyecto.";
       }
@@ -712,9 +870,15 @@ export default {
             id_ficha_tecnica: data.id_ficha_tecnica,
             id_ayuntamiento: this.user.id_municipio,
             ejercicio: this.ejercicioSeleccionado,
-            id_cartera_proyecto: (typeof this.id_cartera_proyecto=='number') ? this.id_cartera_proyecto : this.id_cartera_proyecto.id_cartera_proyecto  ,
+            id_cartera_proyecto:
+              typeof this.id_cartera_proyecto == "number"
+                ? this.id_cartera_proyecto
+                : this.id_cartera_proyecto.id_cartera_proyecto,
             id_anexo_uno: this.id_anexo_uno,
-            id_tipo_ppi: (typeof this.id_tipo_ppi == 'number') ? this.id_tipo_ppi : this.id_tipo_ppi.id_tipo_ppi,
+            id_tipo_ppi:
+              typeof this.id_tipo_ppi == "number"
+                ? this.id_tipo_ppi
+                : this.id_tipo_ppi.id_tipo_ppi,
             subclasificacion_ppi: this.subclasificacion_ppi,
             monto_con_iva: this.monto_con_iva,
             monto_sin_iva: this.monto_sin_iva,
@@ -730,23 +894,26 @@ export default {
           .then(response => {
             if (response.status == 200) {
               console.log(response);
-              if(typeof response.data.id_ficha_tecnica !== 'undefined'){
+              if (typeof response.data.id_ficha_tecnica !== "undefined") {
                 this.$fire({
                   type: "success",
                   title: `Ficha Técnica guardada correctamente, Folio: ${response.data.id_ficha_tecnica}`,
                   confirmButtonText: "Cerrar",
                   confirmButtonColor: "#d33"
                 });
-                 EventBus.$emit("buscarFicha",response.data.id_ficha_tecnica)
-              }else{
-                 this.$fire({
+                EventBus.$emit(
+                  "buscarFicha",
+                  response.data.id_ficha_tecnica,
+                  this.monto_con_iva
+                );
+              } else {
+                this.$fire({
                   type: "success",
                   title: `Sección guardada correctamente`,
                   confirmButtonText: "Cerrar",
                   confirmButtonColor: "#d33"
                 });
               }
-              
             } else {
               this.$fire({
                 type: "error",
@@ -768,14 +935,128 @@ export default {
           });
       }
     },
-    verificarDatos(){
-      return true
+    validarAnexoUno(data) {
+      this.$http
+        .post("/ficha_tecnica/validar_anexo_uno", {
+          id_ficha_tecnica: data.id_ficha_tecnica,
+          id_anexo_uno: this.id_anexo_uno
+        })
+        .then(response => {
+          if (response.status == 200) {
+            this.$fire({
+              type: "success",
+              title: `Sección validada correctamente`,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+           this.iconos_estatus = {
+              color: "green lighten-1",
+              icon: "mdi-check-bold"
+            };
+            this.estatus = "Aceptada";
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
+    },
+    verificarDatos() {
+      return true;
+    },
+    agregarObservacion(seccion) {
+      var observacion_registrada = null;
+      for (let index = 0; index < this.observaciones.length; index++) {
+        if (this.observaciones[index].seccion == seccion) {
+          observacion_registrada = {
+            seccion: this.observaciones[index].seccion,
+            id_observacion: this.observaciones[index].id_observacion,
+            descripcion_observacion: this.observaciones[index]
+              .descripcion_observacion
+          };
+        }
+      }
+      EventBus.$emit("abreDialogObservacion", seccion, observacion_registrada);
+    },
+    registrarObservaciones(observacion) {
+      var bandera = false;
+      for (let index = 0; index < this.observaciones.length; index++) {
+        if (this.observaciones[index].seccion == observacion.seccion) {
+          this.observaciones[index].id_observacion = observacion.id_observacion;
+          this.observaciones[index].descripcion_observacion =
+            observacion.descripcion_observacion;
+          bandera = true;
+        }
+      }
+      if (!bandera) {
+        this.observaciones.push(observacion);
+      }
+    },
+    guardarObservaciones() {
+      this.$http
+        .post("/ficha_tecnica/guardar_observaciones_anexo_uno", {
+          id_anexo_uno: this.id_anexo_uno,
+          observaciones: JSON.stringify(this.observaciones)
+        })
+        .then(response => {
+          if (response.status == 200) {
+            this.$fire({
+              type: "success",
+              title: `Observaciones de la sección I guardadas correctamente.`,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+            this.iconos_estatus = {
+                  color: "red lighten-1",
+                  icon: "mdi-comment-alert"
+                };
+                this.estatus = "Errores y Observaciones";
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
+    },
+    mostrarObservaciones(){
+      this.observaciones.forEach(element => {
+        
+      });
     },
     emiteEvento(tipo) {}
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");
     EventBus.$off("cargaAnexoUno");
+    EventBus.$off("validarSeccion");
+    EventBus.$off("emitirObservaciones");
+    EventBus.$off("guardarObservaciones");
   }
 };
 </script>

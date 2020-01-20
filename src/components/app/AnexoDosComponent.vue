@@ -1,13 +1,35 @@
 <template>
   <v-container fluid class="pa-0">
+    <v-row v-if="estatus !== 'En Edición'">
+      <v-col cols="12" md="3" offset-md="4" class="column">
+        <v-text-field
+          v-model="estatus"
+          outlined
+          readonly
+          label="Estatus de la Sección"
+          type="text"
+        >
+          <template v-slot:prepend>
+            <v-icon :color="iconos_estatus.color">{{
+              iconos_estatus.icon
+            }}</v-icon>
+          </template>
+        </v-text-field>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="12">
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Alineación estratégica</v-toolbar-title>
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('alineacion_estrategica')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -17,7 +39,7 @@
               hide-default-footer
               class="tablaAlternativas"
             >
-              <template v-slot:item.programa="props">
+              <template v-slot:item.programa="props" v-if="visible">
                 <v-edit-dialog
                   :return-value.sync="props.item.programa"
                   @save="save"
@@ -44,7 +66,7 @@
                   </template>
                 </v-edit-dialog>
               </template>
-              <template v-slot:item.objetivoEstrategia="props">
+              <template v-slot:item.objetivoEstrategia="props" v-if="visible">
                 <v-edit-dialog
                   :return-value.sync="props.item.objetivoEstrategia"
                   @save="save"
@@ -71,7 +93,7 @@
                   </template>
                 </v-edit-dialog>
               </template>
-              <template v-slot:item.lineaAccion="props">
+              <template v-slot:item.lineaAccion="props" v-if="visible">
                 <v-edit-dialog
                   :return-value.sync="props.item.lineaAccion"
                   @save="save"
@@ -117,8 +139,13 @@
               relacionados</v-toolbar-title
             >
             <v-spacer></v-spacer>
-            <v-btn icon>
-              <v-icon>mdi-dots-vertical</v-icon>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('programas_proyectos_complementarios')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -133,6 +160,7 @@
                   maxlength="280"
                   counter="280"
                   v-model="proyecto_complementario"
+                  :disabled="!visible"
                 ></v-textarea>
               </v-col>
               <v-col cols="7">
@@ -145,6 +173,7 @@
                   maxlength="280"
                   counter="280"
                   v-model="relacion_complementaria"
+                  :disabled="!visible"
                 ></v-textarea>
               </v-col>
             </v-row>
@@ -158,27 +187,45 @@
 import { EventBus } from "../../utils/event-bus";
 
 export default {
-  props:['ficha_tecnica'],
-  mounted() {
+  props: ["ficha_tecnica"],
+  beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
     if (this.ficha_tecnica.id_anexo_dos !== null) {
       this.id_anexo_dos = this.ficha_tecnica.id_anexo_dos;
       this.buscarAnexoDos();
     }
 
+    if (this.ficha_tecnica.estatus == 2 || this.ficha_tecnica.estatus == 3) {
+      this.visible = false;
+    }
+  },
+  mounted() {
     EventBus.$on("guardarFicha", data => {
       this.guardarAnexoDos(data);
-      // console.log("Guardar Anexo 1", data.id_ficha_tecnica)
+    });
+
+    //FEFOM
+    EventBus.$on("validarSeccion", data => {
+      this.validarAnexoDos(data);
+    });
+    EventBus.$on("emitirObservaciones", data => {
+      this.registrarObservaciones(data);
+    });
+    EventBus.$on("guardarObservaciones", data => {
+      this.guardarObservaciones(data);
     });
   },
   data() {
     return {
+      user: null,
+      iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
       id_anexo_dos: null,
       snack: false,
       snackColor: "",
       snackText: "",
       max280chars: v => v.length <= 280 || "Input too long!",
       pagination: {},
+      visible: true,
       headers: [
         {
           text: "Programa(s) Relacionado(s)",
@@ -221,21 +268,50 @@ export default {
       ],
       proyecto_complementario: null,
       relacion_complementaria: null,
+      estatus: "En Edición",
+      observaciones: []
     };
   },
   methods: {
-    buscarAnexoDos(){
+    buscarAnexoDos() {
+      EventBus.$emit("abreLoading");
       this.$http
         .post("/ficha_tecnica/buscar_anexo_dos", {
           id_anexo_dos: this.id_anexo_dos
         })
         .then(response => {
+          EventBus.$emit("cierraLoading");
           if (response.status == 200) {
-            var data = response.data[0]
-            console.log(data)
-            this.alineacion_estrategica = JSON.parse(data.alineacion_estrategica)
-            this.proyecto_complementario = data.proyecto_complementario
-            this.relacion_complementaria = data.relacion_complementaria
+            var data = response.data[0];
+            console.log(data);
+            this.alineacion_estrategica = JSON.parse(
+              data.alineacion_estrategica
+            );
+            this.proyecto_complementario = data.proyecto_complementario;
+            this.relacion_complementaria = data.relacion_complementaria;
+
+            switch (data.estatus) {
+              case 2:
+                this.iconos_estatus = {
+                  color: "green lighten-1",
+                  icon: "mdi-check-bold"
+                };
+                this.estatus = "Aceptada";
+                break;
+              case 3:
+                this.iconos_estatus = {
+                  color: "red lighten-1",
+                  icon: "mdi-comment-alert"
+                };
+                this.estatus = "Errores y Observaciones";
+                break;
+              default:
+                break;
+            }
+
+            data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
           } else {
             console.log("Error", response.err);
           }
@@ -265,23 +341,26 @@ export default {
     guardarAnexoDos(data) {
       if (this.verificarDatos()) {
         this.$http
-          .post("/ficha_tecnica/guardar_anexo_dos", { 
-            id_ficha_tecnica:  this.ficha_tecnica.id_ficha_tecnica,
+          .post("/ficha_tecnica/guardar_anexo_dos", {
+            id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
             id_anexo_dos: this.ficha_tecnica.id_anexo_dos,
             alineacion_estrategica: JSON.stringify(this.alineacion_estrategica),
             proyecto_complementario: this.proyecto_complementario,
-            relacion_complementaria: this.relacion_complementaria,
+            relacion_complementaria: this.relacion_complementaria
           })
           .then(response => {
             if (response.status == 200) {
               // console.log(response);
-              EventBus.$emit("actualizaPropAnexoDos",response.data.id_anexo_dos)
-               this.$fire({
-                  type: "success",
-                  title: "Sección guardada correctamente",
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
+              EventBus.$emit(
+                "actualizaPropAnexoDos",
+                response.data.id_anexo_dos
+              );
+              this.$fire({
+                type: "success",
+                title: "Sección guardada correctamente",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
             } else {
               this.$fire({
                 type: "error",
@@ -305,10 +384,118 @@ export default {
     },
     verificarDatos() {
       return true;
+    },
+    validarAnexoDos(data) {
+      this.$http
+        .post("/ficha_tecnica/validar_anexo_dos", {
+          id_anexo_dos: this.id_anexo_dos
+        })
+        .then(response => {
+          if (response.status == 200) {
+            this.$fire({
+              type: "success",
+              title: `Sección validada correctamente`,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+            this.iconos_estatus = {
+              color: "green lighten-1",
+              icon: "mdi-check-bold"
+            };
+            this.estatus = "Aceptada";
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
+    },
+    agregarObservacion(seccion) {
+      var observacion_registrada = null;
+      for (let index = 0; index < this.observaciones.length; index++) {
+        if (this.observaciones[index].seccion == seccion) {
+          observacion_registrada = {
+            seccion: this.observaciones[index].seccion,
+            id_observacion: this.observaciones[index].id_observacion,
+            descripcion_observacion: this.observaciones[index]
+              .descripcion_observacion
+          };
+        }
+      }
+      EventBus.$emit("abreDialogObservacion", seccion, observacion_registrada);
+    },
+    registrarObservaciones(observacion) {
+      var bandera = false;
+      for (let index = 0; index < this.observaciones.length; index++) {
+        if (this.observaciones[index].seccion == observacion.seccion) {
+          this.observaciones[index].id_observacion = observacion.id_observacion;
+          this.observaciones[index].descripcion_observacion =
+            observacion.descripcion_observacion;
+          bandera = true;
+        }
+      }
+      if (!bandera) {
+        this.observaciones.push(observacion);
+      }
+    },
+    guardarObservaciones() {
+      this.$http
+        .post("/ficha_tecnica/guardar_observaciones_anexo_dos", {
+          id_anexo_dos: this.id_anexo_dos,
+          observaciones: JSON.stringify(this.observaciones)
+        })
+        .then(response => {
+          if (response.status == 200) {
+            this.$fire({
+              type: "success",
+              title: `Observaciones de la sección II guardadas correctamente.`,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+            this.iconos_estatus = {
+                  color: "red lighten-1",
+                  icon: "mdi-comment-alert"
+                };
+                this.estatus = "Errores y Observaciones";
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
     }
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");
+    EventBus.$off("validarSeccion");
+    EventBus.$off("emitirObservaciones");
+    EventBus.$off("guardarObservaciones");
   }
 };
 </script>

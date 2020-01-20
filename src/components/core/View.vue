@@ -25,6 +25,7 @@
 </template>
 
 <script>
+import { EventBus } from "../../utils/event-bus";
 export default {
   created() {
     localStorage.getItem("jwt") == null
@@ -42,7 +43,8 @@ export default {
   },
   data() {
     return {
-      loginView: true
+      loginView: true,
+      dialogLoading: true,
     };
   },
   watch: {
@@ -58,6 +60,6 @@ export default {
         this.loginView = true;
       }
     }
-  }
+  },
 };
 </script>

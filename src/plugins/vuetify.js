@@ -5,17 +5,26 @@ Vue.use(Vuetify)
 
 export default new Vuetify({
   theme: {
+    disable: true,
     themes: {
       light: {
         primary: '#4caf50',
-        secondary: '#4caf50',
-        tertiary: '#495057',
-        accent: '#82B1FF',
-        error: '#f55a4e',
-        info: '#00d3ee',
-        success: '#5cb860',
-        warning: '#ffa21a'
-      }
+        secondary: '#2196f3',
+        accent: '#009688',
+        error: '#f44336',
+        warning: '#ffeb3b',
+        info: '#cddc39',
+        success: '#8bc34a'
+        },
+        dark: {
+          primary: '#4caf50',
+        secondary: '#2196f3',
+        accent: '#009688',
+        error: '#f44336',
+        warning: '#ffeb3b',
+        info: '#cddc39',
+        success: '#8bc34a'
+        },
     }
   },
   icons: {

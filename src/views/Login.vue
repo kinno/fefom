@@ -8,6 +8,14 @@
             :append-icon="showPassword ? 'mdi-eye' : 'mdi-eye-off'" @click:append="showPassword = !showPassword"
             v-model="password" />
         </v-form>
+         <material-notification
+            class="mb-3"
+            color="red"
+            :dismissible="false"
+            v-model="alertError.show"
+          >
+            <strong>Error</strong> - {{alertError.mensaje}}
+          </material-notification>
       </v-card-text>
       <v-card-actions>
       <v-spacer></v-spacer>
@@ -47,6 +55,10 @@
         showPassword: false,
         userName: "",
         password: "",
+        alertError: {
+          mensaje: "",
+          show : false,
+        },
       }
     },
     methods: {
@@ -58,26 +70,33 @@
               password: this.password
             })
             .then(response => {
-              console.log(response.data.user)
-              let is_fefom = response.data.user.tipo_usuario
-              localStorage.setItem('user', JSON.stringify(response.data.user))
-              localStorage.setItem('jwt', response.data.token)
+              if(response.status == 404){
+                this.error.mensaje = response
+                this.error.show = true
+              }else{
+                console.log(response.data.user)
+                this.alertError.show = false
+                let is_fefom = response.data.user.tipo_usuario
+                localStorage.setItem('user', JSON.stringify(response.data.user))
+                localStorage.setItem('jwt', response.data.token)
 
-              if (localStorage.getItem('jwt') != null) {
-                this.$emit('loggedIn')
-                if (this.$route.params.nextUrl != null) {
-                  this.$router.push(this.$route.params.nextUrl)
-                } else {
-                  // if (is_fefom == 1) {
-                  //   this.$router.push('admin')
-                  // } else {
-                    this.$router.push('dashboard')
-                  // }
+                if (localStorage.getItem('jwt') != null) {
+                  this.$emit('loggedIn')
+                  if (this.$route.params.nextUrl != null) {
+                    this.$router.push(this.$route.params.nextUrl)
+                  } else {
+                    // if (is_fefom == 1) {
+                    //   this.$router.push('admin')
+                    // } else {
+                      this.$router.push('dashboard')
+                    // }
+                  }
                 }
               }
             })
-            .catch(function (error) {
-              console.error(error.response);
+            .catch((error)=>{
+              this.alertError.mensaje = error.response.data
+              this.alertError.show = true
             });
         }
       }

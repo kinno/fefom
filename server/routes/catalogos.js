@@ -54,6 +54,16 @@ Router.get("/get_tipo_ppi", (req, res) => {
   })
 })
 
+Router.get("/get_catalogo_observaciones", (req, res) => {
+  connection.query("Select * from cat_observaciones", (err, rows, fields) => {
+    if (err) return res.status(500).send('Error del servidor.' + err);
+    if (rows.length < 1) return res.status(404).send('Datos Incorrentos.');
+    res.status(200).json({
+      rows
+    });
+  })
+})
+
 Router.post('/registrar_usuario', function(req, res) {
     console.log(req.body)
     var user = req.body

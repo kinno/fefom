@@ -136,6 +136,19 @@ export default {
         {
           icon: "mdi-menu-up",
           "icon-alt": "mdi-menu-right",
+          text: "Ficha Técnica",
+          model: false,
+          children: [
+            {
+              icon: "mdi-checkbox-multiple-blank-circle-outline",
+              text: "Revisión",
+              to: "/revision_ficha_tecnica"
+            }
+          ]
+        },
+        {
+          icon: "mdi-menu-up",
+          "icon-alt": "mdi-menu-right",
           text: "Oficios",
           model: false,
           children: [

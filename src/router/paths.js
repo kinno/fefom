@@ -10,6 +10,7 @@ import ConsultaTechos from '../views/ConsultaTechos'
 import CarteraProyectos from '../views/CarteraProyectos'
 import RevisionCartera from '../views/RevisionCarteraProyectos'
 import FichaTecnica from '../views/FichaTecnica'
+import RevisionFichaTecnica from '../views/RevisionFichaTecnica'
 import Oficios from '../views/Oficios'
 import Catalogos from '../views/Catalogos'
 import Usuarios from '../components/app/UsuariosComponent'
@@ -73,6 +74,15 @@ export default [{
     meta: {
       requiresAuth: true,
       requiresFefom: false,
+    },
+  },
+  {
+    path: '/revision_ficha_tecnica',
+    name: 'Rvisión Ficha Tecnica',
+    component: RevisionFichaTecnica,
+    meta: {
+      requiresAuth: true,
+      requiresFefom: true,
     },
   },
   {

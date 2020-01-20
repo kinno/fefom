@@ -1,5 +1,22 @@
 <template>
   <v-container fluid class="pa-0">
+    <v-row v-if="estatus !== 'En Edición'">
+      <v-col cols="12" md="3" offset-md="4" class="column">
+        <v-text-field
+          v-model="estatus"
+          outlined
+          readonly
+          label="Estatus de la Sección"
+          type="text"
+        >
+          <template v-slot:prepend>
+            <v-icon :color="iconos_estatus.color">{{
+              iconos_estatus.icon
+            }}</v-icon>
+          </template>
+        </v-text-field>
+      </v-col>
+    </v-row>
     <v-row>
       <v-col cols="12">
         <v-card outlined>
@@ -7,6 +24,15 @@
             <v-toolbar-title>
               Identificación de costos
             </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('identificacion_costos')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -17,7 +43,7 @@
                   hide-default-footer
                   class="tablaAlternativas"
                 >
-                  <template v-slot:item.descripcion="props">
+                  <template v-slot:item.descripcion="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.descripcion"
                       @save="save"
@@ -45,7 +71,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.cuantificacion="props">
+                  <template v-slot:item.cuantificacion="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.cuantificacion"
                       @save="save"
@@ -67,7 +93,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.valoracion="props">
+                  <template v-slot:item.valoracion="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.valoracion"
                       @save="save"
@@ -90,7 +116,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.periodicidad="props">
+                  <template v-slot:item.periodicidad="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.periodicidad"
                       @save="save"
@@ -131,13 +157,22 @@
             <v-toolbar-title>
               Identificación de Beneficios
             </v-toolbar-title>
+            <v-spacer></v-spacer>
+            <v-btn
+              v-if="user.tipo_usuario == 1"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('identificacion_beneficios')"
+            >
+              <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
               <v-spacer></v-spacer>
               <v-col cols="12" md="3" class="column">
                 <div class="my-2">
-                  <v-btn text color="green brighten-5" @click="agregarBeneficio"
+                  <v-btn text color="green brighten-5" @click="agregarBeneficio" v-if="visible"
                     >+ Agregar beneficio</v-btn
                   >
                 </div>
@@ -151,7 +186,7 @@
                   hide-default-footer
                   class="tablaAlternativas"
                 >
-                  <template v-slot:item.beneficio="props">
+                  <template v-slot:item.beneficio="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.beneficio"
                       @save="save"
@@ -179,7 +214,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.descripcion="props">
+                  <template v-slot:item.descripcion="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.descripcion"
                       @save="save"
@@ -207,7 +242,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.cuantificacion="props">
+                  <template v-slot:item.cuantificacion="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.cuantificacion"
                       @save="save"
@@ -229,7 +264,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.valoracion="props">
+                  <template v-slot:item.valoracion="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.valoracion"
                       @save="save"
@@ -252,7 +287,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.periodicidad="props">
+                  <template v-slot:item.periodicidad="props" v-if="visible">
                     <v-edit-dialog
                       :return-value.sync="props.item.periodicidad"
                       @save="save"
@@ -274,7 +309,7 @@
                       </template>
                     </v-edit-dialog>
                   </template>
-                  <template v-slot:item.accion="{ item }">
+                  <template v-slot:item.accion="{ item }" v-if="visible">
                     <v-icon @click="deleteItem(item)" color="red darken-1">
                       mdi-delete-forever
                     </v-icon>
@@ -296,17 +331,44 @@
 import { EventBus } from "../../utils/event-bus";
 
 export default {
-  mounted() {
+  props: ["ficha_tecnica"],
+  beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
-    // this.initialize();
+    if (this.ficha_tecnica.id_anexo_siete !== null) {
+      this.id_anexo_siete = this.ficha_tecnica.id_anexo_siete;
+      this.buscarAnexoSiete();
+    }
+
+     if (this.ficha_tecnica.estatus == 2 || this.ficha_tecnica.estatus == 3) {
+      this.visible = false;
+    }
+  },
+  mounted() {
+    EventBus.$on("guardarFicha", data => {
+      this.guardarAnexoSiete(data);
+    });
+
+    //FEFOM
+    EventBus.$on("validarSeccion", data => {
+      this.validarAnexoSiete(data);
+    });
+    EventBus.$on("emitirObservaciones", data => {
+      this.registrarObservaciones(data);
+    });
+    EventBus.$on("guardarObservaciones", data => {
+      this.guardarObservaciones(data);
+    });
   },
   data() {
     return {
+      user: null,
+      id_anexo_siete: null,
       snack: false,
       snackColor: "",
       snackText: "",
       max280chars: v => v.length <= 280 || "Input too long!",
       pagination: {},
+      visible: true,
       headersCostos: [
         {
           text: "Tipo de Costo",
@@ -411,7 +473,10 @@ export default {
           periodicidad: "editar"
         }
       ],
-      beneficios: []
+      beneficios: [],
+      iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
+      estatus: "En Edición",
+      observaciones: []
     };
   },
   methods: {
@@ -445,7 +510,207 @@ export default {
     deleteItem(item) {
       const index = this.beneficios.indexOf(item);
       this.beneficios.splice(index, 1);
+    },
+    buscarAnexoSiete() {
+      EventBus.$emit("abreLoading");
+      this.$http
+        .post("/ficha_tecnica/buscar_anexo_siete", {
+          id_anexo_siete: this.id_anexo_siete
+        })
+        .then(response => {
+          EventBus.$emit("cierraLoading");
+          if (response.status == 200) {
+            var data = response.data[0];
+            console.log(data);
+            this.costos = JSON.parse(data.costos);
+            this.beneficios = JSON.parse(data.beneficios);
+            switch (data.estatus) {
+              case 2:
+                this.iconos_estatus = {
+                  color: "green lighten-1",
+                  icon: "mdi-check-bold"
+                };
+                this.estatus = "Aceptada";
+                break;
+              case 3:
+                this.iconos_estatus = {
+                  color: "red lighten-1",
+                  icon: "mdi-comment-alert"
+                };
+                this.estatus = "Errores y Observaciones";
+                break;
+              default:
+                break;
+            }
+
+            data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
+          } else {
+            console.log("Error", response.err);
+          }
+        })
+        .catch(error => {
+          console.error(error);
+        });
+    },
+    guardarAnexoSiete(data) {
+      if (this.verificarDatos()) {
+        this.$http
+          .post("/ficha_tecnica/guardar_anexo_siete", {
+            id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
+            id_anexo_siete: this.ficha_tecnica.id_anexo_siete,
+            costos: JSON.stringify(this.costos),
+            beneficios: JSON.stringify(this.beneficios)
+          })
+          .then(response => {
+            if (response.status == 200) {
+              
+              EventBus.$emit(
+                "actualizaPropAnexoSiete",
+                response.data.id_anexo_siete
+              );
+              this.$fire({
+                type: "success",
+                title: "Sección guardada correctamente",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
+            } else {
+              this.$fire({
+                type: "error",
+                title: "Error",
+                text: response.err,
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
+            }
+          })
+          .catch(error => {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: error,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          });
+      }
+    },
+    validarAnexoSiete(data) {
+      this.$http
+        .post("/ficha_tecnica/validar_anexo_siete", {
+          id_anexo_siete: this.id_anexo_siete
+        })
+        .then(response => {
+          if (response.status == 200) {
+            this.$fire({
+              type: "success",
+              title: `Sección validada correctamente`,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+            this.iconos_estatus = {
+              color: "green lighten-1",
+              icon: "mdi-check-bold"
+            };
+            this.estatus = "Aceptada";
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
+    },
+    agregarObservacion(seccion) {
+      var observacion_registrada = null;
+      for (let index = 0; index < this.observaciones.length; index++) {
+        if (this.observaciones[index].seccion == seccion) {
+          observacion_registrada = {
+            seccion: this.observaciones[index].seccion,
+            id_observacion: this.observaciones[index].id_observacion,
+            descripcion_observacion: this.observaciones[index]
+              .descripcion_observacion
+          };
+        }
+      }
+      EventBus.$emit("abreDialogObservacion", seccion, observacion_registrada);
+    },
+    registrarObservaciones(observacion) {
+      var bandera = false;
+      for (let index = 0; index < this.observaciones.length; index++) {
+        if (this.observaciones[index].seccion == observacion.seccion) {
+          this.observaciones[index].id_observacion = observacion.id_observacion;
+          this.observaciones[index].descripcion_observacion =
+            observacion.descripcion_observacion;
+          bandera = true;
+        }
+      }
+      if (!bandera) {
+        this.observaciones.push(observacion);
+      }
+    },
+    guardarObservaciones() {
+      this.$http
+        .post("/ficha_tecnica/guardar_observaciones_anexo_siete", {
+          id_anexo_siete: this.id_anexo_siete,
+          observaciones: JSON.stringify(this.observaciones)
+        })
+        .then(response => {
+          if (response.status == 200) {
+            this.$fire({
+              type: "success",
+              title: `Observaciones de la sección VII guardadas correctamente.`,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+            this.iconos_estatus = {
+              color: "red lighten-1",
+              icon: "mdi-comment-alert"
+            };
+            this.estatus = "Errores y Observaciones";
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
+    },
+    verificarDatos() {
+      return true;
     }
+  },
+   beforeDestroy() {
+    EventBus.$off("guardarFicha");
+    EventBus.$off("validarSeccion");
+    EventBus.$off("emitirObservaciones");
+    EventBus.$off("guardarObservaciones");
   }
 };
 </script>
