@@ -89,13 +89,13 @@ Router.post("/upload", upload.single("file"), async (req, res) => {
           [excel[0].data[index][0].toUpperCase()],
           (err, rows, fields) => {
             if (err) return res.status(500).send("Error del servidor." + err);
-            if (rows.length < 1)
-              return res.status(404).send("Datos Incorrentos.");
-            var id_municipio = rows[0].id;
+            // if (rows.length < 1) return res.status(404).send("No existe el municipio en la base.");
+            if (rows.length >= 1){
+              var id_municipio = rows[0].id_municipio;
               var query = `insert into tbl_techos_financieros
-              (id_municipio, ejercicio, monto_total, monto_iluminacion_municipal, porc_iluminacion_municipal, monto_seguridad, porc_seguridad, monto_inversion_publica, porc_inversion_publica, monto_desarrollo, porc_desarrollo, monto_no_etiquetado, porc_no_etiquetado)
+              (id_municipio, ejercicio, monto_total, monto_iluminacion_municipal, porc_iluminacion_municipal, monto_seguridad, porc_seguridad, monto_inversion_publica, porc_inversion_publica, monto_desarrollo, porc_desarrollo,monto_proteccion_civil, porc_proteccion_civil, monto_no_etiquetado, porc_no_etiquetado, monto_retencion, porc_retencion)
                values
-               (?,?,?,?,?,?,?,?,?,?,?,?,?)`
+               (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`
               connection.query(query ,
                 [id_municipio,
                   req.body.ejercicio,
@@ -109,11 +109,17 @@ Router.post("/upload", upload.single("file"), async (req, res) => {
                   excel[0].data[index][8] ,
                   excel[0].data[index][9] * 100,
                   excel[0].data[index][10] ,
-                  excel[0].data[index][11] * 100
-                ], (err, rows, fields) => {
+                  excel[0].data[index][11] * 100,
+                  excel[0].data[index][12] ,
+                  excel[0].data[index][13] * 100,
+                  excel[0].data[index][14] ,
+                  excel[0].data[index][15] * 100
+                ], function(err, result, fields){
                   if (err) return res.status(500).send('Error del servidor.' + err);
                   if (rows.length < 1) return res.status(404).send('Datos Incorrentos.');
+                 
               })
+            }
           }
         );
       }

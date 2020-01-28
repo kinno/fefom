@@ -18,80 +18,27 @@
       </v-col>
     </v-row>
     <v-row>
-      <v-col cols="12">
+      <v-col cols="12" md="6">
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
-            <v-toolbar-title>Posibles medidas de optimización</v-toolbar-title>
+            <v-toolbar-title>Consideraciones Generales</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('posibles_medidas_optimizacion')"
+              @click="agregarObservacion('consideraciones_generales')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
             <v-btn
-              v-if="user.tipo_usuario == 2 && obs_posibles_medidas_optimizacion.observacion !== null"
+              v-if="
+                user.tipo_usuario == 2 &&
+                  obs_consideraciones_generales.observacion !== null
+              "
               icon
               color="red lighten-1"
-              @click="agregarObservacion('posibles_medidas_optimizacion')"
-            >
-              <v-icon dark>mdi-message-alert</v-icon>
-            </v-btn>
-          </v-toolbar>
-          <v-card-text>
-            <v-row>
-              <v-col cols="6" class="column">
-                <v-textarea
-                  label="Medida:"
-                  auto-grow
-                  outlined
-                  rows="5"
-                  row-height="15"
-                  maxlength="1000"
-                  counter="1000"
-                  v-model="medida_optimizacion"
-                  :disabled="!visible"
-                ></v-textarea>
-              </v-col>
-              <v-col cols="6" class="column">
-                <v-textarea
-                  label="Descripción:"
-                  auto-grow
-                  outlined
-                  rows="5"
-                  row-height="15"
-                  maxlength="1000"
-                  counter="1000"
-                  v-model="descripcion_optimizacion"
-                  :disabled="!visible"
-                ></v-textarea>
-              </v-col>
-            </v-row>
-          </v-card-text>
-        </v-card>
-      </v-col>
-    </v-row>
-    <v-row>
-      <v-col cols="6">
-        <v-card outlined>
-          <v-toolbar dense flat color="grey lighten-2">
-            <v-toolbar-title class="subtitle-2 text-center">Análisis de la oferta sin proyecto* (considerando medidas de optimización)</v-toolbar-title>
-            <v-spacer></v-spacer>
-            <v-btn
-              v-if="user.tipo_usuario == 1"
-              icon
-              color="red lighten-1"
-              @click="agregarObservacion('analisis_oferta_sin_proyecto')"
-            >
-              <v-icon dark>mdi-comment-remove-outline</v-icon>
-            </v-btn>
-            <v-btn
-              v-if="user.tipo_usuario == 2 && obs_analisis_oferta_sin_proyecto.observacion !== null"
-              icon
-              color="red lighten-1"
-              @click="agregarObservacion('analisis_oferta_sin_proyecto')"
+              @click="agregarObservacion('consideraciones_generales')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -100,13 +47,14 @@
             <v-row>
               <v-col cols="12" class="column">
                 <v-textarea
+                  label="Comentarios Finales:"
                   auto-grow
                   outlined
-                  rows="5"
-                  row-height="15"
+                  rows="10"
+                  row-height="30"
                   maxlength="1000"
                   counter="1000"
-                  v-model="analisis_oferta_sin_proyecto"
+                  v-model="comentarios_finales"
                   :disabled="!visible"
                 ></v-textarea>
               </v-col>
@@ -114,43 +62,90 @@
           </v-card-text>
         </v-card>
       </v-col>
-      <v-col cols="6">
+      <v-col cols="12" md="6">
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
-            <v-toolbar-title class="subtitle-2 text-center">Análisis de la demanda sin proyecto* (considerando medidas de optimización)</v-toolbar-title>
+            <v-toolbar-title>Responsables de la Información</v-toolbar-title>
             <v-spacer></v-spacer>
             <v-btn
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('analisis_demanda_sin_proyecto')"
+              @click="agregarObservacion('responables_informacion')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
             <v-btn
-              v-if="user.tipo_usuario == 2 && obs_analisis_demanda_sin_proyecto.observacion !== null"
+              v-if="
+                user.tipo_usuario == 2 &&
+                  obs_responsables_informacion.observacion !== null
+              "
               icon
               color="red lighten-1"
-              @click="agregarObservacion('analisis_demanda_sin_proyecto')"
+              @click="agregarObservacion('responables_informacion')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
-            <v-row>
-              <v-col cols="12" class="column">
-                <v-textarea
-                  auto-grow
-                  outlined
-                  rows="5"
-                  row-height="15"
-                  maxlength="1000"
-                  counter="1000"
-                  v-model="analisis_demanda_sin_proyecto"
-                  :disabled="!visible"
-                ></v-textarea>
-              </v-col>
-            </v-row>
+            <v-container fluid>
+              <v-row>
+                <v-col cols="12" class="pt-0">
+                  <v-text-field
+                    v-model="ramo"
+                    label="Ramo"
+                    dense
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="entidad"
+                    label="Entidad"
+                    dense
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="area_responsable"
+                    label="Área Responsable:"
+                    dense
+                  ></v-text-field>
+                  <v-card>
+                    <v-card-text>
+                      <div class="overline mb-4">Autorizó</div>
+                      <v-text-field
+                        v-model="nombre"
+                        label="Nombre:"
+                        dense
+                      ></v-text-field>
+                      <v-text-field
+                        v-model="cargo"
+                        label="Cargo:"
+                        dense
+                      ></v-text-field>
+                    </v-card-text>
+                  </v-card>
+
+                  <v-text-field
+                    v-model="responsable_informacion"
+                    label="Responsable de la Información:"
+                    dense
+                    class="mt-5"
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="cargo_responsable_informacion"
+                    label="Cargo:"
+                    dense
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="telefono_responsable_informacion"
+                    label="Teléfono:"
+                    dense
+                  ></v-text-field>
+                  <v-text-field
+                    v-model="email_responsable_informacion"
+                    label="Correo Electrónico:"
+                    dense
+                  ></v-text-field>
+                </v-col>
+              </v-row>
+            </v-container>
           </v-card-text>
         </v-card>
       </v-col>
@@ -158,29 +153,29 @@
   </v-container>
 </template>
 <script>
-import {EventBus} from '../../utils/event-bus'
+import { EventBus } from "../../utils/event-bus";
 
 export default {
-  props:['ficha_tecnica'],
+  props: ["ficha_tecnica"],
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
-   if (this.ficha_tecnica.id_anexo_cuatro !== null) {
-      this.id_anexo_cuatro = this.ficha_tecnica.id_anexo_cuatro;
-      this.buscarAnexoCuatro();
+    if (this.ficha_tecnica.id_anexo_ocho !== null) {
+      this.id_anexo_ocho = this.ficha_tecnica.id_anexo_ocho;
+      this.buscarAnexoOcho();
     }
 
-     if (this.ficha_tecnica.estatus == 2 || this.ficha_tecnica.estatus == 3) {
+    if (this.ficha_tecnica.estatus == 2 || this.ficha_tecnica.estatus == 3) {
       this.visible = false;
     }
   },
   mounted() {
-     EventBus.$on("guardarFicha", data => {
-      this.guardarAnexoCuatro(data);
+    EventBus.$on("guardarFicha", data => {
+      this.guardarAnexoOcho(data);
     });
 
     //FEFOM
     EventBus.$on("validarSeccion", data => {
-      this.validarAnexoCuatro(data);
+      this.validarAnexoOcho(data);
     });
     EventBus.$on("emitirObservaciones", data => {
       this.registrarObservaciones(data);
@@ -191,49 +186,57 @@ export default {
   },
   data: () => ({
     user: null,
-    id_anexo_cuatro: null,
-    medida_optimizacion: "",
-    descripcion_optimizacion: "",
-    analisis_oferta_sin_proyecto: "",
-    analisis_demanda_sin_proyecto: "",
-    tab: null,
-    showTab: false,
+    id_anexo_ocho: null,
+    comentarios_finales: "",
+    ramo: "",
+    entidad: "",
+    area_responsable: "",
+    nombre: "",
+    cargo: "",
+    responsable_informacion: "",
+    cargo_responsable_informacion: "",
+    telefono_responsable_informacion: "",
+    email_responsable_informacion: "",
+
     visible: true,
-     iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
-     estatus: "En Edición",
-      observaciones: [],
-      obs_posibles_medidas_optimizacion:{
-        observacion: null,
-        id_observacion: null,
-      },
-      obs_analisis_oferta_sin_proyecto:{
-        observacion: null,
-        id_observacion: null,
-      },
-      obs_analisis_demanda_sin_proyecto:{
-        observacion: null,
-        id_observacion: null,
-      },
+    iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
+    estatus: "En Edición",
+    observaciones: [],
+    obs_consideraciones_generales: {
+      observacion: null,
+      id_observacion: null
+    },
+    obs_responsables_informacion: {
+      observacion: null,
+      id_observacion: null
+    }
   }),
-  watch: {
-     
-  },
+  watch: {},
   methods: {
-   buscarAnexoCuatro(){
-     EventBus.$emit("abreLoading");
+    buscarAnexoOcho() {
+      EventBus.$emit("abreLoading");
       this.$http
-        .post("/ficha_tecnica/buscar_anexo_cuatro", {
-          id_anexo_cuatro: this.id_anexo_cuatro
+        .post("/ficha_tecnica/buscar_anexo_ocho", {
+          id_anexo_ocho: this.id_anexo_ocho
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
           if (response.status == 200) {
-            var data = response.data[0]
-            console.log(data)
-            this.medida_optimizacion = data.medida_optimizacion
-            this.descripcion_optimizacion = data.descripcion_optimizacion
-            this.analisis_oferta_sin_proyecto = data.analisis_oferta_sin_proyecto
-            this.analisis_demanda_sin_proyecto = data.analisis_demanda_sin_proyecto
+            var data = response.data[0];
+            console.log(data);
+            this.comentarios_finales = data.comentarios_finales;
+            this.ramo = data.ramo;
+            this.entidad = data.entidad;
+            this.area_responsable = data.area_responsable;
+            this.nombre = data.nombre;
+            this.cargo = data.cargo;
+            this.responsable_informacion = data.responsable_informacion;
+            this.cargo_responsable_informacion =
+              data.cargo_responsable_informacion;
+            this.telefono_responsable_informacion =
+              data.telefono_responsable_informacion;
+            this.email_responsable_informacion =
+              data.email_responsable_informacion;
 
             data.observaciones !== null
               ? (this.observaciones = JSON.parse(data.observaciones))
@@ -246,7 +249,7 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
-                if(this.ficha_tecnica.estatus == 4){
+                if (this.ficha_tecnica.estatus == 4) {
                   this.visible = false;
                 }
                 break;
@@ -256,8 +259,8 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
-                if(this.ficha_tecnica.estatus == 4){
-                  this.mostrarObservaciones()
+                if (this.ficha_tecnica.estatus == 4) {
+                  this.mostrarObservaciones();
                 }
                 break;
               default:
@@ -271,28 +274,36 @@ export default {
           console.error(error);
         });
     },
-    guardarAnexoCuatro(data) {
+    guardarAnexoOcho(data) {
       if (this.verificarDatos()) {
         this.$http
-          .post("/ficha_tecnica/guardar_anexo_cuatro", { 
-            id_ficha_tecnica:  this.ficha_tecnica.id_ficha_tecnica,
-            id_anexo_cuatro: this.ficha_tecnica.id_anexo_cuatro,
-            medida_optimizacion: this.medida_optimizacion,
-            descripcion_optimizacion: this.descripcion_optimizacion,
-            analisis_oferta_sin_proyecto: this.analisis_oferta_sin_proyecto,
-            analisis_demanda_sin_proyecto: this.analisis_demanda_sin_proyecto,
-          
+          .post("/ficha_tecnica/guardar_anexo_ocho", {
+            id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
+            id_anexo_ocho: this.ficha_tecnica.id_anexo_ocho,
+            comentarios_finales: this.comentarios_finales,
+            ramo: this.ramo,
+            entidad: this.entidad,
+            area_responsable: this.area_responsable,
+            nombre: this.nombre,
+            cargo: this.cargo,
+            responsable_informacion: this.responsable_informacion,
+            cargo_responsable_informacion: this.cargo_responsable_informacion,
+            telefono_responsable_informacion: this.telefono_responsable_informacion,
+            email_responsable_informacion: this.email_responsable_informacion,
           })
           .then(response => {
             if (response.status == 200) {
-              // console.log(response);
-              EventBus.$emit("actualizaPropAnexoCuatro",response.data.id_anexo_cuatro)
-               this.$fire({
-                  type: "success",
-                  title: "Sección guardada correctamente",
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
+              console.log(response);
+              EventBus.$emit(
+                "actualizaPropAnexoOcho",
+                response.data.id_anexo_ocho
+              );
+              this.$fire({
+                type: "success",
+                title: "Sección guardada correctamente",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
             } else {
               this.$fire({
                 type: "error",
@@ -314,10 +325,10 @@ export default {
           });
       }
     },
-    validarAnexoCuatro(data) {
+    validarAnexoOcho(data) {
       this.$http
-        .post("/ficha_tecnica/validar_anexo_cuatro", {
-          id_anexo_cuatro: this.id_anexo_cuatro
+        .post("/ficha_tecnica/validar_anexo_ocho", {
+          id_anexo_ocho: this.id_anexo_ocho
         })
         .then(response => {
           if (response.status == 200) {
@@ -382,24 +393,23 @@ export default {
     },
     guardarObservaciones() {
       this.$http
-        .post("/ficha_tecnica/guardar_observaciones_anexo_cuatro", {
-          id_anexo_cuatro: this.id_anexo_cuatro,
+        .post("/ficha_tecnica/guardar_observaciones_anexo_ocho", {
+          id_anexo_ocho: this.id_anexo_ocho,
           observaciones: JSON.stringify(this.observaciones)
         })
         .then(response => {
           if (response.status == 200) {
             this.$fire({
               type: "success",
-              title: `Observaciones de la sección IV guardadas correctamente.`,
+              title: `Observaciones de la sección VIII guardadas correctamente.`,
               confirmButtonText: "Cerrar",
               confirmButtonColor: "#d33"
             });
             this.iconos_estatus = {
-                  color: "red lighten-1",
-                  icon: "mdi-comment-alert"
-                };
-                this.estatus = "Errores y Observaciones";
-            
+              color: "red lighten-1",
+              icon: "mdi-comment-alert"
+            };
+            this.estatus = "Errores y Observaciones";
           } else {
             this.$fire({
               type: "error",
@@ -423,27 +433,27 @@ export default {
     verificarDatos() {
       return true;
     },
-    mostrarObservaciones(){
+    mostrarObservaciones() {
       this.observaciones.forEach(element => {
-        console.log(element)
+        console.log(element);
         switch (element.seccion) {
-          case 'posibles_medidas_optimizacion':
-            this.obs_posibles_medidas_optimizacion.observacion = element.descripcion_observacion
-            this.obs_posibles_medidas_optimizacion.id_observacion = element.id_observacion
+          case "consideraciones_generales":
+            this.obs_consideraciones_generales.observacion =
+              element.descripcion_observacion;
+            this.obs_consideraciones_generales.id_observacion =
+              element.id_observacion;
             break;
-          case 'analisis_oferta_sin_proyecto':
-            this.obs_analisis_oferta_sin_proyecto.observacion = element.descripcion_observacion
-            this.obs_analisis_oferta_sin_proyecto.id_observacion = element.id_observacion
-            break;
-          case 'analisis_demanda_sin_proyecto':
-            this.obs_analisis_demanda_sin_proyecto.observacion = element.descripcion_observacion
-            this.obs_analisis_demanda_sin_proyecto.id_observacion = element.id_observacion
+          case "responsables_informacion":
+            this.obs_responsables_informacion.observacion =
+              element.descripcion_observacion;
+            this.obs_responsables_informacion.id_observacion =
+              element.id_observacion;
             break;
           default:
             break;
         }
       });
-    },
+    }
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");
@@ -453,6 +463,4 @@ export default {
   }
 };
 </script>
-<style>
-
-</style>
+<style></style>

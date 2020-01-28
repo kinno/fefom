@@ -240,7 +240,7 @@
               id: (typeof this.editedItem.id === 'undefined') ? null : this.editedItem.id,
               username: this.editedItem.username,
               password: this.editedItem.password,
-              id_municipio: this.editedItem.municipio.id,
+              id_municipio: this.editedItem.municipio.id_municipio,
               activo: 1,
               tipo_usuario: this.editedItem.tipo_usuario.id
             })

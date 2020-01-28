@@ -95,7 +95,7 @@
               }
             })
             .catch((error)=>{
-              this.alertError.mensaje = error.response.data
+              this.alertError.mensaje = (error.response.data.error) ? error.response.data.error : error.response.data
               this.alertError.show = true
             });
         }

@@ -83,18 +83,19 @@
             >
               <template v-slot:item="{item}">
                 <tr>
-                  <td width="48%">{{item.nombre_proyecto}}</td>
+                 <td width="24%">{{item.nombre_proyecto}}</td>
+                  <td width="24%">{{item.descripcion_proyecto}}</td>
                   <td width="30%" class="text-right">{{item.monto | currency}}</td>
                   <td width="10%" class="text-center font-weight-black">{{item.desc_estatus}}</td>
                   <td width="12%">
                     <v-row v-if="item.estatus!==4 && item.estatus !==3 && item.estatus !==1">
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="aceptarProyecto(item, 1)">
+                        <v-btn small height="30px" @click="aceptarProyecto(item, 5)">
                           <v-icon color="green darken-2">mdi-check-circle-outline</v-icon>
                         </v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="rechazarProyecto(item, 1)">
+                        <v-btn small height="30px" @click="rechazarProyecto(item, 5)">
                           <v-icon color="red darken-2">mdi-cancel</v-icon>
                         </v-btn>
                       </v-col>
@@ -133,18 +134,19 @@
             >
               <template v-slot:item="{item}">
                 <tr>
-                  <td width="48%">{{item.nombre_proyecto}}</td>
+                 <td width="24%">{{item.nombre_proyecto}}</td>
+                  <td width="24%">{{item.descripcion_proyecto}}</td>
                   <td width="30%" class="text-right">{{item.monto | currency}}</td>
                   <td width="10%" class="text-center font-weight-black">{{item.desc_estatus}}</td>
                   <td width="12%">
                     <v-row v-if="item.estatus!==4 && item.estatus !==3 && item.estatus !==1">
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="aceptarProyecto(item, 2)">
+                        <v-btn small height="30px" @click="aceptarProyecto(item, 5)">
                           <v-icon color="green darken-2">mdi-check-circle-outline</v-icon>
                         </v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="rechazarProyecto(item, 2)">
+                        <v-btn small height="30px" @click="rechazarProyecto(item, 5)">
                           <v-icon color="red darken-2">mdi-cancel</v-icon>
                         </v-btn>
                       </v-col>
@@ -182,19 +184,20 @@
               class="tablaProyectos"
             >
               <template v-slot:item="{item}">
-                <tr>
-                  <td width="48%">{{item.nombre_proyecto}}</td>
+               <tr>
+                 <td width="24%">{{item.nombre_proyecto}}</td>
+                  <td width="24%">{{item.descripcion_proyecto}}</td>
                   <td width="30%" class="text-right">{{item.monto | currency}}</td>
                   <td width="10%" class="text-center font-weight-black">{{item.desc_estatus}}</td>
                   <td width="12%">
-                    <v-row v-if="item.estatus!==4 && item.estatus !==3  && item.estatus !==1">
+                    <v-row v-if="item.estatus!==4 && item.estatus !==3 && item.estatus !==1">
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="aceptarProyecto(item, 3)">
+                        <v-btn small height="30px" @click="aceptarProyecto(item, 5)">
                           <v-icon color="green darken-2">mdi-check-circle-outline</v-icon>
                         </v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="rechazarProyecto(item, 3)">
+                        <v-btn small height="30px" @click="rechazarProyecto(item, 5)">
                           <v-icon color="red darken-2">mdi-cancel</v-icon>
                         </v-btn>
                       </v-col>
@@ -233,18 +236,72 @@
             >
               <template v-slot:item="{item}">
                 <tr>
-                  <td width="48%">{{item.nombre_proyecto}}</td>
+                 <td width="24%">{{item.nombre_proyecto}}</td>
+                  <td width="24%">{{item.descripcion_proyecto}}</td>
                   <td width="30%" class="text-right">{{item.monto | currency}}</td>
                   <td width="10%" class="text-center font-weight-black">{{item.desc_estatus}}</td>
                   <td width="12%">
                     <v-row v-if="item.estatus!==4 && item.estatus !==3 && item.estatus !==1">
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="aceptarProyecto(item, 4)">
+                        <v-btn small height="30px" @click="aceptarProyecto(item, 5)">
                           <v-icon color="green darken-2">mdi-check-circle-outline</v-icon>
                         </v-btn>
                       </v-col>
                       <v-col cols="6">
-                        <v-btn small height="30px" @click="rechazarProyecto(item, 4)">
+                        <v-btn small height="30px" @click="rechazarProyecto(item, 5)">
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-header color="grey lighten-3" class="font-weight-bold">
+          <v-col cols="12" sm="6" md="8" class="text-left pa-0">
+            Protección Civil
+            <!-- <v-icon color="green darken-2">mdi-check-circle-outline</v-icon> -->
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado: {{techo_asignado_proteccion_civil | currency}}
+           <br />
+            <br />Obras y/o Acciones:
+            <span
+              class="green--text text--lighten-1"
+            >{{proyectosProteccionCivil.length}}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersProteccionCivil"
+              :items="proyectosProteccionCivil"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+               class="tablaProyectos mt-0"
+            >
+              <template v-slot:item="{item}">
+                <tr>
+                 <td width="24%">{{item.nombre_proyecto}}</td>
+                  <td width="24%">{{item.descripcion_proyecto}}</td>
+                  <td width="30%" class="text-right">{{item.monto | currency}}</td>
+                  <td width="10%" class="text-center font-weight-black">{{item.desc_estatus}}</td>
+                  <td width="12%">
+                    <v-row v-if="item.estatus!==4 && item.estatus !==3 && item.estatus !==1">
+                      <v-col cols="6">
+                        <v-btn small height="30px" @click="aceptarProyecto(item, 5)">
+                          <v-icon color="green darken-2">mdi-check-circle-outline</v-icon>
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6">
+                        <v-btn small height="30px" @click="rechazarProyecto(item, 5)">
                           <v-icon color="red darken-2">mdi-cancel</v-icon>
                         </v-btn>
                       </v-col>
@@ -283,11 +340,12 @@
             >
               <template v-slot:item="{item}">
                 <tr>
-                  <td width="48%">{{item.nombre_proyecto}}</td>
+                 <td width="24%">{{item.nombre_proyecto}}</td>
+                  <td width="24%">{{item.descripcion_proyecto}}</td>
                   <td width="30%" class="text-right">{{item.monto | currency}}</td>
                   <td width="10%" class="text-center font-weight-black">{{item.desc_estatus}}</td>
                   <td width="12%">
-                    <v-row v-if="item.estatus!==4 && item.estatus !==3  && item.estatus !==1">
+                    <v-row v-if="item.estatus!==4 && item.estatus !==3 && item.estatus !==1">
                       <v-col cols="6">
                         <v-btn small height="30px" @click="aceptarProyecto(item, 5)">
                           <v-icon color="green darken-2">mdi-check-circle-outline</v-icon>
@@ -365,12 +423,18 @@ export default {
         value: "nombre_proyecto"
       },
       {
+        text: "Descripción",
+        align: "left",
+        sortable: true,
+        value: "descripcion_proyecto"
+      },
+      {
         text: "Monto",
         align: "right",
         sortable: true,
         value: "monto"
       },
-      { text: "Estatus", value: "desc_estatus", sortable: true, align: "center"},
+      { text: "Estatus", value: "desc_estatus", sortable: true },
       { text: "Acciones", value: "action", sortable: false }
     ],
     headersSeguridad: [
@@ -381,12 +445,18 @@ export default {
         value: "nombre_proyecto"
       },
       {
+        text: "Descripción",
+        align: "left",
+        sortable: true,
+        value: "descripcion_proyecto"
+      },
+      {
         text: "Monto",
         align: "right",
         sortable: true,
         value: "monto"
       },
-      { text: "Estatus", value: "desc_estatus", sortable: true ,align: "center"},
+      { text: "Estatus", value: "desc_estatus", sortable: true },
       { text: "Acciones", value: "action", sortable: false }
     ],
     headersInversion: [
@@ -397,12 +467,18 @@ export default {
         value: "nombre_proyecto"
       },
       {
+        text: "Descripción",
+        align: "left",
+        sortable: true,
+        value: "descripcion_proyecto"
+      },
+      {
         text: "Monto",
         align: "right",
         sortable: true,
         value: "monto"
       },
-      { text: "Estatus", value: "desc_estatus", sortable: true  ,align: "center"},
+      { text: "Estatus", value: "desc_estatus", sortable: true },
       { text: "Acciones", value: "action", sortable: false }
     ],
     headersDesarrollo: [
@@ -413,12 +489,40 @@ export default {
         value: "nombre_proyecto"
       },
       {
+        text: "Descripción",
+        align: "left",
+        sortable: true,
+        value: "descripcion_proyecto"
+      },
+      {
         text: "Monto",
         align: "right",
         sortable: true,
         value: "monto"
       },
-      { text: "Estatus", value: "desc_estatus", sortable: true  ,align: "center"},
+      { text: "Estatus", value: "desc_estatus", sortable: true },
+      { text: "Acciones", value: "action", sortable: false }
+    ],
+    headersProteccionCivil: [
+      {
+        text: "Obra y/o Acciones",
+        align: "left",
+        sortable: true,
+        value: "nombre_proyecto"
+      },
+      {
+        text: "Descripción",
+        align: "left",
+        sortable: true,
+        value: "descripcion_proyecto"
+      },
+      {
+        text: "Monto",
+        align: "right",
+        sortable: true,
+        value: "monto"
+      },
+      { text: "Estatus", value: "desc_estatus", sortable: true },
       { text: "Acciones", value: "action", sortable: false }
     ],
     headersNoEtiquetado: [
@@ -429,12 +533,18 @@ export default {
         value: "nombre_proyecto"
       },
       {
+        text: "Descripción",
+        align: "left",
+        sortable: true,
+        value: "descripcion_proyecto"
+      },
+      {
         text: "Monto",
         align: "right",
         sortable: true,
         value: "monto"
       },
-      { text: "Estatus", value: "desc_estatus", sortable: true  ,align: "center"},
+      { text: "Estatus", value: "desc_estatus", sortable: true },
       { text: "Acciones", value: "action", sortable: false }
     ],
     editedIndex: -1,
@@ -475,7 +585,9 @@ export default {
     proyectosSeguridad: [],
     proyectosInversion: [],
     proyectosDesarrollo: [],
+    proyectosProteccionCivil: [],
     proyectosNoEtiquetado: [],
+    // proyectosRetencion: [],
     montoTotal: 0.0,
     techo_asignado_iluminacion_municipal: 0.0,
     disponible_iluminacion: 0.0,
@@ -485,6 +597,8 @@ export default {
     disponible_inversion: 0.0,
     techo_asignado_desarrollo: 0.0,
     disponible_desarrollo: 0.0,
+    techo_asignado_proteccion_civil: 0.0,
+    disponible_proteccion_civil: 0.0,
     techo_asignado_no_etiquetado: 0.0,
     disponible_no_etiquetado: 0.0,
     obraIluminacion: "",
@@ -603,6 +717,7 @@ export default {
       this.techo_asignado_iluminacion_municipal = 0.0;
       this.techo_asignado_seguridad = 0.0;
       this.techo_asignado_inversion_publica = 0.0;
+      this.techo_asignado_proteccion_civil = 0.0;
       this.techo_asignado_desarrollo = 0.0;
       this.techo_asignado_no_etiquetado = 0.0;
       this.$http
@@ -628,6 +743,9 @@ export default {
             this.techo_asignado_desarrollo = parseFloat(
               element.monto_desarrollo
             ).toFixed(2);
+            this.techo_asignado_proteccion_civil = parseFloat(
+              element.monto_proteccion_civil
+            ).toFixed(2);
             this.techo_asignado_no_etiquetado = parseFloat(
               element.monto_no_etiquetado
             ).toFixed(2);
@@ -643,6 +761,7 @@ export default {
       this.proyectosSeguridad = [];
       this.proyectosInversion = [];
       this.proyectosDesarrollo = [];
+      this.proyectosProteccionCivil = [];
       this.proyectosNoEtiquetado = [];
       this.$http
         .post("/cartera_proyectos/get_cartera", {
@@ -658,12 +777,14 @@ export default {
           + response.data.proyectos.seguridad.length
           + response.data.proyectos.inversion.length
           + response.data.proyectos.desarrollo.length
+          + response.data.proyectos.proteccion_civil.length
           +  response.data.proyectos.no_etiquetado.length;
 
           this.proyectosIluminacion = response.data.proyectos.iluminacion;
           this.proyectosSeguridad = response.data.proyectos.seguridad;
           this.proyectosInversion = response.data.proyectos.inversion;
           this.proyectosDesarrollo = response.data.proyectos.desarrollo;
+          this.proyectosProteccionCivil = response.data.proyectos.proteccion_civil;
           this.proyectosNoEtiquetado = response.data.proyectos.no_etiquetado;
 
           this.proyectosIluminacion.forEach(element => {
@@ -688,6 +809,13 @@ export default {
             }
           });
           this.proyectosDesarrollo.forEach(element => {
+            if(element.estatus == 3){
+              this.obrasAceptadas++
+            }else if (element.estatus == 4) {
+              this.obrasRechazadas++
+            }
+          });
+          this.proyectosProteccionCivil.forEach(element => {
             if(element.estatus == 3){
               this.obrasAceptadas++
             }else if (element.estatus == 4) {
@@ -772,6 +900,11 @@ export default {
           this.dialog = true;
           break;
         case 5:
+           this.editedIndex = this.proyectosProteccionCivil.indexOf(item);
+          this.editedItem = Object.assign({}, item);
+          this.dialog = true;
+          break;
+        case 6:
            this.editedIndex = this.proyectosNoEtiquetado.indexOf(item);
           this.editedItem = Object.assign({}, item);
           this.dialog = true;

@@ -33,6 +33,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_identificacion_costos.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('identificacion_costos')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -64,8 +72,8 @@
                           outlined
                           rows="3"
                           row-height="15"
-                          maxlength="280"
-                          counter="280"
+                          maxlength="6000"
+                          counter="600"
                           class="mt-5"
                         ></v-textarea>
                       </template>
@@ -166,6 +174,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+             <v-btn
+              v-if="user.tipo_usuario == 2 && obs_identificacion_beneficios.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('identificacion_beneficios')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -235,8 +251,8 @@
                           outlined
                           rows="3"
                           row-height="15"
-                          maxlength="280"
-                          counter="280"
+                          maxlength="600"
+                          counter="600"
                           class="mt-5"
                         ></v-textarea>
                       </template>
@@ -476,7 +492,15 @@ export default {
       beneficios: [],
       iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
       estatus: "En Edición",
-      observaciones: []
+      observaciones: [],
+      obs_identificacion_costos:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_identificacion_beneficios:{
+        observacion: null,
+        id_observacion: null,
+      },
     };
   },
   methods: {
@@ -524,6 +548,9 @@ export default {
             console.log(data);
             this.costos = JSON.parse(data.costos);
             this.beneficios = JSON.parse(data.beneficios);
+            data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
             switch (data.estatus) {
               case 2:
                 this.iconos_estatus = {
@@ -531,6 +558,9 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.visible = false;
+                }
                 break;
               case 3:
                 this.iconos_estatus = {
@@ -538,14 +568,13 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.mostrarObservaciones()
+                }
                 break;
               default:
                 break;
             }
-
-            data.observaciones !== null
-              ? (this.observaciones = JSON.parse(data.observaciones))
-              : (this.observaciones = []);
           } else {
             console.log("Error", response.err);
           }
@@ -704,7 +733,24 @@ export default {
     },
     verificarDatos() {
       return true;
-    }
+    },
+    mostrarObservaciones(){
+      this.observaciones.forEach(element => {
+        console.log(element)
+        switch (element.seccion) {
+          case 'identificacion_costos':
+            this.obs_identificacion_costos.observacion = element.descripcion_observacion
+            this.obs_identificacion_costos.id_observacion = element.id_observacion
+            break;
+          case 'identificacion_beneficios':
+            this.obs_identificacion_beneficios.observacion = element.descripcion_observacion
+            this.obs_identificacion_beneficios.id_observacion = element.id_observacion
+            break;
+          default:
+            break;
+        }
+      });
+    },
   },
    beforeDestroy() {
     EventBus.$off("guardarFicha");

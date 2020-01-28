@@ -31,8 +31,30 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_alternativas_solucion.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('alternativas_solucion')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
+            <v-row>
+              <v-spacer></v-spacer>
+              <v-col cols="12" md="3" class="column">
+                <div class="my-2">
+                  <v-btn
+                    text
+                    color="green brighten-5"
+                    @click="agregarAlternativa"
+                    v-if="visible"
+                    >+ Agregar alternativa</v-btn
+                  >
+                </div>
+              </v-col>
+            </v-row>
             <v-data-table
           :headers="headers"
           :items="alternativas_costos"
@@ -60,8 +82,8 @@
                   outlined
                   rows="3"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   class="mt-5"
                 ></v-textarea>
               </template>
@@ -129,13 +151,18 @@
               <template v-slot:input>
                 <v-text-field
                   v-model="props.item.costoTotal"
-                  label="Costo de mantenimiento"
+                  label="Costo total"
                   reverse
                   counter
                 ></v-text-field>
               </template>
             </v-edit-dialog>
           </template>
+          <template v-slot:item.accion="{ item }" v-if="visible">
+              <v-icon @click="deleteItem(item)" color="red darken-1">
+                mdi-delete-forever
+              </v-icon>
+            </template>
         </v-data-table>
           </v-card-text>
         </v-card>
@@ -159,9 +186,17 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('justificación_solucion_seleccionada')"
+              @click="agregarObservacion('justificacion_solucion_seleccionada')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_justificacion_solucion_seleccionada.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('justificacion_solucion_seleccionada')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -172,8 +207,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="justificacion"
                   :disabled="!visible"
                 ></v-textarea>
@@ -257,6 +292,13 @@ export default {
           align: "right",
           width: "16.6%",
           sortable: false
+        },
+        {
+          text: "",
+          align: "center",
+          sortable: false,
+          value: "accion",
+          width: "5%"
         }
       ],
       alternativas_costos: [
@@ -276,7 +318,15 @@ export default {
       justificacion: null,
        iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
      estatus: "En Edición",
-      observaciones: []
+      observaciones: [],
+       obs_alternativas_solucion:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_justificacion_solucion_seleccionada:{
+        observacion: null,
+        id_observacion: null,
+      },
     };
   },
   methods: {
@@ -298,6 +348,32 @@ export default {
     close() {
       console.log("Dialog closed");
     },
+    agregarAlternativa() {
+      if(this.alternativas_costos.length == 2){
+        this.snack = true;
+        this.snackColor = "red lighten-1";
+        this.snackText =
+          "Error: Sólo se pueden registrar máximo 2 alternativas de solución.";
+        return false;
+      }
+      this.alternativas_costos.push({
+        descripcion: "Nueva Alternativa",
+        costoMantenimiento: 0.0,
+        costoOperacion: 0.0,
+        costoTotal: 0.0
+      });
+    },
+    deleteItem(item) {
+      if(this.alternativas_costos.length == 1){
+        this.snack = true;
+        this.snackColor = "red lighten-1";
+        this.snackText =
+          "Error: Debe registrar por lo menos 1 alternativa de solución.";
+        return false;
+      }
+      const index = this.alternativas_costos.indexOf(item);
+      this.alternativas_costos.splice(index, 1);
+    },
     buscarAnexoCinco() {
       EventBus.$emit("abreLoading");
       this.$http
@@ -311,6 +387,9 @@ export default {
             console.log(data);
             this.alternativas_costos = JSON.parse(data.alternativas_costos);
             this.justificacion = data.justificacion;
+             data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
             switch (data.estatus) {
               case 2:
                 this.iconos_estatus = {
@@ -318,6 +397,9 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.visible = false;
+                }
                 break;
               case 3:
                 this.iconos_estatus = {
@@ -325,14 +407,13 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.mostrarObservaciones()
+                }
                 break;
               default:
                 break;
             }
-
-            data.observaciones !== null
-              ? (this.observaciones = JSON.parse(data.observaciones))
-              : (this.observaciones = []);
           } else {
             console.log("Error", response.err);
           }
@@ -492,7 +573,24 @@ export default {
     },
     verificarDatos() {
       return true;
-    }
+    },
+    mostrarObservaciones(){
+      this.observaciones.forEach(element => {
+        console.log(element)
+        switch (element.seccion) {
+          case 'alternativas_solucion':
+            this.obs_alternativas_solucion.observacion = element.descripcion_observacion
+            this.obs_alternativas_solucion.id_observacion = element.id_observacion
+            break;
+          case 'justificación_solucion_seleccionada':
+            this.obs_justificacion_solucion_seleccionada.observacion = element.descripcion_observacion
+            this.obs_justificacion_solucion_seleccionada.id_observacion = element.id_observacion
+            break;
+          default:
+            break;
+        }
+      });
+    },
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");

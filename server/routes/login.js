@@ -26,10 +26,11 @@ Router.post('/register-admin', function(req, res) {
 Router.post('/', (req, res) => {
     const query = "Select * from cat_usuario join cat_municipio on cat_usuario.id_municipio = cat_municipio.id_municipio where cat_usuario.username = ?";
     connection.query(query,[req.body.username],(err, rows, fields)=>{
+        console.log(rows)
         if (err) return res.status(500).send('Error del servidor.'+err);
         if (rows.length < 1) return res.status(404).send('Usuario y/o contraseña incorrectos.');
         let passwordIsValid = bcrypt.compareSync(req.body.password, rows[0].password);
-        if (!passwordIsValid) return res.status(401).send({ auth: false, token: null });
+        if (!passwordIsValid) return res.status(401).send({ auth: false, token: null, error: 'Contraseña incorrecta.' });
         let token = jwt.sign({ id: rows[0].id }, config.secret, { expiresIn: 86400 // expires in 24 hours
         });
         res.status(200).json({ auth: true, token: token, user: rows[0] });

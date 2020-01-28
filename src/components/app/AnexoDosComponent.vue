@@ -31,6 +31,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_alineacion_estrategica.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('alineacion_estrategica')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-data-table
@@ -146,6 +154,14 @@
               @click="agregarObservacion('programas_proyectos_complementarios')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_programas_proyectos_complementarios.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('programas_proyectos_complementarios')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -269,7 +285,15 @@ export default {
       proyecto_complementario: null,
       relacion_complementaria: null,
       estatus: "En Edición",
-      observaciones: []
+      observaciones: [],
+      obs_alineacion_estrategica:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_programas_proyectos_complementarios:{
+        observacion: null,
+        id_observacion: null,
+      },
     };
   },
   methods: {
@@ -290,6 +314,10 @@ export default {
             this.proyecto_complementario = data.proyecto_complementario;
             this.relacion_complementaria = data.relacion_complementaria;
 
+            data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
+
             switch (data.estatus) {
               case 2:
                 this.iconos_estatus = {
@@ -297,6 +325,9 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.visible = false;
+                }
                 break;
               case 3:
                 this.iconos_estatus = {
@@ -304,14 +335,14 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
+                 if(this.ficha_tecnica.estatus == 4){
+                  this.mostrarObservaciones()
+                }
                 break;
               default:
                 break;
             }
-
-            data.observaciones !== null
-              ? (this.observaciones = JSON.parse(data.observaciones))
-              : (this.observaciones = []);
+            
           } else {
             console.log("Error", response.err);
           }
@@ -489,7 +520,24 @@ export default {
             confirmButtonColor: "#d33"
           });
         });
-    }
+    },
+    mostrarObservaciones(){
+      this.observaciones.forEach(element => {
+        console.log(element)
+        switch (element.seccion) {
+          case 'alineacion_estrategica':
+            this.obs_alineacion_estrategica.observacion = element.descripcion_observacion
+            this.obs_alineacion_estrategica.id_observacion = element.id_observacion
+            break;
+          case 'programas_proyectos_complementarios':
+            this.obs_programas_proyectos_complementarios.observacion = element.descripcion_observacion
+            this.obs_programas_proyectos_complementarios.id_observacion = element.id_observacion
+            break;
+          default:
+            break;
+        }
+      });
+    },
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");

@@ -365,6 +365,7 @@ export default {
         });
     },
     imprimirOficio() {
+       EventBus.$emit("abreLoading");
       this.$http
         .get("/oficios/imprimir_oficio", {responseType: 'arraybuffer',params:{
           oficio: this.oficio,
@@ -374,7 +375,7 @@ export default {
         .then(response => {
           // console.log(response);
           if (response.status == 200) {
-             
+             EventBus.$emit("cierraLoading");
            var blob = new Blob([response.data], {type: 'application/pdf'});
 
             var link = document.createElement('a');
@@ -393,6 +394,7 @@ export default {
           }
         })
         .catch(error => {
+           EventBus.$emit("cierraLoading");
           this.$fire({
             type: "error",
             title: "Error",

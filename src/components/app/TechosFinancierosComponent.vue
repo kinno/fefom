@@ -47,7 +47,7 @@
                         v-model="editedItem.municipio"
                         :items="municipios"
                         item-text="descripcion"
-                        item-value="id"
+                        item-value="id_municipio"
                         label="Ayuntamiento"
                         return-object
                       ></v-select>
@@ -166,6 +166,32 @@
                       <div>
                         <v-row>
                           <v-col class="pb-0 pt-0 font-weight-black"
+                            >Protección Civil</v-col
+                          >
+                        </v-row>
+                        <v-row>
+                          <v-col cols="4">
+                            <v-text-field
+                              v-model="editedItem.porc_proteccion_civil"
+                              label="Porcentaje"
+                              append-icon="mdi-percent"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="8">
+                            <v-text-field
+                              v-model="editedItem.monto_proteccion_civil"
+                              label="Monto"
+                             readonly
+                              type="number"
+                              reverse
+                              append-outer-icon="mdi-plus" @click:append-outer="increment(4)" prepend-icon="mdi-minus" @click:prepend="decrement(4)"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </div>
+                      <div>
+                        <v-row>
+                          <v-col class="pb-0 pt-0 font-weight-black"
                             >Recursos no etiquetados</v-col
                           >
                         </v-row>
@@ -180,6 +206,32 @@
                           <v-col cols="8">
                             <v-text-field
                               v-model="editedItem.monto_no_etiquetado"
+                              label="Monto"
+                             readonly
+                              type="number"
+                              reverse
+                              append-outer-icon="mdi-plus" @click:append-outer="increment(5)" prepend-icon="mdi-minus" @click:prepend="decrement(5)"
+                            ></v-text-field>
+                          </v-col>
+                        </v-row>
+                      </div>
+                      <div>
+                        <v-row>
+                          <v-col class="pb-0 pt-0 font-weight-black"
+                            >Retención 50% programa especial FEFOM</v-col
+                          >
+                        </v-row>
+                        <v-row>
+                          <v-col cols="4">
+                            <v-text-field
+                              v-model="editedItem.porc_retencion"
+                              label="Porcentaje"
+                              append-icon="mdi-percent"
+                            ></v-text-field>
+                          </v-col>
+                          <v-col cols="8">
+                            <v-text-field
+                              v-model="editedItem.monto_retencion"
                               label="Monto"
                              readonly
                               type="number"
@@ -311,6 +363,14 @@
               }}%)
               </span>
             </td>
+            <td>
+              {{ item.monto_proteccion_civil | currency }}<br>
+              <span class="font-weight-black">
+                 ({{
+                item.porc_proteccion_civil
+              }}%)
+              </span>
+            </td>
             <!-- <td >{{item.porc_desarrollo}}</td> -->
             <td>
               {{ item.monto_no_etiquetado | currency }}<br>
@@ -322,16 +382,24 @@
             </td>
             <!-- <td >{{item.porc_no_etiquetado}}</td> -->
             <td>
-              <v-row no-gutters>
+              {{ item.monto_retencion | currency }}<br>
+              <span class="font-weight-black">
+                 ({{
+                item.porc_retencion
+              }}%)
+              </span>
+            </td>
+            <td>
+              <v-row  no-gutters>
                 <v-col cols="6">
-                  <v-btn x-small height="30px" @click="editItem(item)">
+                  <v-btn class="btnK" x-small height="30px" @click="editItem(item)">
                     <v-icon color="green darken-2"
                       >mdi-square-edit-outline</v-icon
                     >
                   </v-btn>
                 </v-col>
                 <v-col cols="6">
-                  <v-btn x-small height="30px" @click="deleteItem(item)">
+                  <v-btn class="btnK" x-small height="30px" @click="deleteItem(item)">
                     <v-icon color="red darken-2">mdi-delete-forever</v-icon>
                   </v-btn>
                 </v-col>
@@ -406,10 +474,22 @@ export default {
         align: "center",
         sortable: false
       },
+      {
+        text: "Protección Civil",
+        value: "monto_proteccion_civil",
+        align: "center",
+        sortable: false
+      },
       // { text: "%", value: "porc_desarrollo", align: "right" },
       {
         text: "Recursos no etiquetados",
         value: "monto_no_etiquetado",
+        align: "center",
+        sortable: false
+      },
+      {
+        text: "Retención 50% Programa Especial FEFOM",
+        value: "monto_retencion",
         align: "center",
         sortable: false
       },
@@ -432,8 +512,12 @@ export default {
       porc_inversion_publica: 0,
       monto_desarrollo: 0,
       porc_desarrollo: 0,
+      monto_proteccion_civil: 0,
+      porc_proteccion_civil: 0,
       monto_no_etiquetado: 0,
-      porc_no_etiquetado: 0
+      porc_no_etiquetado: 0,
+      monto_retencion: 0,
+      porc_retencion: 0
     },
     defaultItem: {
       municipio: [],
@@ -446,8 +530,12 @@ export default {
       porc_inversion_publica: 0,
       monto_desarrollo: 0,
       porc_desarrollo: 0,
+      monto_proteccion_civil: 0,
+      porc_proteccion_civil: 0,
       monto_no_etiquetado: 0,
-      porc_no_etiquetado: 0
+      porc_no_etiquetado: 0,
+      monto_retencion: 0,
+      porc_retencion: 0
     }
   }),
 
@@ -490,18 +578,28 @@ export default {
       console.log(monto_total, monto);
       this.editedItem.monto_desarrollo = monto.toFixed(2);
     },
+    "editedItem.porc_proteccion_civil": function(val) {
+      var monto_total = parseFloat(this.editedItem.monto_total).toFixed(2);
+      var monto = (parseFloat(val).toFixed(2) * (monto_total )) / 100;
+      console.log(monto_total, monto);
+      this.editedItem.monto_proteccion_civil = monto.toFixed(2);
+    },
     "editedItem.porc_no_etiquetado": function(val) {
       var monto_total = parseFloat(this.editedItem.monto_total).toFixed(2);
       var monto = (parseFloat(val).toFixed(2) * monto_total) / 100;
       console.log(monto_total, monto);
       this.editedItem.monto_no_etiquetado = monto.toFixed(2);
-    }
+    },
+    "editedItem.porc_retencion": function(val) {
+      var monto_total = parseFloat(this.editedItem.monto_total).toFixed(2);
+      var monto = (parseFloat(val).toFixed(2) * monto_total) / 100;
+      console.log(monto_total, monto);
+      this.editedItem.monto_retencion = monto.toFixed(2);
+    },
   },
-
   created() {
     this.initialize();
   },
-
   methods: {
     initialize() {
       this.$http
@@ -534,7 +632,7 @@ export default {
             this.techosFinancieros.push({
               id: element.id_techo,
               municipio: {
-                id: element.id_municipio,
+                id_municipio: element.id_municipio,
                 descripcion: element.descripcion
               },
               monto_total: element.monto_total,
@@ -546,8 +644,12 @@ export default {
               porc_inversion_publica: element.porc_inversion_publica,
               monto_desarrollo: element.monto_desarrollo,
               porc_desarrollo: element.porc_desarrollo,
+              monto_proteccion_civil: element.monto_proteccion_civil,
+              porc_proteccion_civil: element.porc_proteccion_civil,
               monto_no_etiquetado: element.monto_no_etiquetado,
-              porc_no_etiquetado: element.porc_no_etiquetado
+              porc_no_etiquetado: element.porc_no_etiquetado,
+              monto_retencion: element.monto_retencion,
+              porc_retencion: element.porc_retencion
             });
           });
         })
@@ -596,7 +698,13 @@ export default {
           this.editedItem.monto_desarrollo = (parseFloat(this.editedItem.monto_desarrollo) + 0.01).toFixed(2)
           break;
         case 5:
+          this.editedItem.monto_proteccion_civil = (parseFloat(this.editedItem.monto_proteccion_civil) + 0.01).toFixed(2)
+          break;
+        case 6:
           this.editedItem.monto_no_etiquetado = (parseFloat(this.editedItem.monto_no_etiquetado) + 0.01).toFixed(2)
+          break;
+        case 7:
+          this.editedItem.monto_retencion = (parseFloat(this.editedItem.monto_retencion) + 0.01).toFixed(2)
           break;
         default:
           break;
@@ -618,7 +726,13 @@ export default {
           this.editedItem.monto_desarrollo = (parseFloat(this.editedItem.monto_desarrollo) - 0.01).toFixed(2)
           break;
         case 5:
+          this.editedItem.monto_proteccion_civil = (parseFloat(this.editedItem.monto_proteccion_civil) - 0.01).toFixed(2)
+          break;
+        case 6:
           this.editedItem.monto_no_etiquetado = (parseFloat(this.editedItem.monto_no_etiquetado) - 0.01).toFixed(2)
+          break;
+        case 7:
+          this.editedItem.monto_retencion = (parseFloat(this.editedItem.monto_retencion) - 0.01).toFixed(2)
           break;
         default:
           break;
@@ -652,8 +766,12 @@ export default {
           porc_inversion_publica: this.editedItem.porc_inversion_publica,
           monto_desarrollo: this.editedItem.monto_desarrollo,
           porc_desarrollo: this.editedItem.porc_desarrollo,
+          monto_proteccion_civil: this.editedItem.monto_proteccion_civil,
+          porc_proteccion_civil: this.editedItem.porc_proteccion_civil,
           monto_no_etiquetado: this.editedItem.monto_no_etiquetado,
-          porc_no_etiquetado: this.editedItem.porc_no_etiquetado
+          porc_no_etiquetado: this.editedItem.porc_no_etiquetado,
+          monto_retencion: this.editedItem.monto_retencion,
+          porc_retencion: this.editedItem.porc_retencion,
         })
         .then(response => {
           console.log(response);
@@ -705,7 +823,16 @@ export default {
             }
             // EventBus.$emit("loading", false);
             this.dialog2 = false;
+          })
+          .catch(error => {
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
           });
+        });
       } catch (err) {
         // EventBus.$emit("loading", false);
         console.log(err);
@@ -720,8 +847,11 @@ export default {
  background-color: #e8f5e9 !important;
 }
 .tablaTechos table > tbody > tr > td {
-  font-size: 10pt !important;
+  font-size: 12px !important;
   text-align: right;
   width: 12.5%;
+}
+.btnK{
+  min-width: 0 !important;
 }
 </style>

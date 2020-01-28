@@ -34,6 +34,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_descripcion_general.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('descripcion_general')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -43,8 +51,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="descripcion_general"
                   :disabled="!visible"
                 ></v-textarea>
@@ -70,6 +78,14 @@
               @click="agregarObservacion('descripcion_componentes_proyecto')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_descripcion_componentes_proyecto.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('descripcion_componentes_proyecto')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -138,8 +154,8 @@
                           outlined
                           rows="3"
                           row-height="15"
-                          maxlength="280"
-                          counter="280"
+                          maxlength="600"
+                          counter="600"
                           class="mt-5"
                         ></v-textarea>
                       </template>
@@ -283,6 +299,14 @@
                 >
                   <v-icon dark>mdi-comment-remove-outline</v-icon>
                 </v-btn>
+                <v-btn
+              v-if="user.tipo_usuario == 2 && obs_aspectos_ambientales.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('aspectos_ambientales')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
               </v-toolbar>
               <v-card-text>
                 <v-row>
@@ -292,8 +316,8 @@
                       outlined
                       rows="5"
                       row-height="15"
-                      maxlength="280"
-                      counter="280"
+                      maxlength="600"
+                      counter="600"
                       v-model="aspecto_ambiental"
                       :disabled="!visible"
                     ></v-textarea>
@@ -317,6 +341,14 @@
                 >
                   <v-icon dark>mdi-comment-remove-outline</v-icon>
                 </v-btn>
+                <v-btn
+                  v-if="user.tipo_usuario == 2 && obs_aspectos_tecnicos.observacion !== null"
+                  icon
+                  color="red lighten-1"
+                  @click="agregarObservacion('aspectos_tecnicos')"
+                >
+                  <v-icon dark>mdi-message-alert</v-icon>
+                </v-btn>
               </v-toolbar>
               <v-card-text>
                 <v-row>
@@ -326,8 +358,8 @@
                       outlined
                       rows="5"
                       row-height="15"
-                      maxlength="280"
-                      counter="280"
+                      maxlength="600"
+                      counter="600"
                       v-model="aspecto_tecnico"
                       :disabled="!visible"
                     ></v-textarea>
@@ -351,6 +383,14 @@
                 >
                   <v-icon dark>mdi-comment-remove-outline</v-icon>
                 </v-btn>
+                <v-btn
+                  v-if="user.tipo_usuario == 2 && obs_aspectos_legales.observacion !== null"
+                  icon
+                  color="red lighten-1"
+                  @click="agregarObservacion('aspectos_legales')"
+                >
+                  <v-icon dark>mdi-message-alert</v-icon>
+                </v-btn>
               </v-toolbar>
               <v-card-text>
                 <v-row>
@@ -360,8 +400,8 @@
                       outlined
                       rows="5"
                       row-height="15"
-                      maxlength="280"
-                      counter="280"
+                      maxlength="600"
+                      counter="600"
                       v-model="aspecto_legal"
                       :disabled="!visible"
                     ></v-textarea>
@@ -387,6 +427,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+                  v-if="user.tipo_usuario == 2 && obs_plano_localizacion.observacion !== null"
+                  icon
+                  color="red lighten-1"
+                  @click="agregarObservacion('plano_localizacion')"
+                >
+                  <v-icon dark>mdi-message-alert</v-icon>
+                </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -403,6 +451,28 @@
                 ></v-file-input>
               </v-col>
             </v-row>
+            <v-row>
+                  <v-col cols="6" class="column">
+                    <v-text-field
+                      value=""
+                      label="Latitud:"
+                      dense
+                      v-model="latitud"
+                      :disabled="!visible"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="6" class="column">
+                    <v-text-field
+                      value=""
+                      label="Longitud:"
+                      dense
+                      v-model="longitud"
+                      :disabled="!visible"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
             <v-row>
               <v-col
                 cols="12"
@@ -465,6 +535,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_analisis_oferta_con_proyecto.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('analisis_oferta_con_proyecto')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -474,8 +552,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="analisis_oferta_proyecto"
                   :disabled="!visible"
                 ></v-textarea>
@@ -499,6 +577,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_analisis_demanda_con_proyecto.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('analisis_demanda_con_proyecto')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -508,8 +594,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="analisis_demanda_proyecto"
                   :disabled="!visible"
                 ></v-textarea>
@@ -536,6 +622,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_diagnostico_situacion_proyecto.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('diagnostico_situacion_proyecto')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -545,8 +639,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="diagnostico"
                   :disabled="!visible"
                 ></v-textarea>
@@ -661,9 +755,47 @@ export default {
       diagnostico: "",
       ruta_imagen_proyecto: null,
       imagenNueva: null,
+      latitud: null, 
+      longitud: null,
       iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
       estatus: "En Edición",
-      observaciones: []
+      observaciones: [],
+      obs_descripcion_general:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_descripcion_componentes_proyecto:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_aspectos_ambientales:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_plano_localizacion:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_aspectos_tecnicos:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_aspectos_legales:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_analisis_oferta_con_proyecto:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_analisis_demanda_con_proyecto:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_diagnostico_situacion_proyecto:{
+        observacion: null,
+        id_observacion: null,
+      },
     };
   },
   methods: {
@@ -783,10 +915,17 @@ export default {
               (this.analisis_demanda_proyecto = data.analisis_demanda_proyecto),
               (this.diagnostico = data.diagnostico),
               (this.ruta_imagen_proyecto = data.ruta_imagen_proyecto);
+              this.latitud = data.latitud_plano;
+              this.longitud = data.longitud_plano;
             this.componentes.forEach(element => {
               this.total_componentes =
                 this.total_componentes + element.montoTotal;
             });
+
+            data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
+            console.log(data.estatus)
             switch (data.estatus) {
               case 2:
                 this.iconos_estatus = {
@@ -794,6 +933,9 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.visible = false;
+                }
                 break;
               case 3:
                 this.iconos_estatus = {
@@ -801,14 +943,15 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.mostrarObservaciones()
+                }
                 break;
               default:
                 break;
             }
 
-            data.observaciones !== null
-              ? (this.observaciones = JSON.parse(data.observaciones))
-              : (this.observaciones = []);
+            
           } else {
             console.log("Error", response.err);
           }
@@ -831,7 +974,9 @@ export default {
             analisis_oferta_proyecto: this.analisis_oferta_proyecto,
             analisis_demanda_proyecto: this.analisis_demanda_proyecto,
             diagnostico: this.diagnostico,
-            ruta_imagen_proyecto: this.ruta_imagen_proyecto
+            ruta_imagen_proyecto: this.ruta_imagen_proyecto,
+            latitud: this.latitud,
+            longitud: this.longitud
           })
           .then(response => {
             if (response.status == 200) {
@@ -983,7 +1128,52 @@ export default {
       } else {
         return true;
       }
-    }
+    },
+    mostrarObservaciones(){
+      this.observaciones.forEach(element => {
+        console.log(element)
+        switch (element.seccion) {
+          case 'descripcion_general':
+            this.obs_descripcion_general.observacion = element.descripcion_observacion
+            this.obs_descripcion_general.id_observacion = element.id_observacion
+            break;
+          case 'descripcion_componentes_proyecto':
+            this.obs_descripcion_componentes_proyecto.observacion = element.descripcion_observacion
+            this.obs_descripcion_componentes_proyecto.id_observacion = element.id_observacion
+            break;
+          case 'aspectos_ambientales':
+            this.obs_aspectos_ambientales.observacion = element.descripcion_observacion
+            this.obs_aspectos_ambientales.id_observacion = element.id_observacion
+            break;
+          case 'plano_localizacion':
+            this.obs_plano_localizacion.observacion = element.descripcion_observacion
+            this.obs_plano_localizacion.id_observacion = element.id_observacion
+            break;
+          case 'aspectos_tecnicos':
+            this.obs_aspectos_tecnicos.observacion = element.descripcion_observacion
+            this.obs_aspectos_tecnicos.id_observacion = element.id_observacion
+            break;
+          case 'aspectos_legales':
+            this.obs_aspectos_legales.observacion = element.descripcion_observacion
+            this.obs_aspectos_legales.id_observacion = element.id_observacion
+            break;
+          case 'analisis_oferta_con_proyecto':
+            this.obs_analisis_oferta_con_proyecto.observacion = element.descripcion_observacion
+            this.obs_analisis_oferta_con_proyecto.id_observacion = element.id_observacion
+            break;
+          case 'analisis_demanda_con_proyecto':
+            this.obs_analisis_demanda_con_proyecto.observacion = element.descripcion_observacion
+            this.obs_analisis_demanda_con_proyecto.id_observacion = element.id_observacion
+            break;
+          case 'diagnostico_situacion_proyecto':
+            this.obs_diagnostico_situacion_proyecto.observacion = element.descripcion_observacion
+            this.obs_diagnostico_situacion_proyecto.id_observacion = element.id_observacion
+            break;
+          default:
+            break;
+        }
+      });
+    },
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");

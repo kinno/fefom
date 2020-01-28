@@ -3,6 +3,7 @@ const Router = express.Router();
 const connection = require("../db/db");
 var pdf = require('html-pdf')
 var moment = require('moment');
+const path = require('path');
 
 var formatoOficio = require('../formatoOficios');
 moment.locale("Es");
@@ -146,21 +147,25 @@ Router.post("/buscar_oficio_cartera", (req, res) => {
 
     Router.get("/imprimir_oficio", (req, res) => {
       // console.log(req.query)
+      var ruta = path.join(__dirname,'../../public/img/headerM.jpg');
+       ruta = ruta.replace(/\\/g, "/");
       var html = formatoOficio(req.query);
       var config = {
 
         "format": "Letter", // allowed units: A3, A4, A5, Legal, Letter, Tabloid
         "border": {
-          "top": "50px", // default is 0, units: mm, cm, in, px
-          "right": "50px",
-          "bottom": "50px",
-          "left": "50px"
+          "top": "0cm",            // default is 0, units: mm, cm, in, px
+          "right": "1.4cm",
+          "bottom": "1.2cm",
+          "left": "1.4cm"
         },
 
         paginationOffset: 1, // Override the initial pagination number
-        // "header": {
-        //   "height": "45mm",
-        //   "contents": '<div style="text-align: center;">Author: Marc Bachmann</div>'
+        "header": {
+          "height": "28mm",
+        },
+        // "footer": {
+        //   "height": "28mm",
         // },
         // "footer": {
         //   "height": "28mm",

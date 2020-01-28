@@ -104,6 +104,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_monto_total_inversion.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('monto_total_inversion')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -160,6 +168,14 @@
               @click="agregarObservacion('fuentes_financiamiento')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_fuentes_financiamiento.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('fuentes_financiamiento')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -234,6 +250,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+             <v-btn
+              v-if="user.tipo_usuario == 2 && obs_horizonte_evaluacion.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('horizonte_evaluacion')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -250,12 +274,11 @@
               </v-col>
               <v-col cols="12" md="4" class="column">
                 <v-text-field
-                  v-model="anios_ejecucion"
+                  v-model="anios_operacion"
                   dense
                   type="number"
                   outlined
-                  label="Años de ejecución"
-                  disabled
+                  label="Años de operación"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -331,6 +354,14 @@
               @click="agregarObservacion('calendario_inversion')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_calendario_inversion.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('calendario_inversion')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
           </v-toolbar>
           <v-card-text>
@@ -452,6 +483,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_localizacion_geografica.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('localizacion_geografica')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -469,6 +508,42 @@
                 ></v-textarea>
               </v-col>
               <v-col cols="12" md="7">
+                <v-row>
+                  <v-col cols="10" class="column">
+                    <v-file-input
+                      v-if="visible"
+                      dense
+                      outlined
+                      v-model="imagenNueva"
+                      accept="image/*"
+                      label="Cargar imagen de localización geográfica"
+                      prepend-icon="mdi-camera"
+                      @change="cargaImagen"
+                    ></v-file-input>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col cols="6" class="column">
+                    <v-text-field
+                      value=""
+                      label="Latitud:"
+                      dense
+                      v-model="latitud"
+                      :disabled="!visible"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                  <v-col cols="6" class="column">
+                    <v-text-field
+                      value=""
+                      label="Longitud:"
+                      dense
+                      v-model="longitud"
+                      :disabled="!visible"
+                      outlined
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
                 <v-row>
                   <v-col
                     cols="12"
@@ -512,20 +587,7 @@
                     </v-card>
                   </v-col>
                 </v-row>
-                <v-row>
-                  <v-col cols="10" class="column">
-                    <v-file-input
-                      v-if="visible"
-                      dense
-                      outlined
-                      v-model="imagenNueva"
-                      accept="image/*"
-                      label="Cargar imagen de localización geográfica"
-                      prepend-icon="mdi-camera"
-                      @change="cargaImagen"
-                    ></v-file-input>
-                  </v-col>
-                </v-row>
+                
               </v-col>
             </v-row>
           </v-card-text>
@@ -620,10 +682,12 @@ export default {
     fecha_inicio_ejecucion: null,
     fecha_final_ejecucion: null,
     meses_ejecucion: 0,
-    anios_ejecucion: 0,
+    anios_operacion: 0,
     calendario_inversion: [],
     totalCalendario: 0,
     localizacion_geografica: null,
+    latitud: null,
+    longitud: null,
     ruta_imagen_localizacion: null,
     imagenes: [],
     imagenNueva: null,
@@ -650,7 +714,28 @@ export default {
     snackColor: "",
     snackText: "",
     loading: true,
-    transition: "scale-transition"
+    transition: "scale-transition",
+    obs_monto_total_inversion:{
+      observacion: null,
+      id_observacion: null,
+    },
+    obs_fuentes_financiamiento:{
+      observacion: null,
+      id_observacion: null,
+    },
+    obs_horizonte_evaluacion:{
+      observacion: null,
+      id_observacion: null,
+    },
+    obs_calendario_inversion:{
+      observacion: null,
+      id_observacion: null,
+    },
+    obs_localizacion_geografica:{
+      observacion: null,
+      id_observacion: null,
+    },
+    terminoRevision: false,
   }),
   watch: {
     meses_ejecucion: function(val) {
@@ -658,10 +743,6 @@ export default {
         this.fecha_final_ejecucion = moment(this.fecha_inicio_ejecucion)
           .add(val, "M")
           .format("YYYY-MM");
-        this.anios_ejecucion = moment(this.fecha_final_ejecucion).diff(
-          this.fecha_inicio_ejecucion,
-          "years"
-        );
       }
     },
     fecha_inicio_ejecucion: function(val) {
@@ -741,10 +822,13 @@ export default {
               data.fecha_inicio_ejecucion
             ).format("YYYY-MM");
             this.meses_ejecucion = data.meses_ejecucion;
+            this.anios_operacion = data.anios_operacion;
             this.calendario_inversion = JSON.parse(data.calendario_inversion);
-
+            
             // totalCalendario: 0,
             this.localizacion_geografica = data.localizacion_geografica;
+            this.latitud = data.latitud;
+            this.longitud = data.longitud;
             this.ruta_imagen_localizacion = data.ruta_imagen_localizacion;
             data.observaciones !== null
               ? (this.observaciones = JSON.parse(data.observaciones))
@@ -757,6 +841,9 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.visible = false;
+                }
                 break;
               case 3:
                 this.iconos_estatus = {
@@ -764,7 +851,9 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
-                this.mostrarObservaciones()
+                if(this.ficha_tecnica.estatus == 4){
+                  this.mostrarObservaciones()
+                }
                 break;
               default:
                 break;
@@ -886,9 +975,11 @@ export default {
             fuentes_financiamiento: JSON.stringify(this.fuentes_financiamiento),
             fecha_inicio_ejecucion: this.fecha_inicio_ejecucion,
             meses_ejecucion: this.meses_ejecucion,
-            anios_ejecucion: this.anios_ejecucion,
+            anios_operacion: this.anios_operacion,
             calendario_inversion: JSON.stringify(this.calendario_inversion),
             localizacion_geografica: this.localizacion_geografica,
+            latitud: this.latitud,
+            longitud: this.longitud,
             ruta_imagen_localizacion: this.ruta_imagen_localizacion
           })
           .then(response => {
@@ -1046,7 +1137,32 @@ export default {
     },
     mostrarObservaciones(){
       this.observaciones.forEach(element => {
+        console.log(element)
+        switch (element.seccion) {
+          case 'monto_total_inversion':
+            this.obs_monto_total_inversion.observacion = element.descripcion_observacion
+            this.obs_monto_total_inversion.id_observacion = element.id_observacion
+            break;
+          case 'fuentes_financiamiento':
+            this.obs_fuentes_financiamiento.observacion = element.descripcion_observacion
+            this.obs_fuentes_financiamiento.id_observacion = element.id_observacion
+            break;
+          case "horizonte_evaluacion":
+            this.obs_horizonte_evaluacion.observacion = element.descripcion_observacion
+            this.obs_horizonte_evaluacion.id_observacion = element.id_observacion
+            break;
+          case "calendario_inversion":
+            this.obs_calendario_inversion.observacion = element.descripcion_observacion
+            this.obs_calendario_inversion.id_observacion = element.id_observacion
+            break;
+          case "localizacion_geografica":
+            this.obs_localizacion_geografica.observacion = element.descripcion_observacion
+            this.obs_localizacion_geografica.id_observacion = element.id_observacion
+            break;
         
+          default:
+            break;
+        }
       });
     },
     emiteEvento(tipo) {}

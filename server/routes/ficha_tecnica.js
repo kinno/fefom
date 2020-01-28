@@ -190,18 +190,35 @@ Router.post("/buscar_anexo_siete", (req, res) => {
   );
 });
 
+Router.post("/buscar_anexo_ocho", (req, res) => {
+  var data = req.body;
+  query = `
+            SELECT * FROM tbl_anexo_ocho
+            WHERE id_anexo_ocho = ?
+           `;
+  connection.query(
+  query,
+  [data.id_anexo_ocho],
+    (err, rows, fields) => {
+      if (err) return res.status(500).send("Error del servidor." + err);
+      res.status(200).send(rows);
+    }
+  );
+});
+
 Router.post("/guardar_anexo_uno", (req, res) => {
   var data = req.body;
-
+  console.log(data)
   var query = "";
   if (data.id_anexo_uno == null) {
     query = `insert into tbl_anexo_uno
-         (estatus,id_cartera_proyecto, id_tipo_ppi, subclasificacion_ppi, monto_con_iva, monto_sin_iva, monto_estudios, fuentes_financiamiento, fecha_inicio_ejecucion, meses_ejecucion, anios_ejecucion, calendario_inversion, localizacion_geografica, ruta_imagen_localizacion)
+         (estatus,id_cartera_proyecto, id_tipo_ppi, subclasificacion_ppi, monto_con_iva, monto_sin_iva, monto_estudios, fuentes_financiamiento, fecha_inicio_ejecucion, meses_ejecucion, anios_operacion, calendario_inversion, localizacion_geografica, ruta_imagen_localizacion,latitud,longitud)
          values
-         (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,?,?)`
   } else {
     query = `
          UPDATE tbl_anexo_uno SET
+         estatus=1,
             id_cartera_proyecto = ?,
             id_tipo_ppi=?,
             subclasificacion_ppi=?,
@@ -211,16 +228,18 @@ Router.post("/guardar_anexo_uno", (req, res) => {
             fuentes_financiamiento=?,
             fecha_inicio_ejecucion=?,
             meses_ejecucion=?,
-            anios_ejecucion=?,
+            anios_operacion=?,
             calendario_inversion=?,
             localizacion_geografica=?,
-            ruta_imagen_localizacion=?
+            ruta_imagen_localizacion=?,
+            latitud = ?,
+            longitud = ?
           WHERE 
             id_anexo_uno=?;
            `;
   }
 
-  connection.query(query, [data.id_cartera_proyecto,data.id_tipo_ppi, data.subclasificacion_ppi, data.monto_con_iva, data.monto_sin_iva, data.monto_estudios, data.fuentes_financiamiento, data.fecha_inicio_ejecucion, data.meses_ejecucion, data.anios_ejecucion, data.calendario_inversion, data.localizacion_geografica, data.ruta_imagen_localizacion, data.id_anexo_uno], (err, rows, fields) => {
+  connection.query(query, [data.id_cartera_proyecto,data.id_tipo_ppi, data.subclasificacion_ppi, data.monto_con_iva, data.monto_sin_iva, data.monto_estudios, data.fuentes_financiamiento, data.fecha_inicio_ejecucion, data.meses_ejecucion, data.anios_operacion, data.calendario_inversion, data.localizacion_geografica, data.ruta_imagen_localizacion,data.latitud, data.longitud, data.id_anexo_uno], (err, rows, fields) => {
     if (err) return res.status(500).send(err)
     if (data.id_ficha_tecnica == null) {
      
@@ -425,9 +444,9 @@ Router.post("/guardar_anexo_seis", (req, res) => {
   var query = "";
   if (data.id_anexo_seis == null) {
     query = `insert into tbl_anexo_seis
-         (estatus,descripcion_general,componentes,aspecto_ambiental,aspecto_tecnico,aspecto_legal,analisis_oferta_proyecto,analisis_demanda_proyecto,diagnostico,ruta_imagen_proyecto)
+         (estatus,descripcion_general,componentes,aspecto_ambiental,aspecto_tecnico,aspecto_legal,analisis_oferta_proyecto,analisis_demanda_proyecto,diagnostico,ruta_imagen_proyecto,latitud_plano, longitud_plano)
          values
-         (1, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+         (1, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
   } else {
     query = `
          UPDATE tbl_anexo_seis SET
@@ -440,13 +459,15 @@ Router.post("/guardar_anexo_seis", (req, res) => {
          analisis_oferta_proyecto = ?,
          analisis_demanda_proyecto = ?,
          diagnostico = ?,
-         ruta_imagen_proyecto = ?
+         ruta_imagen_proyecto = ?,
+         latitud_plano = ?,
+         longitud_plano = ?
           WHERE 
             id_anexo_seis=?
            `;
   }
 
-  connection.query(query, [data.descripcion_general,data.componentes,data.aspecto_ambiental,data.aspecto_tecnico,data.aspecto_legal,data.analisis_oferta_proyecto,data.analisis_demanda_proyecto,data.diagnostico,data.ruta_imagen_proyecto,data.id_anexo_seis], (err, rows, fields) => {
+  connection.query(query, [data.descripcion_general,data.componentes,data.aspecto_ambiental,data.aspecto_tecnico,data.aspecto_legal,data.analisis_oferta_proyecto,data.analisis_demanda_proyecto,data.diagnostico,data.ruta_imagen_proyecto,data.latitud, data.longitud, data.id_anexo_seis], (err, rows, fields) => {
     if (err) return res.status(500).send(err)
     if(data.id_anexo_seis == null){
      
@@ -507,17 +528,68 @@ Router.post("/guardar_anexo_siete", (req, res) => {
   })
 });
 
+Router.post("/guardar_anexo_ocho", (req, res) => {
+  var data = req.body;
+  var query = "";
+  if (data.id_anexo_ocho == null) {
+    query = `insert into tbl_anexo_ocho
+         (estatus,comentarios_finales,ramo,entidad,area_responsable,nombre,cargo,responsable_informacion,cargo_responsable_informacion,telefono_responsable_informacion,email_responsable_informacion)
+         values
+         (1, ?, ?, ?, ?, ?, ?, ?, ? ,? ,?)`
+  } else {
+    query = `
+         UPDATE tbl_anexo_ocho SET
+         estatus=1,
+          comentarios_finales = ?,
+          ramo = ?,
+          entidad = ?,
+          area_responsable = ?,
+          nombre = ?,
+          cargo = ?,
+          responsable_informacion = ?,
+          cargo_responsable_informacion = ?,
+          telefono_responsable_informacion = ?,
+          email_responsable_informacion = ?
+          WHERE 
+            id_anexo_ocho=?
+           `;
+  }
+
+  connection.query(query, [data.comentarios_finales,data.ramo,data.entidad,data.area_responsable,data.nombre,data.cargo,data.responsable_informacion,data.cargo_responsable_informacion,data.telefono_responsable_informacion,data.email_responsable_informacion, data.id_anexo_ocho], (err, rows, fields) => {
+    if (err) return res.status(500).send(err)
+    if(data.id_anexo_ocho == null){
+     
+        query2 = `
+         UPDATE tbl_ficha_tecnica SET
+          id_anexo_ocho=?
+          WHERE 
+            id_ficha_tecnica=?
+           `;
+           connection.query(query2, [rows.insertId,data.id_ficha_tecnica], (err2, rows2, fields) => {
+            if (err2) return res.status(500).send(err2)
+            res.status(200).send({id_anexo_ocho: rows.insertId})
+          })
+      
+    }else{
+      
+      res.status(200).send({id_anexo_ocho: data.id_anexo_ocho})
+    }
+  })
+});
+
 Router.post("/cerrar_ficha", (req, res) => {
   var data = req.body;
+  console.log(data)
   query = `
     UPDATE tbl_ficha_tecnica SET
-      estatus = 3
+      estatus = 3,
+      version = ?
     WHERE 
       id_ficha_tecnica=?
            `;
   connection.query(
   query,
-  [data.id_ficha_tecnica,data.id_ayuntamiento],
+  [(data.version + 1),data.id_ficha_tecnica],
     (err, rows, fields) => {
       if (err) return res.status(500).send("Error del servidor." + err);
       res.status(200).send(rows);
@@ -658,6 +730,26 @@ Router.post("/guardar_observaciones_anexo_siete", (req, res) => {
   );
 });
 
+
+Router.post("/guardar_observaciones_anexo_ocho", (req, res) => {
+  var data = req.body;
+  query = `
+    UPDATE tbl_anexo_ocho SET
+      estatus = 3,
+      observaciones = ?
+    WHERE 
+      id_anexo_ocho=?
+           `;
+  connection.query(
+  query,
+  [data.observaciones,data.id_anexo_ocho],
+    (err, rows, fields) => {
+      if (err) return res.status(500).send("Error del servidor." + err);
+      res.status(200).send(rows);
+    }
+  );
+});
+
 Router.post("/validar_anexo_uno", (req, res) => {
   var data = req.body;
   var query = "";
@@ -770,6 +862,21 @@ Router.post("/validar_anexo_siete", (req, res) => {
   })
 });
 
+Router.post("/validar_anexo_ocho", (req, res) => {
+  var data = req.body;
+  var query = "";
+    query = `
+         UPDATE tbl_anexo_ocho SET
+            estatus = 2,
+            observaciones = null
+          WHERE 
+            id_anexo_ocho=?;
+           `;
+   connection.query(query, [data.id_anexo_ocho], (err, rows, fields) => {
+    if (err) return res.status(500).send(err)
+    res.status(200).send("ok")
+  })
+});
 
 Router.post("/cerrar_revision", (req, res) => {
   var data = req.body;
@@ -783,7 +890,8 @@ Router.post("/cerrar_revision", (req, res) => {
       cuatro.estatus AS estatus_cuatro,
       cinco.estatus AS estatus_cinco,
       seis.estatus AS estatus_seis,
-      siete.estatus AS estatus_siete
+      siete.estatus AS estatus_siete,
+      ocho.estatus AS estatus_ocho,
   FROM
       tbl_ficha_tecnica AS ficha
           JOIN
@@ -800,6 +908,8 @@ Router.post("/cerrar_revision", (req, res) => {
       tbl_anexo_seis AS seis ON seis.id_anexo_seis = ficha.id_anexo_seis
           JOIN
       tbl_anexo_siete AS siete ON siete.id_anexo_siete = ficha.id_anexo_siete
+          JOIN
+      tbl_anexo_ocho AS ocho ON ocho.id_anexo_ocho = ficha.id_anexo_ocho
   WHERE
       id_ficha_tecnica = ?
           AND (uno.estatus != 1 AND dos.estatus != 1
@@ -807,7 +917,8 @@ Router.post("/cerrar_revision", (req, res) => {
           AND cuatro.estatus != 1
           AND cinco.estatus != 1
           AND seis.estatus != 1
-          AND siete.estatus != 1)
+          AND siete.estatus != 1
+          AND ocho.estatus != 1)
            `;
    connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
     if (err) return res.status(500).send(err)
@@ -815,7 +926,7 @@ Router.post("/cerrar_revision", (req, res) => {
       return res.status(202).send({error: 1})
     }else{
       console.log(rows)
-      if(rows[0].estatus_uno == 2 && rows[0].estatus_dos == 2 && rows[0].estatus_tres == 2 && rows[0].estatus_cuatro == 2 && rows[0].estatus_cinco == 2 && rows[0].estatus_seis == 2 && rows[0].estatus_siete == 2){
+      if(rows[0].estatus_uno == 2 && rows[0].estatus_dos == 2 && rows[0].estatus_tres == 2 && rows[0].estatus_cuatro == 2 && rows[0].estatus_cinco == 2 && rows[0].estatus_seis == 2 && rows[0].estatus_siete == 2 && rows[0].estatus_ocho == 2){
         //Todas las secciones validadas
         // console.log("Todas las secciones validadas")
         var query = "";
@@ -863,6 +974,7 @@ Router.get("/imprimir_ficha", (req, res) => {
             join tbl_anexo_cinco as cinco on ficha.id_anexo_cinco = cinco.id_anexo_cinco
             join tbl_anexo_seis as seis on ficha.id_anexo_seis = seis.id_anexo_seis
             join tbl_anexo_siete as siete on ficha.id_anexo_siete = siete.id_anexo_siete
+            join tbl_anexo_ocho as ocho on ficha.id_anexo_ocho = ocho.id_anexo_ocho
             where ficha.id_ficha_tecnica = ?
            `;
   connection.query(
@@ -876,12 +988,23 @@ Router.get("/imprimir_ficha", (req, res) => {
 
         "format": "Letter", // allowed units: A3, A4, A5, Legal, Letter, Tabloid
         "border": {
-          "top": "50px", // default is 0, units: mm, cm, in, px
-          "right": "50px",
-          "bottom": "50px",
-          "left": "50px",
+          "top": "1.5cm",            // default is 0, units: mm, cm, in, px
+          "right": "1.5cm",
+          "bottom": "1.5cm",
+          "left": "1.5cm"
         },
-        paginationOffset: 1, // Override the initial pagination number
+        // "border": {
+        //   "top": "50px", // default is 0, units: mm, cm, in, px
+        //   "right": "50px",
+        //   "bottom": "50px",
+        //   "left": "50px",
+        // },
+        
+        paginationOffset: 0, // Override the initial pagination number
+        "footer": {
+          "height": "0.5cm",
+         
+        },
         // "header": {
         //   "height": "45mm",
         //   "contents": '<div style="text-align: center;">Author: Marc Bachmann</div>'
@@ -895,6 +1018,7 @@ Router.get("/imprimir_ficha", (req, res) => {
         //     last: 'Last Page'
         //   }
         // },
+        
       }
       pdf.create(html, config).toStream(function (err, stream) {
         res.setHeader('Content-disposition', 'attachment; filename=ficha_tecnica.pdf');

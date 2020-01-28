@@ -108,6 +108,62 @@
         </material-card>
       </v-flex>
     </v-layout>
+    <v-dialog
+      v-model="dialogObservaciones"
+      width="500"
+      persistent
+    >
+      <v-card>
+        <v-card-title
+          class="headline grey lighten-2"
+          primary-title
+          
+        >
+          Observaciones: {{seccionObservacion}}
+        </v-card-title>
+
+        <v-card-text>
+          <v-row>
+            <v-col cols="12" class="column mt-5">
+              <v-select
+                v-model="observacionSeleccionada"
+                :items="catalogoObservaciones"
+                item-text="texto_observacion"
+                item-value="id_observacion"
+                label="Observación:"
+                readonly
+                outlined
+                dense
+                required
+              ></v-select>
+            </v-col>
+          </v-row>
+          <v-row>
+            <v-col  cols="12" class="column">
+              <v-textarea
+                outlined
+                label="Descripción"
+                v-model="descripcionObservacion"
+                readonly
+              ></v-textarea>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="dialogObservaciones = false, observacionSeleccionada=null, descripcionObservacion=null"
+          >
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 
@@ -119,10 +175,12 @@ import AnexoCuatroComponent from "../components/app/AnexoCuatroComponent";
 import AnexoCincoComponent from "../components/app/AnexoCincoComponent";
 import AnexoSeisComponent from "../components/app/AnexoSeisComponent";
 import AnexoSieteComponent from "../components/app/AnexoSieteComponent";
+import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
 import { EventBus } from "../utils/event-bus";
 export default {
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user"));
+    this.cargarCatalogoObservaciones()
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
       console.log("actualizando ficha_tecnica.id_anexo_dos");
       this.ficha_tecnica.id_anexo_dos = id_anexo_dos;
@@ -143,13 +201,25 @@ export default {
       console.log("actualizando ficha_tecnica.id_anexo_seis");
       this.ficha_tecnica.id_anexo_seis = id_anexo_seis;
     });
-    EventBus.$on("actualizaPropAnexoSiete ", id_anexo_siete => {
+    EventBus.$on("actualizaPropAnexoSiete", id_anexo_siete => {
       console.log("actualizando ficha_tecnica.id_anexo_siete");
       this.ficha_tecnica.id_anexo_siete = id_anexo_siete;
+    });
+    EventBus.$on("actualizaPropAnexoOcho", id_anexo_ocho => {
+      console.log("actualizando ficha_tecnica.id_anexo_ocho");
+      this.ficha_tecnica.id_anexo_ocho = id_anexo_ocho;
     });
     EventBus.$on("buscarFicha", id_ficha_tecnica => {
       this.id_ficha_tecnica = id_ficha_tecnica;
       this.buscar();
+    });
+    EventBus.$on("abreDialogObservacion", (seccion,observaciones) => {
+      this.dialogObservaciones = true
+      this.seccionObservacion = seccion
+      if(observaciones !== null){
+        this.observacionSeleccionada = observaciones.id_observacion
+        this.descripcionObservacion = observaciones.descripcion_observacion
+      }
     });
   },
   components: {
@@ -159,7 +229,8 @@ export default {
     AnexoCuatroComponent,
     AnexoCincoComponent,
     AnexoSeisComponent,
-    AnexoSieteComponent
+    AnexoSieteComponent,
+    AnexoOchoComponent,
   },
   data() {
     return {
@@ -221,6 +292,11 @@ export default {
           titulo: "VII. Identificación y cuantíficación de costos y beneficios",
           component: "anexo-siete-component",
           anexo: 7
+        },
+        {
+          titulo: "Consideraciones generales",
+          component: "anexo-ocho-component",
+          anexo: 8
         }
       ],
       id_ficha_tecnica: null,
@@ -237,8 +313,14 @@ export default {
         id_anexo_cuatro: null,
         id_anexo_cinco: null,
         id_anexo_seis: null,
-        id_anexo_siete: null
-      }
+        id_anexo_siete: null,
+        id_anexo_ocho: null
+      },
+      dialogObservaciones: false,
+      seccionObservacion: "",
+      catalogoObservaciones: [],
+      observacionSeleccionada: null,
+      descripcionObservacion: null,
     };
   },
   computed: {
@@ -264,13 +346,15 @@ export default {
         this.ficha_tecnica.id_anexo_cuatro !== null &&
         this.ficha_tecnica.id_anexo_cinco !== null &&
         this.ficha_tecnica.id_anexo_seis !== null &&
-        this.ficha_tecnica.id_anexo_siete !== null
+        this.ficha_tecnica.id_anexo_siete !== null &&
+        this.ficha_tecnica.id_anexo_ocho !== null 
       ) {
          if (confirm("¿Deseas cerrar y envíar la ficha para revisión? Una vez enviado ya no se podrán realizar cambios en la ficha.")) {
            this.$http
           .post("/ficha_tecnica/cerrar_ficha", {
             id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
             id_ayuntamiento: this.user.id_municipio,
+            version: this.ficha_tecnica.version,
           })
           .then(response => {
             if (response.status == 200) {
@@ -415,14 +499,27 @@ export default {
           });
         });
     },
+     cargarCatalogoObservaciones(){
+      this.$http
+        .get("/catalogos/get_catalogo_observaciones")
+        .then(response => {
+          response.data.rows.forEach(element => {
+            this.catalogoObservaciones.push(element);
+          });
+        })
+        .catch(err => {});
+    },
   },
   beforeDestroy() {
+    EventBus.$off("buscarFicha");
     EventBus.$off("actualizaPropAnexoDos");
     EventBus.$off("actualizaPropAnexoTres");
     EventBus.$off("actualizaPropAnexoCuatro");
     EventBus.$off("actualizaPropAnexoCinco");
     EventBus.$off("actualizaPropAnexoSeis");
     EventBus.$off("actualizaPropAnexoSiete");
+    EventBus.$off("actualizaPropAnexoOcho");
+    EventBus.$off("abreDialogObservacion");
   }
 };
 </script>

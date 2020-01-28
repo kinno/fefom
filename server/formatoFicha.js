@@ -19,8 +19,8 @@ function formatoFicha(datos) {
     var monto_inversion = `
     <style type="text/css">
     .tg  {border-collapse:collapse;border-spacing:0;}
-    .tg td{font-family:Arial; font-size: 12px !important; sans-serif;padding:0px 0px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:black;}
-    .tg th{font-family:Arial; font-size: 14px !important; sans-serif;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg td{font-family:Arial; font-size: 10px !important; sans-serif;padding:0px 0px;border-style:solid;border-width:0px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg th{font-family:Arial; font-size: 11px !important; sans-serif;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
     .tg .tg-cly1{text-align:left;vertical-align:middle}
     .tg .tg-f2tu{font-weight:bold;background-color:#efefef;color:#000000;text-align:center;vertical-align:middle}
     .titulo{ font-size: 14px !important}
@@ -102,7 +102,7 @@ function formatoFicha(datos) {
       </tr>
       <tr>
         <td class="tg-0lax">Número de Años de Operación:</td>
-        <td class="tg-0lax">${datos[0].anios_ejecucion}</td>
+        <td class="tg-0lax">${datos[0].anios_operacion}</td>
       </tr>
     </table>
     `;
@@ -143,14 +143,14 @@ function formatoFicha(datos) {
 
     var localizacion = `
     <style type="text/css">
-    .tg  {border-collapse:collapse;border-spacing:0;}
-    .tg td{font-family:Arial, sans-serif;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-    .tg th{font-family:Arial, sans-serif;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
-    .tg .tg-cly1N{text-align:left;}
-    .tg .tg-n5sa{font-weight:bold;background-color:#c0c0c0;color:#ffffff;text-align:center;vertical-align:middle}
-    .tg .tg-0laxN{text-align:left;}
+    .tg1  {border-collapse:collapse;border-spacing:0;}
+    .tg1 td{font-family:Arial, sans-serif; font-size: 10px !important;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg1 th{font-family:Arial, sans-serif; font-size: 11px !important;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg1 .tg-cly1N{text-align:left;}
+    .tg1 .tg-n5sa{font-weight:bold;background-color:#c0c0c0;color:#ffffff;text-align:center;vertical-align:middle}
+    .tg1 .tg-0laxN{text-align:left; }
     </style>
-    <table class="tg">
+    <table class="tg1">
     <tr>
         <th class="tg-n5sa" colspan="2">Localización Geográfica</th>
     </tr>
@@ -159,7 +159,9 @@ function formatoFicha(datos) {
             ${datos[0].localizacion_geografica}
         </td>
         <td class="tg-0laxN" style="width: 50%" valign="top"> 
-            <center><img src="file:///${ruta}imgfichas/${datos[0].ruta_imagen_localizacion}" style="width:300px " /></center>
+            <center><img src="file:///${ruta}imgfichas/${datos[0].ruta_imagen_localizacion}" style="width:75%; height: auto" /></center><br>
+            Latitud: ${datos[0].latitud} <br>
+            Longitud: ${datos[0].longitud}
         </td>
     </tr>
     </table>
@@ -174,6 +176,7 @@ function formatoFicha(datos) {
         text-align: right !important;
       }
     </style>
+    <!-- page-break-after:always; --!>
     <div style="page-break-after:always;">
         <p style="background-color: black; color: white;" align="center"><b>I. Información general del PPI</b></p>
         <table style="width: 100%">
@@ -183,7 +186,7 @@ function formatoFicha(datos) {
         <tr>
         <td colspan="2" style="text-align: right">
           <span style="font-size: 12px;">Ficha Técnica No:</span> <span>${datos[0].id_ficha_tecnica}</span><br>
-          <span style="font-size: 12px;">Versión:</span> <span>${datos[0].version}</span>
+          <span style="font-size: 12px;">Versión:</span> <span>V${datos[0].version}</span>
         </td>
         </tr>
         <tr>
@@ -444,7 +447,7 @@ function formatoFicha(datos) {
     `;
 
     var seccion45 = `
-        <div style=" page-break-after:always;">
+        <div style="page-break-after:always;">
         <p style="background-color: black; color: white;" align="center"><b>IV. Alineación de la Situación Sin Proyecto</b></p>
             ${medidas_optimizacion}
             <p style="background-color: black; color: white;" align="center"><b>V. Alternativas de Solución</b></p>
@@ -534,7 +537,9 @@ function formatoFicha(datos) {
       <tr>
         <td class="tg-lboi">${datos[0].aspecto_ambiental}</td>
         <td class="tg-lboi" rowspan="5">
-          <img src="file:///${ruta}imgfichas/${datos[0].ruta_imagen_proyecto}" style="width:400px" />
+          <img src="file:///${ruta}imgfichas/${datos[0].ruta_imagen_proyecto}" style="width:400px" /><br>
+          Latitud: ${datos[0].latitud_plano} <br>
+          Longitud: ${datos[0].longitud_plano}
         </td>
       </tr>
       <tr>
@@ -651,7 +656,90 @@ function formatoFicha(datos) {
         </div>
     `;
 
-    var html = seccion1+seccion2+seccion3+seccion45+seccion6+seccion6_2+seccion7;
+    var comentarios = `
+    <style type="text/css">
+    .tg  {border-collapse:collapse;border-spacing:0; width:100%;}
+    .tg td{font-family:Arial, sans-serif;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg th{font-family:Arial, sans-serif;font-weight:normal;padding:10px 5px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
+    .tg .tg-cly1{text-align:left;vertical-align:top}
+    .tg .tg-7fle{font-weight:bold;background-color:#efefef;text-align:center;vertical-align:top}
+    .tg .tg-9etm{font-weight:bold;background-color:#9b9b9b;color:#ffffff;text-align:center;vertical-align:middle}
+    .tg .tg-tc7w{font-weight:bold;background-color:#9b9b9b;color:#ffffff;text-align:left;vertical-align:top}
+    .tg .tg-0lax{text-align:left;vertical-align:top}
+    .tg .tg-i1re{font-weight:bold;background-color:#9b9b9b;color:#ffffff;text-align:center;vertical-align:top}
+    .left {font-weight:bold; text-align: right;  border: none !important;}
+    .right {text-align: left;  border: none !important;}
+    </style>
+    <table class="tg" style="undefined;table-layout: fixed;">
+    <colgroup>
+    <col style="">
+    </colgroup>
+    <tr>
+        <th class="tg-9etm">Comentarios Finales</th>
+    </tr>
+    <tr>
+        <td class="tg-cly1" >${datos[0].comentarios_finales}</td>
+    </tr>
+    <tr>
+        <th class="tg-9etm">Responsables de la Información</th>
+    </tr>
+    <tr>
+        <td class="tg-cly1">
+          <table style="width: 100%; border-collapse:collapse;border-spacing:0;border:0px !important;">
+            <tr>
+              <td class="left" style="width: 35%"> Ramo:</td><td class="right" style="width: 65%">${datos[0].ramo}</td>
+            </tr>
+            <tr>  
+              <td class="left"> Entidad:</td><td class="right">${datos[0].entidad}</td>
+            </tr>
+            <tr>
+              <td class="left"> Área Responsable:</td><td class="right">${datos[0].area_responsable}</td>
+            </tr>
+            <tr>
+              <td colspan="2" style=" border: none !important;">
+                <table class="tg" style="width: 100%; border-collapse:collapse;border-spacing:0;">
+                  <tr>
+                    <td class="left"></td><th class="tg-9etm">Nombre</th><th class="tg-9etm">Cargo</th><th class="tg-9etm" style="width: 30%">Firma</th>
+                  </tr>
+                  <tr>
+                    <td class="tg-9etm" style="height: 150px !important">Autorizó</td><td>${datos[0].nombre}</td><td>${datos[0].cargo}</td><td></td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="left"> Responsable de la Información:</td><td class="right">${datos[0].responsable_informacion}</td>
+            </tr>
+            <tr>  
+              <td class="left"> Cargo:</td><td class="right">${datos[0].cargo_responsable_informacion}</td>
+            </tr>
+            <tr> 
+              <td class="left"> Teléfono:</td><td class="right">${datos[0].telefono_responsable_informacion}</td>
+            </tr>
+            <tr>
+              <td class="left"> Correo electrónico:</td><td class="right">${datos[0].email_responsable_informacion}</td>
+            </tr>
+            <tr>
+              <td class="left"> Versión:</td><td class="right">V${datos[0].version}</td>
+            </tr>
+            <tr>
+              <td class="left"> Fecha:</td><td class="right">**/**/****</td>
+            </tr>
+          </table>
+        </td>
+    </tr>
+    </table>
+    `;
+
+    var seccion8 = `
+    <div style="">
+    <p style="background-color: black; color: white;" align="center"><b>Consideraciones Generales</b></p>
+        ${comentarios}
+    </div>
+`;
+
+    var footer = `<div id="pageFooter" style="font-size: 9px; padding: 0;" align="right">{{page}} de {{pages}}</div>`;
+    var html = seccion1+seccion2+seccion3+seccion45+seccion6+seccion6_2+seccion7+seccion8+footer;
   return html
   }
   module.exports = formatoFicha;

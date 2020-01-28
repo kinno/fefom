@@ -31,6 +31,14 @@
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_descripcion_problematica.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('descripcion_problematica')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
+            </v-btn>
           </v-toolbar>
           <v-card-text>
             <v-row>
@@ -41,8 +49,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="descripcion_problematica"
                   :disabled="!visible"
                 ></v-textarea>
@@ -112,8 +120,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="analisis_oferta"
                   :disabled="!visible"
                 ></v-textarea>
@@ -125,8 +133,8 @@
                   outlined
                   rows="5"
                   row-height="15"
-                  maxlength="280"
-                  counter="280"
+                  maxlength="1000"
+                  counter="1000"
                   v-model="analisis_demanda"
                   :disabled="!visible"
                 ></v-textarea>
@@ -153,6 +161,14 @@
               @click="agregarObservacion('variables_relevantes')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
+            </v-btn>
+            <v-btn
+              v-if="user.tipo_usuario == 2 && obs_variables_relevantes.observacion !== null"
+              icon
+              color="red lighten-1"
+              @click="agregarObservacion('variables_relevantes')"
+            >
+              <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
               </v-toolbar>
               <v-card-text>
@@ -328,7 +344,15 @@ export default {
     ],
     variables_relevantes: [],
     estatus: "En Edición",
-      observaciones: []
+      observaciones: [],
+      obs_descripcion_problematica:{
+        observacion: null,
+        id_observacion: null,
+      },
+      obs_variables_relevantes:{
+        observacion: null,
+        id_observacion: null,
+      },
   }),
   watch: {},
   methods: {
@@ -392,6 +416,10 @@ export default {
             this.analisis_demanda = data.analisis_demanda;
             this.variables_relevantes = JSON.parse(data.variables_relevantes);
 
+             data.observaciones !== null
+              ? (this.observaciones = JSON.parse(data.observaciones))
+              : (this.observaciones = []);
+
             switch (data.estatus) {
               case 2:
                 this.iconos_estatus = {
@@ -399,6 +427,9 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Aceptada";
+                if(this.ficha_tecnica.estatus == 4){
+                  this.visible = false;
+                }
                 break;
               case 3:
                 this.iconos_estatus = {
@@ -406,14 +437,13 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Errores y Observaciones";
+                 if(this.ficha_tecnica.estatus == 4){
+                  this.mostrarObservaciones()
+                }
                 break;
               default:
                 break;
             }
-
-            data.observaciones !== null
-              ? (this.observaciones = JSON.parse(data.observaciones))
-              : (this.observaciones = []);
           } else {
             console.log("Error", response.err);
           }
@@ -603,8 +633,45 @@ export default {
         });
     },
     verificarDatos() {
+      if(this.imagenes.length < 4){
+        this.$fire({
+              type: "warning",
+              title: "Error",
+              text: "Se deben cargar por lo menos 4 imágenes",
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+        return false;
+      } 
+      if(this.imagenes.length > 6){
+        this.$fire({
+              type: "warning",
+              title: "Error",
+              text: "Se deben cargar máximo 6 imágenes",
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+        return false;
+      } 
       return true;
-    }
+    },
+    mostrarObservaciones(){
+      this.observaciones.forEach(element => {
+        console.log(element)
+        switch (element.seccion) {
+          case 'descripcion_problematica':
+            this.obs_descripcion_problematica.observacion = element.descripcion_observacion
+            this.obs_descripcion_problematica.id_observacion = element.id_observacion
+            break;
+          case 'variables_relevantes':
+            this.obs_variables_relevantes.observacion = element.descripcion_observacion
+            this.obs_variables_relevantes.id_observacion = element.id_observacion
+            break;
+          default:
+            break;
+        }
+      });
+    },
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");
