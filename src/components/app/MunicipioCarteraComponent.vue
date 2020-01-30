@@ -754,7 +754,7 @@ export default {
     },
     rubros: [],
     ejercicios: [],
-    ejercicioSeleccionado: "2020",
+    ejercicioSeleccionado: null,
     nuevaObra: [
       { nombreProyecto: "", monto: "" },
       { nombreProyecto: "", monto: "" },
@@ -893,6 +893,7 @@ export default {
           response.data.rows.forEach(element => {
             this.ejercicios.push(element);
           });
+          this.ejercicioSeleccionado = this.ejercicios[this.ejercicios.length - 1].ejercicio
         })
         .catch(err => {});
 

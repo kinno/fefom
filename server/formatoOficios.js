@@ -119,7 +119,7 @@ function formatoTecho(datos) {
                     </tr>
                     <tr>
                     <td colspan="3" style="font-family:Arial, sans-serif;font-size:12px;text-align: center;  padding: 10px;">
-                      "2020. Año de Laura Méndez de Cuenca; emblema de la mujer mexiquense."
+                      ${oficio.leyenda}
                     </td>
                     </tr>
                   </table>

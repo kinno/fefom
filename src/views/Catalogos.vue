@@ -99,9 +99,10 @@
 import UsuariosComponent from "../components/app/CatalogoUsuariosComponent";
 import AyuntamientosComponent from "../components/app/CatalogoAyuntamientosComponent";
 import EjerciciosComponent from "../components/app/CatalogoEjerciciosComponent";
+import ObservacionesComponent from "../components/app/CatalogoObservacionesComponent";
   export default {
     components: {
-      UsuariosComponent, AyuntamientosComponent, EjerciciosComponent
+      UsuariosComponent, AyuntamientosComponent, EjerciciosComponent, ObservacionesComponent
     },
     data() {
       return {
@@ -121,6 +122,10 @@ import EjerciciosComponent from "../components/app/CatalogoEjerciciosComponent";
         {
           titulo: "Ejercicios",
           component: "ejercicios-component",
+        },
+        {
+          titulo: "Observaciones",
+          component: "observaciones-component",
         },
       ],
       }

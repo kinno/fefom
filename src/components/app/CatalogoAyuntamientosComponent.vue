@@ -55,7 +55,6 @@
                         item-text="cargo"
                         item-value="id_cargo"
                         label="Cargo:"
-                        return-object
                         outlined
                         dense
                         >
@@ -131,6 +130,7 @@ export default {
       id_municipio: null, 
       descripcion: null,
       id_cargo: null,
+      cargo: null,
       titulo: null,
       nombre: null
     },
@@ -138,6 +138,7 @@ export default {
       id_municipio: null,
       descripcion: null,
       id_cargo: null,
+      cargo: null,
       titulo: null,
       nombre: null
     }
@@ -154,7 +155,14 @@ export default {
   watch: {
     dialog(val) {
       val || this.close();
-    }
+    },
+    'editedItem.id_cargo': function(val){
+      this.cargo.forEach(element => {
+        if(element.id_cargo == val){
+          this.editedItem.cargo = element.cargo
+        }
+      });
+    },
   },
   created() {
     this.initialize();
@@ -231,7 +239,7 @@ export default {
             typeof this.editedItem.id_municipio === "undefined"
               ? null
               : this.editedItem.id_municipio,
-        descripcion: this.editedItem.descripcion,
+            descripcion: this.editedItem.descripcion,
         id_cargo: this.editedItem.id_cargo,
         titulo: this.editedItem.titulo,
         nombre: this.editedItem.nombre
