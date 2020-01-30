@@ -24,7 +24,7 @@
 
       <v-list-item-content>
         <v-list-item-title>
-          <pre>{{(this.user.descripcion!==null) ? this.user.descripcion : "Administrativo"}}</pre>
+          <pre>{{(this.user.descripcion!==null) ? this.user.descripcion : this.user.nombre}}</pre>
         </v-list-item-title>
         <v-list-item-subtitle>Configuración</v-list-item-subtitle>
       </v-list-item-content>
@@ -104,6 +104,7 @@ import { mapMutations, mapState } from "vuex";
 export default {
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
+    console.log(this.user)
     if (this.user.tipo_usuario == 1) {
       this.items = [
         {

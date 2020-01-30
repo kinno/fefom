@@ -75,7 +75,7 @@ Router.get("/get_catalogo_observaciones", (req, res) => {
 })
 
 Router.post('/registrar_usuario', function(req, res) {
-    console.log(req.body)
+    // console.log(req.body)
     var user = req.body
     var query= "";
     if(user.id == null){
@@ -89,14 +89,14 @@ Router.post('/registrar_usuario', function(req, res) {
     })    
 });
 
-Router.post('/registrar_ayuntamiento', function(req, res) {
-    console.log(req.body)
+Router.post('/registrar_municipio', function(req, res) {
+    // console.log(req.body)
     var municipio = req.body
     var query= "";
     if(municipio.id_municipio == null){
-         query = "insert into cat_municipio(descripcion, id_cargo, título, nombre) values (?,?,?,?)"
+         query = "insert into cat_municipio(descripcion, id_cargo, titulo, nombre) values (?,?,?,?)"
     }else{
-         query = "update cat_municipio set descripcion=?, id_cargo=?, título=?, nombre=? where id_municipio=?"
+         query = "update cat_municipio set descripcion=?, id_cargo=?, titulo=?, nombre=? where id_municipio=?"
     }
     connection.query(query,[municipio.descripcion,municipio.id_cargo,municipio.titulo,municipio.nombre,municipio.id_municipio],(err, rows, fields)=>{
         if (err) return res.status(500).send(err)
@@ -105,7 +105,7 @@ Router.post('/registrar_ayuntamiento', function(req, res) {
 });
 
 Router.post('/registrar_ejercicio', function(req, res) {
-    console.log(req.body)
+    // console.log(req.body)
     var ejercicio = req.body
     var query= "";
     if(ejercicio.id_ejercicio == null){
@@ -114,6 +114,21 @@ Router.post('/registrar_ejercicio', function(req, res) {
          query = "update cat_ejercicio set ejercicio=?, leyenda=? where id_ejercicio=?"
     }
     connection.query(query,[ejercicio.ejercicio,ejercicio.leyenda,ejercicio.id_ejercicio],(err, rows, fields)=>{
+        if (err) return res.status(500).send(err)
+        res.status(200).send("ok")
+    })    
+});
+
+Router.post('/registrar_observacion', function(req, res) {
+    // console.log(req.body)
+    var observacion = req.body
+    var query= "";
+    if(observacion.id_observacion == null){
+         query = "insert into cat_observaciones(texto_observacion) values (?)"
+    }else{
+         query = "update cat_observaciones set texto_observacion=? where id_observacion=?"
+    }
+    connection.query(query,[observacion.texto_observacion,observacion.id_observacion],(err, rows, fields)=>{
         if (err) return res.status(500).send(err)
         res.status(200).send("ok")
     })    

@@ -36,7 +36,7 @@
                       v-model="editedItem.tipo_usuario"
                       :items="tipo_usuario"
                       item-text="descripcion"
-                      item-value="id"
+                      item-value="id_municipio"
                       label="Tipo de usuario"
                       return-object
                       outlined
@@ -221,16 +221,18 @@
         val || this.close()
       },
       'editedItem.tipo_usuario': function(val){
-        if(val.id == 1){
+        if(val.lenth!==0){
+           if(val.id == 1){
           this.editedItem.municipio = null
-        }else if(val.id == 2){
-          this.editedItem.tipo_rol = null
+          }else if(val.id == 2){
+            this.editedItem.tipo_rol = null
+          }
+          
         }
-        this.editedItem.nombre = null
-        this.editedItem.apellido_paterno = null
-        this.editedItem.apellido_materno = null
+       
       },
       'editedItem.municipio': function(val){
+        console.log(val)
         if(val!==null){
           this.editedItem.nombre = val.descripcion
           this.editedItem.apellido_paterno = val.descripcion
@@ -267,19 +269,19 @@
                 if(element.tipo_rol !== null){
                   switch (element.tipo_rol) {
                     case 1:
-                      tipo_rol.id = tipo_rol
+                      tipo_rol.id = element.tipo_rol
                       tipo_rol.descripcion = "Analista"
                       break;
                     case 2:
-                      tipo_rol.id = tipo_rol
+                      tipo_rol.id = element.tipo_rol
                       tipo_rol.descripcion = "Revisor"
                       break;
                     case 3:
-                      tipo_rol.id = tipo_rol
+                      tipo_rol.id = element.tipo_rol
                       tipo_rol.descripcion = "Autorizador"
                       break;
                     case 4:
-                      tipo_rol.id = tipo_rol
+                      tipo_rol.id = element.tipo_rol
                       tipo_rol.descripcion = "Administrador"
                       break;
                   
@@ -295,7 +297,7 @@
                   apellido_paterno: element.apellido_paterno,
                   apellido_materno: element.apellido_materno,
                   municipio: {
-                    id: element.id_municipio,
+                    id_municipio: element.id_municipio,
                     descripcion: element.descripcion
                   },
                   activo: element.activo,

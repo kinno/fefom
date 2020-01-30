@@ -499,7 +499,7 @@ export default {
     techosFinancieros: [],
     ejercicios: [],
     municipios: [],
-    ejercicioSeleccionado: "2020",
+    ejercicioSeleccionado: null,
     editedIndex: -1,
     editedItem: {
       municipio: [],
@@ -550,7 +550,7 @@ export default {
       val || this.close();
     },
     ejercicioSeleccionado(val) {
-      this.initialize();
+      this.getTechos();
     },
     "editedItem.porc_iluminacion_municipal": function(val) {
       var monto_total = parseFloat(this.editedItem.monto_total).toFixed(2);
@@ -608,6 +608,7 @@ export default {
           response.data.rows.forEach(element => {
             this.ejercicios.push(element);
           });
+          this.ejercicioSeleccionado = this.ejercicios[this.ejercicios.length - 1].ejercicio
         })
         .catch(err => {});
 

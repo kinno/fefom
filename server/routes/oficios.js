@@ -11,8 +11,9 @@ moment.locale("Es");
 
 Router.post("/buscar_oficio_techos", (req, res) => {
   query = `
-            SELECT * FROM tbl_principal_oficio
-            WHERE ejercicio like ? and id_municipio = ? and id_tipo_oficio = 1
+          SELECT tbl_principal_oficio.*, cat_ejercicio.leyenda FROM tbl_principal_oficio
+            left join cat_ejercicio on tbl_principal_oficio.ejercicio = cat_ejercicio.ejercicio
+          WHERE tbl_principal_oficio.ejercicio like ? and tbl_principal_oficio.id_municipio = ? and id_tipo_oficio = 1
            `;
   connection.query(
     query,
@@ -83,7 +84,7 @@ Router.post("/crear_oficio", async (req, res) => {
 Router.post("/buscar_oficio_cartera", (req, res) => {
   var datos = [];
       query = `
-            SELECT * FROM tbl_principal_oficio
+            SELECT tbl_principal_oficio.*, cat_ejercicios.leyenda FROM tbl_principal_oficio
             WHERE ejercicio like ? and id_municipio = ? and id_tipo_oficio = 2
            `;
       connection.query(

@@ -570,7 +570,7 @@ export default {
     },
     rubros: [],
     ejercicios: [],
-    ejercicioSeleccionado: "2020",
+    ejercicioSeleccionado: null,
     municipios: [],
     municipioSeleccionado: "",
     nuevaObra: [
@@ -686,6 +686,7 @@ export default {
           response.data.rows.forEach(element => {
             this.ejercicios.push(element);
           });
+          this.ejercicioSeleccionado = this.ejercicios[this.ejercicios.length - 1].ejercicio
         })
         .catch(err => {});
 
