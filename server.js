@@ -37,10 +37,9 @@ app.use("/server/oficios", oficiosRoutes);
 
 
 app.use(serveStatic(__dirname + "/dist"));
-var port = process.env.PORT || 8081;
-app.listen(port);
-// app.listen('5000','0.0.0.0',()=>{
-//     console.log('server started 5000');
-// });
+//app.listen(port);
+ app.listen('8081','0.0.0.0',()=>{
+     console.log('server started 8081');
+});
 
 // console.log(process.env.NODE_ENV)
