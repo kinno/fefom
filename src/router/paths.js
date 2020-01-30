@@ -13,7 +13,6 @@ import FichaTecnica from '../views/FichaTecnica'
 import RevisionFichaTecnica from '../views/RevisionFichaTecnica'
 import Oficios from '../views/Oficios'
 import Catalogos from '../views/Catalogos'
-import Usuarios from '../components/app/UsuariosComponent'
 
 export default [{
     path: '/',
@@ -98,13 +97,9 @@ export default [{
     path: '/catalogos',
     name: 'Catalogos',
     component: Catalogos,
-    children: [
-      // UserHome will be rendered inside User's <router-view>
-      // when /user/:id is matched
-      { path: 'usuarios', component: Usuarios },
-    ],
     meta: {
-      requiresAuth: true
+      requiresAuth: true,
+      requiresFefom: true,
     },
   },
   

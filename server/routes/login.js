@@ -24,7 +24,7 @@ Router.post('/register-admin', function(req, res) {
 });
 
 Router.post('/', (req, res) => {
-    const query = "Select * from cat_usuario join cat_municipio on cat_usuario.id_municipio = cat_municipio.id_municipio where cat_usuario.username = ?";
+    const query = "Select * from cat_usuario left join cat_municipio on cat_usuario.id_municipio = cat_municipio.id_municipio where cat_usuario.username = ? and cat_usuario.activo = 1";
     connection.query(query,[req.body.username],(err, rows, fields)=>{
         console.log(rows)
         if (err) return res.status(500).send('Error del servidor.'+err);

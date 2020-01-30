@@ -8,6 +8,4 @@ lintOnSave: false,
     historyApiFallback: true,
    
   },
-
-  
 };
