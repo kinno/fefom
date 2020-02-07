@@ -10,7 +10,7 @@
     clipped
     mobile-break-point="991"
     persistent
-    width="200"
+    width="200px"
     :expand-on-hover="true"
   >
     <template v-slot:img="attrs">
@@ -18,8 +18,8 @@
     </template>
 
     <v-list-item two-line>
-      <v-list-item-avatar class="mr-1">
-        <v-icon>mdi-account-circle</v-icon>
+      <v-list-item-avatar >
+        <v-icon large dense>mdi-account-circle</v-icon>
       </v-list-item-avatar>
 
       <v-list-item-content>
@@ -104,7 +104,7 @@ import { mapMutations, mapState } from "vuex";
 export default {
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
-    console.log(this.user)
+    // console.log(this.user)
     if (this.user.tipo_usuario == 1) {
       this.items = [
         {
@@ -245,6 +245,7 @@ export default {
         .then(response => {
           localStorage.clear();
           window.localStorage.clear();
+          console.log(localStorage.getItem('jwt'))
           this.$router.push({ path: "/" });
         })
         .catch(function(error) {

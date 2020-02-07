@@ -47,7 +47,7 @@
                       ></v-autocomplete>
                     </v-col>
                   </v-row>
-                  <v-row >
+                  <v-row>
                     <v-col cols="12" md="7">
                       <v-select
                         v-model="editedItem.id_cargo"
@@ -57,9 +57,9 @@
                         label="Cargo:"
                         outlined
                         dense
-                        >
+                      >
                       </v-select>
-                      </v-col>
+                    </v-col>
                     <v-col cols="12" md="5">
                       <v-text-field
                         dense
@@ -92,12 +92,17 @@
         </v-toolbar>
       </template>
       <template v-slot:item.action="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-square-edit-outline
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete-forever
-        </v-icon>
+        <v-btn class="btnK pa-0" x-small height="30px" @click="editItem(item)">
+          <v-icon color="green darken-2">mdi-square-edit-outline</v-icon>
+        </v-btn>
+        <v-btn
+          class="btnK pa-0"
+          x-small
+          height="30px"
+          @click="deleteItem(item)"
+        >
+          <v-icon color="red darken-2">mdi-delete-forever</v-icon>
+        </v-btn>
       </template>
       <template v-slot:no-data>
         <v-btn color="primary" @click="initialize">Reset</v-btn>
@@ -124,10 +129,10 @@ export default {
     ],
     desserts: [],
     municipios: [],
-    cargo:[],
+    cargo: [],
     editedIndex: -1,
     editedItem: {
-      id_municipio: null, 
+      id_municipio: null,
       descripcion: null,
       id_cargo: null,
       cargo: null,
@@ -156,13 +161,13 @@ export default {
     dialog(val) {
       val || this.close();
     },
-    'editedItem.id_cargo': function(val){
+    "editedItem.id_cargo": function(val) {
       this.cargo.forEach(element => {
-        if(element.id_cargo == val){
-          this.editedItem.cargo = element.cargo
+        if (element.id_cargo == val) {
+          this.editedItem.cargo = element.cargo;
         }
       });
-    },
+    }
   },
   created() {
     this.initialize();
@@ -239,10 +244,10 @@ export default {
             typeof this.editedItem.id_municipio === "undefined"
               ? null
               : this.editedItem.id_municipio,
-            descripcion: this.editedItem.descripcion,
-        id_cargo: this.editedItem.id_cargo,
-        titulo: this.editedItem.titulo,
-        nombre: this.editedItem.nombre
+          descripcion: this.editedItem.descripcion,
+          id_cargo: this.editedItem.id_cargo,
+          titulo: this.editedItem.titulo,
+          nombre: this.editedItem.nombre
         })
         .then(response => {
           console.log(response);

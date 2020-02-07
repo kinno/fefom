@@ -11,21 +11,47 @@ const carteraRoutes = require("./server/routes/cartera_proyectos");
 const fichaTecnica = require("./server/routes/ficha_tecnica");
 const oficiosRoutes = require("./server/routes/oficios");
 const history = require('connect-history-api-fallback');
+const jwt = require('jsonwebtoken');
+const config = require('./server/config');
+var moment = require('moment');
 
 
 app = express();
-// app.use((req, res, next) => {
-//     res.header('Access-Control-Allow-Origin', '*');
-//     res.header('Access-Control-Allow-Headers', 'Authorization, X-API-KEY, Origin, X-Requested-With, Content-Type, Accept, Access-COntrol-Allow-Request-Method');
-//     res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-//     res.header('Allow', 'GET, POST, OPTIONS, PUT, DELETE');
-//     next();
-// })
 app.use(cors())
 app.use(morgan('tiny'));
 app.use(history())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
+
+var requestTime = function (req, res, next) {
+  // console.log(req.originalUrl)
+  if(req.originalUrl != '/server/login/'){
+    // console.log("Entro al middleware")
+    if(!req.headers.authorization) {
+      return res
+        .status(403)
+        .send({message: "Tu petición no tiene cabecera de autorización"});
+    }
+    
+    var token = req.headers.authorization.split(" ")[1];
+    var payload = jwt.decode(token, config.TOKEN_SECRET);
+
+    // console.log(payload.exp, moment().unix())
+    
+    if(payload.exp <= moment().unix()) {
+       return res
+         .status(401)
+          .send({message: "El token ha expirado"});
+    }
+    
+    req.user = payload.sub;
+    next();
+  }else{
+    next()
+  }
+   
+  };
+app.use(requestTime)  
 
 app.use("/server/login", loginRoutes);
 app.use("/server/catalogos", catalogosRoutes);

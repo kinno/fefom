@@ -1,10 +1,7 @@
 <template>
   <v-card>
     <v-card-title> </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="desserts"
-    >
+    <v-data-table :headers="headers" :items="desserts">
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-spacer></v-spacer>
@@ -31,13 +28,13 @@
                       ></v-text-field>
                     </v-col>
                   </v-row>
-                  <v-row >
+                  <v-row>
                     <v-col cols="12" md="12">
                       <v-textarea
                         outlined
                         label="Leyenda:"
                         v-model="editedItem.leyenda"
-                        ></v-textarea>
+                      ></v-textarea>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -53,15 +50,20 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
-      </template>   
+      </template>
       <template v-slot:item.action="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-square-edit-outline
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete-forever
-        </v-icon>
-      </template>  
+        <v-btn class="btnK pa-0" x-small height="30px" @click="editItem(item)">
+          <v-icon color="green darken-2">mdi-square-edit-outline</v-icon>
+        </v-btn>
+        <v-btn
+          class="btnK pa-0"
+          x-small
+          height="30px"
+          @click="deleteItem(item)"
+        >
+          <v-icon color="red darken-2">mdi-delete-forever</v-icon>
+        </v-btn>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -83,22 +85,20 @@ export default {
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      id_ejercicio: null, 
+      id_ejercicio: null,
       ejercicio: null,
-      leyenda: null,
+      leyenda: null
     },
     defaultItem: {
-       id_ejercicio: null, 
+      id_ejercicio: null,
       ejercicio: null,
-      leyenda: null,
+      leyenda: null
     }
   }),
 
   computed: {
-       formTitle() {
-      return this.editedIndex === -1
-        ? "Nuevo ejercicio"
-        : "Editar ejercicio";
+    formTitle() {
+      return this.editedIndex === -1 ? "Nuevo ejercicio" : "Editar ejercicio";
     }
   },
 
@@ -140,8 +140,8 @@ export default {
             typeof this.editedItem.id_ejercicio === "undefined"
               ? null
               : this.editedItem.id_ejercicio,
-        ejercicio: this.editedItem.ejercicio,
-        leyenda: this.editedItem.leyenda,
+          ejercicio: this.editedItem.ejercicio,
+          leyenda: this.editedItem.leyenda
         })
         .then(response => {
           console.log(response);
@@ -170,7 +170,7 @@ export default {
           .then(response => {
             console.log(response);
             if (response.status == 200) {
-              this.desserts.splice(index, 1)
+              this.desserts.splice(index, 1);
             } else {
               console.log("Error", response.err);
             }
@@ -179,7 +179,7 @@ export default {
             console.error(error);
           });
       }
-    },
+    }
   }
 };
 </script>

@@ -7,6 +7,7 @@
           title="Ficha Técnica"
           text="Revisión"
           class="mt-8"
+         style="margin-bottom: 65px !important"
         >
           <v-container fluid class="pa-0">
             <v-card color="grey lighten-3">
@@ -100,15 +101,17 @@
                   {{ item.titulo }}
                 </v-tab>
               </v-tabs>
-              <v-card flat>
-                <v-card-text>
-                  <component
-                    :is="currentTabComponent"
-                    :ficha_tecnica="ficha_tecnica"
-                    :key="update"
-                  ></component>
-                </v-card-text>
-              </v-card>
+              <v-fade-transition mode="out-in" >
+                <v-card flat :key="change">
+                  <v-card-text>
+                    <component
+                      :is="currentTabComponent"
+                      :ficha_tecnica="ficha_tecnica"
+                      :key="update"
+                    ></component>
+                  </v-card-text>
+                </v-card>
+              </v-fade-transition>
             </v-card>
           </v-container>
         </material-card>
@@ -244,6 +247,7 @@ export default {
       tab: null,
       currentTab: "anexo-uno-component",
       update: 0,
+      change:0,
       botonVisible: true,
       estatusList: [
         {
@@ -325,6 +329,7 @@ export default {
   },
   computed: {
     currentTabComponent: function() {
+      this.change++;
       return this.currentTab;
     }
   },

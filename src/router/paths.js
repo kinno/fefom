@@ -18,6 +18,7 @@ export default [{
     path: '/',
     component: Login,
     name: "Login",
+    props: true,
     meta: {
       guest: true
     },

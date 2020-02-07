@@ -115,19 +115,14 @@
       </v-toolbar>
     </template>
     <template v-slot:item.action="{ item }">
-      <v-icon
-        small
-        class="mr-2"
-        @click="editItem(item)"
-      >
-        mdi-square-edit-outline
-      </v-icon>
-      <v-icon
-        small
-        @click="deleteItem(item)"
-      >
-        mdi-delete-forever
-      </v-icon>
+     <v-btn class="btnK pa-0" x-small height="30px" @click="editItem(item)">
+        <v-icon color="green darken-2"
+          >mdi-square-edit-outline</v-icon
+        >
+      </v-btn>
+      <v-btn class="btnK pa-0" x-small height="30px" @click="deleteItem(item)">
+        <v-icon color="red darken-2">mdi-delete-forever</v-icon>
+      </v-btn>
     </template>
     <template v-slot:no-data>
       <v-btn color="primary" @click="initialize">Reset</v-btn>

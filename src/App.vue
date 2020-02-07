@@ -4,7 +4,7 @@
 
     <core-drawer v-if="drawer"/> -->
 
-    <core-view />
+    <core-view class="fill-height"/>
 
     <!-- <core-footer /> -->
     <v-dialog v-model="dialogLoading" persistent width="300">

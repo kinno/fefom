@@ -7,6 +7,7 @@
           title="Ficha Técnica"
           text="Creación y/o Modificación"
           class="mt-8"
+          style="margin-bottom: 65px !important"
         >
           <v-container fluid class="pa-0">
             <v-card color="grey lighten-3">

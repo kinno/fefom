@@ -34,7 +34,7 @@
         </v-toolbar>
       </v-col>
     </v-row>
-    <v-expansion-panels accordion popout focusable>
+    <v-expansion-panels accordion popout focusable class="pb-5">
       <v-expansion-panel>
         <v-expansion-panel-header color="grey lighten-3" class="font-weight-bold">
           <v-col cols="12" sm="6" md="8" class="text-left pa-0">
