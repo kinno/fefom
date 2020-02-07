@@ -36,7 +36,8 @@ app.use("/server/oficios", oficiosRoutes);
 
 
 
-app.use(serveStatic(__dirname + "/dist"));
+//app.use(serveStatic(__dirname + "/dist"));
+//console.log(__dirname)
 //app.listen(port);
  app.listen('8081','0.0.0.0',()=>{
      console.log('server started 8081');
