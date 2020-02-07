@@ -7,9 +7,10 @@
           title="Catálogos"
           text="Administración"
           class="mt-8"
+          style="margin-bottom: 65px !important"
         >
         <v-container grid-list-xs>
-          <v-row no-gutters>
+          <v-row >
             <v-col cols="12" md="2">
                 <v-tabs
                   v-model="tab"
@@ -22,7 +23,7 @@
                   <v-tab
                     v-for="item in items"
                     :key="item.titulo"
-                    @click="expand=false, currentTab = item.component"
+                    @click=" currentTab = item.component"
                   >
                     {{ item.titulo }}
                   </v-tab>
@@ -40,8 +41,8 @@
                 </v-tabs>
             </v-col>
             <v-col cols="12" md="10">
-              <v-expand-x-transition>
-                <v-card  color="green lighten-4">
+              <v-fade-transition mode="out-in">
+                <v-card  color="green lighten-4" :key="update">
                   <v-card-text>
                     <component
                         :is="currentTabComponent"
@@ -50,7 +51,7 @@
                       ></component>
                   </v-card-text>
                 </v-card>
-              </v-expand-x-transition>
+              </v-fade-transition>
             </v-col>
           </v-row>
         </v-container>
@@ -132,6 +133,7 @@ import ObservacionesComponent from "../components/app/CatalogoObservacionesCompo
     },
      computed: {
       currentTabComponent: function() {
+        this.update++;
         return this.currentTab;
       }
   },

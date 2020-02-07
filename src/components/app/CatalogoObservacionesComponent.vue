@@ -1,10 +1,7 @@
 <template>
   <v-card>
     <v-card-title> </v-card-title>
-    <v-data-table
-      :headers="headers"
-      :items="desserts"
-    >
+    <v-data-table :headers="headers" :items="desserts">
       <template v-slot:top>
         <v-toolbar flat color="white">
           <v-spacer></v-spacer>
@@ -21,13 +18,13 @@
 
               <v-card-text>
                 <v-container>
-                  <v-row >
+                  <v-row>
                     <v-col cols="12" md="12">
                       <v-textarea
                         outlined
                         label="Texto de la observación:"
                         v-model="editedItem.texto_observacion"
-                        ></v-textarea>
+                      ></v-textarea>
                     </v-col>
                   </v-row>
                 </v-container>
@@ -43,15 +40,20 @@
             </v-card>
           </v-dialog>
         </v-toolbar>
-      </template>   
+      </template>
       <template v-slot:item.action="{ item }">
-        <v-icon small class="mr-2" @click="editItem(item)">
-          mdi-square-edit-outline
-        </v-icon>
-        <v-icon small @click="deleteItem(item)">
-          mdi-delete-forever
-        </v-icon>
-      </template>  
+        <v-btn class="btnK pa-0" x-small height="30px" @click="editItem(item)">
+          <v-icon color="green darken-2">mdi-square-edit-outline</v-icon>
+        </v-btn>
+        <v-btn
+          class="btnK pa-0"
+          x-small
+          height="30px"
+          @click="deleteItem(item)"
+        >
+          <v-icon color="red darken-2">mdi-delete-forever</v-icon>
+        </v-btn>
+      </template>
     </v-data-table>
   </v-card>
 </template>
@@ -62,23 +64,23 @@ export default {
     dialog: false,
     search: "",
     headers: [
-      { text: "Observación", value: "texto_observacion", width: "90%"},
+      { text: "Observación", value: "texto_observacion", width: "90%" },
       { text: "Acciones", value: "action", sortable: false, width: "10%" }
     ],
     desserts: [],
     editedIndex: -1,
     editedItem: {
-      id_observacion: null, 
+      id_observacion: null,
       texto_observacion: null
     },
     defaultItem: {
-        id_observacion: null, 
+      id_observacion: null,
       texto_observacion: null
     }
   }),
 
   computed: {
-       formTitle() {
+    formTitle() {
       return this.editedIndex === -1
         ? "Nuevo observación"
         : "Editar observacion";
@@ -123,7 +125,7 @@ export default {
             typeof this.editedItem.id_observacion === "undefined"
               ? null
               : this.editedItem.id_observacion,
-        texto_observacion: this.editedItem.texto_observacion,
+          texto_observacion: this.editedItem.texto_observacion
         })
         .then(response => {
           console.log(response);
@@ -152,7 +154,7 @@ export default {
           .then(response => {
             console.log(response);
             if (response.status == 200) {
-              this.desserts.splice(index, 1)
+              this.desserts.splice(index, 1);
             } else {
               console.log("Error", response.err);
             }
@@ -161,7 +163,7 @@ export default {
             console.error(error);
           });
       }
-    },
+    }
   }
 };
 </script>

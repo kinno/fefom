@@ -17,7 +17,7 @@
       max-height="50"
     ></v-img>
   <v-spacer></v-spacer>
-  <v-toolbar-title class="ml-10">Sistema del Fondo Estatal Para El Fortalecimiento Municipal (FEFOM)</v-toolbar-title>
+  <v-toolbar-title class="ml-10">Sistema del Fondo Estatal de Fortalecimiento Municipal (FEFOM)</v-toolbar-title>
    <v-spacer></v-spacer>
    <v-img
       src="../../../public/img/Logo_Gem_R.png"

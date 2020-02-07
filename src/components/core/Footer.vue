@@ -2,34 +2,26 @@
   <v-footer
     id="core-footer"
     absolute
-    height="50"
-    color="grey lighten-2"
+    height="60"
+    color="grey darken-1"
+    class="font-weight-medium font-size"
+    padless
+    
+    
   >
-    <div class="footer-items">
-      <span
-        v-for="link in links"
-        :key="link.name"
-      >
-        <a
-          :href="link.Link"
-          class="tertiary--text footer-links"
-        >{{ link.name }}</a>
-      </span>
-    </div>
-    <v-spacer />
-    <span class="font-weight-light copyright">
-      &copy;
-      {{ (new Date()).getFullYear() }}
-      <a
-        href="https://www.creative-tim.com/"
-        target="_blank"
-      >Creative Tim</a>, made with
-      <v-icon
-        color="tertiary"
-        size="17"
-      >mdi-heart</v-icon>
-      for a better web
-    </span>
+  <!-- {{ new Date().getFullYear() }} — <strong>Vuetify</strong> -->
+  <v-row>
+    
+    <v-col
+      class="text-right pa-0 pr-5"
+      cols="12"
+    >
+       <p class="ma-0 text-uppercase font-weight-black" style="font-size: 11px;">Secretaría de finanzas</p>
+       <p class="ma-0 text-uppercase" style="font-size: 10px;">Subsecretaría de planeación y presupuesto</p>
+       <p class="ma-0" style="font-size: 10px;">Calle del Colorin Número 101, Colonia Lomas Altas.
+        Toluca. Estado de México. CP 50060, Teléfono: 01 (722) 625 0486</p>
+    </v-col>
+  </v-row>
   </v-footer>
 </template>
 

@@ -7,6 +7,8 @@
          title="Techos Financieros"
           text=""
           class="mt-8"
+          style="margin-bottom: 65px !important"
+          
         >
           <techos-financieros-component></techos-financieros-component>
         </material-card>

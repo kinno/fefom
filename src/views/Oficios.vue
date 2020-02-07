@@ -7,6 +7,7 @@
           title="Control de Oficios"
           text=""
           class="mt-8"
+          style="margin-bottom: 65px !important"
         >
          <oficios-component></oficios-component>
         </material-card>

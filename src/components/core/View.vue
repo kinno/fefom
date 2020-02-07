@@ -1,25 +1,26 @@
 <template>
   <div>
     <core-app-bar />
-    <div v-if="loginView == false">
+    <div v-if="loginView == false"  class="fill-height">
       <core-drawer />
-      <v-content class="grey lighten-3" style="height:100%">
+      <v-content class="grey lighten-2 fill-height" >
         <div id="core-view">
           <v-fade-transition mode="out-in">
             <router-view />
           </v-fade-transition>
         </div>
       </v-content>
-      <!-- <core-footer></core-footer> -->
+      <core-footer></core-footer>
     </div>
-    <div v-else>
-      <v-content class="grey lighten-3">
+    <div v-else class="fill-height">
+      <v-content class="grey lighten-2 fill-height">
         <div id="core-view">
           <v-fade-transition mode="out-in">
             <router-view />
           </v-fade-transition>
         </div>
       </v-content>
+      <core-footer></core-footer>
     </div>
   </div>
 </template>
@@ -35,7 +36,7 @@ export default {
   name: "CoreView",
   components: {
     CoreDrawer: () => import("@/components/core/Drawer"),
-    // CoreFooter: () => import('@/components/core/Footer'),
+    CoreFooter: () => import('@/components/core/Footer'),
     CoreAppBar: () => import("@/components/core/AppBar")
   },
   metaInfo() {

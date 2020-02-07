@@ -10,6 +10,28 @@ import VueCurrencyFilter  from 'vue-currency-filter'
 import VueSimpleAlert from "vue-simple-alert";
 
 Axios.defaults.baseURL = 'http://localhost:8081/server'
+Axios.interceptors.request.use(function(config){
+  const token = localStorage.getItem('jwt');
+    config.headers.Authorization =  token ? `Bearer ${token}` : '';
+    return config;
+  // this.$http.defaults.headers.common['Authorization'] = `bearer ${localStorage.getItem('jwt')}`;
+})
+
+Axios.interceptors.response.use(function (response) {
+  // Do something with response data
+  return response;
+}, function (error) {
+  // Do something with response error
+  if(error.response.status === 401){
+    localStorage.clear();
+    window.localStorage.clear();
+   router.push({name: 'Login', params: { expired: true }}).catch(err => {})
+    return Promise.reject(error);
+  }else{
+    return Promise.reject(error);
+  }
+  
+});
 Vue.prototype.$http = Axios;
 Vue.use(VueCurrencyFilter,{
   symbol : '$',

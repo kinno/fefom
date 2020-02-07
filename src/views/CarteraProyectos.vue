@@ -7,6 +7,7 @@
           title="Registro de Cartera de Proyectos"
           text=""
           class="mt-8"
+         style="margin-bottom: 65px !important"
         >
           <cartera-proyectos-component></cartera-proyectos-component>
         </material-card>

@@ -329,7 +329,11 @@
         <template v-slot:item="{ item }">
           <tr>
             <td class="text-left">{{ item.municipio.descripcion }}</td>
-            <td>{{ item.monto_total | currency }}</td>
+            <td>
+              <span class="font-weight-black">
+              {{ item.monto_total | currency }}
+              </span>
+            </td>
             <td>
               {{ item.monto_iluminacion_municipal | currency }}<br>
               <span class="font-weight-black">
@@ -392,14 +396,14 @@
             <td>
               <v-row  no-gutters>
                 <v-col cols="6">
-                  <v-btn class="btnK" x-small height="30px" @click="editItem(item)">
+                  <v-btn class="btnK pa-0" x-small height="30px" @click="editItem(item)">
                     <v-icon color="green darken-2"
                       >mdi-square-edit-outline</v-icon
                     >
                   </v-btn>
                 </v-col>
                 <v-col cols="6">
-                  <v-btn class="btnK" x-small height="30px" @click="deleteItem(item)">
+                  <v-btn class="btnK pa-0" x-small height="30px" @click="deleteItem(item)">
                     <v-icon color="red darken-2">mdi-delete-forever</v-icon>
                   </v-btn>
                 </v-col>
