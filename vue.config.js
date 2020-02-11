@@ -9,5 +9,8 @@ devServer: {
     port: '80',
     hot: true,
 public: '0.0.0.0:80',
+ headers: {
+            'Access-Control-Allow-Origin': '*'
+        },
   },
 };
