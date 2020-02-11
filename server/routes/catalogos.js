@@ -157,4 +157,16 @@ Router.post('/eliminar_ejercicio', function(req, res) {
         return res.status(200).send("ok")
     })    
 });
+
+Router.post('/eliminar_observacion', function(req, res) {
+   
+    var observacion = req.body
+    var query= "";
+    query = "delete from cat_observaciones where id_observacion = ?"
+    // console.log(user.id)
+    connection.query(query,[observacion.id_observacion],(err, rows, fields)=>{
+        if (err) return res.status(500).send(err)
+        return res.status(200).send("ok")
+    })    
+});
 module.exports = Router;

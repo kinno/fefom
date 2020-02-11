@@ -146,10 +146,10 @@ export default {
     },
     deleteItem(item) {
       const index = this.desserts.indexOf(item);
-      if (confirm(`¿Deseas eliminar el ejercicio ${item.ejercicio}?`)) {
+      if (confirm(`¿Deseas eliminar la observacion?`)) {
         this.$http
-          .post("/catalogos/eliminar_ejercicio", {
-            id_ejercicio: this.desserts[index].id_ejercicio
+          .post("/catalogos/eliminar_observacion", {
+            id_observacion: this.desserts[index].id_observacion
           })
           .then(response => {
             console.log(response);
