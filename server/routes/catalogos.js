@@ -80,13 +80,28 @@ Router.post('/registrar_usuario', function(req, res) {
     var query= "";
     if(user.id == null){
          query = "insert into cat_usuario(username, password, id_municipio, activo, tipo_usuario, tipo_rol, nombre, apellido_paterno, apellido_materno) values (?,?,?,?,?,?,?,?,?)"
+         connection.query(query,[user.username,bcrypt.hashSync(user.password, 8),user.id_municipio, user.activo, user.tipo_usuario, user.tipo_rol,user.nombre, user.apellido_paterno, user.apellido_materno, user.id],(err, rows, fields)=>{
+          if (err) return res.status(500).send(err)
+          res.status(200).send("ok")
+      }) 
     }else{
-         query = "update cat_usuario set username=?, password=?, id_municipio=?, activo=?, tipo_usuario=?, tipo_rol=?, nombre=?, apellido_paterno=?, apellido_materno=? where id_usuario=?"
+         query = "update cat_usuario set username=?, id_municipio=?, activo=?, tipo_usuario=?, tipo_rol=?, nombre=?, apellido_paterno=?, apellido_materno=? where id_usuario=?"
+         connection.query(query,[user.username,user.id_municipio, user.activo, user.tipo_usuario, user.tipo_rol,user.nombre, user.apellido_paterno, user.apellido_materno, user.id],(err, rows, fields)=>{
+          if (err) return res.status(500).send(err)
+          res.status(200).send("ok")
+      }) 
     }
-    connection.query(query,[user.username,bcrypt.hashSync(user.password, 8),user.id_municipio, user.activo, user.tipo_usuario, user.tipo_rol,user.nombre, user.apellido_paterno, user.apellido_materno, user.id],(err, rows, fields)=>{
-        if (err) return res.status(500).send(err)
-        res.status(200).send("ok")
-    })    
+       
+});
+
+Router.post('/cambiar_pass', function(req, res) {
+    var user = req.body
+    var query= "";
+    query = "update cat_usuario set password=? where id_usuario=?"
+    connection.query(query,[bcrypt.hashSync(user.password, 8), user.id],(err, rows, fields)=>{
+     if (err) return res.status(500).send(err)
+     res.status(200).send("ok")
+    });
 });
 
 Router.post('/registrar_municipio', function(req, res) {

@@ -553,7 +553,7 @@
     </v-expansion-panels>
     <v-dialog v-model="dialog" max-width="700px" scrollable persistent>
       <v-card ref="form">
-        <v-card-title primary-title>Rechazar proyecto</v-card-title>
+        <v-card-title primary-title>Observaciones del proyecto</v-card-title>
         <v-card-text>
           <v-row>
             <v-col cols="12" class="pb-0">

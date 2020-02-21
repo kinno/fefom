@@ -32,7 +32,7 @@ Router.post('/', (req, res) => {
         if (rows.length < 1) return res.status(404).send('Usuario y/o contraseña incorrectos.');
         let passwordIsValid = bcrypt.compareSync(req.body.password, rows[0].password);
         if (!passwordIsValid) return res.status(401).send({ auth: false, token: null, error: 'Contraseña incorrecta.' });
-        let token = jwt.sign({ id: rows[0].id }, config.secret, { expiresIn: '30m' // expires in 10 min 
+        let token = jwt.sign({ id: rows[0].id }, config.secret, { expiresIn: '3h' // expires in 10 min 
         // let token = jwt.sign({ id: rows[0].id }, config.secret, { expiresIn: 86400 // expires in 24 hours
         });
         res.status(200).json({ auth: true, token: token, user: rows[0] });
