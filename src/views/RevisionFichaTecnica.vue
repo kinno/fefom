@@ -7,7 +7,7 @@
           title="Ficha Técnica"
           text="Revisión"
           class="mt-8"
-         style="margin-bottom: 65px !important"
+          style="margin-bottom: 65px !important"
         >
           <v-container fluid class="pa-0">
             <v-card color="grey lighten-3">
@@ -33,10 +33,9 @@
                     </v-col>
                     <v-spacer></v-spacer>
                     <v-col cols="12" md="8">
-                        
                       <v-btn
                         color="green"
-                        class="ma-2 white--text"
+                        class="ma-0 tile white--text"
                         small
                         @click="buscar()"
                       >
@@ -63,24 +62,25 @@
                         Guardar Observaciones
                         <v-icon right dark>mdi-comment-remove-outline</v-icon>
                       </v-btn>
-                      <!-- <v-btn
-                        color="green"
-                        class="ma-2 white--text"
-                        small
-                        @click="imprimirFicha()"
-                      >
-                        Imprimir
-                        <v-icon right dark>mdi-printer</v-icon>
-                      </v-btn> -->
                       <v-btn
                        v-if="botonVisible"
                         color="green"
                         class="ma-2 white--text"
                         small
-                        @click="cerrarFicha()"
+                        @click="cerrarFicha(1)"
                       >
-                        Cerrar revisión
-                        <v-icon right dark>mdi-content-save-alert</v-icon>
+                        Regresar con Observaciones
+                        <v-icon right dark>mdi-arrow-top-left-thick</v-icon>
+                      </v-btn>
+                      <v-btn
+                       v-if="botonVisible"
+                        color="green"
+                        class="ma-2 white--text"
+                        small
+                        @click="cerrarFicha(2)"
+                      >
+                        Enviar a validación
+                        <v-icon right dark>mdi-arrow-top-right-thick</v-icon>
                       </v-btn>
                     </v-col>
                   </v-toolbar>
@@ -101,7 +101,7 @@
                   {{ item.titulo }}
                 </v-tab>
               </v-tabs>
-              <v-fade-transition mode="out-in" >
+              <v-fade-transition mode="out-in">
                 <v-card flat :key="change">
                   <v-card-text>
                     <component
@@ -117,38 +117,15 @@
         </material-card>
       </v-flex>
     </v-layout>
-    <v-dialog
-      v-model="dialogObservaciones"
-      width="500"
-      persistent
-    >
+    <v-dialog v-model="dialogObservaciones" width="500" persistent>
       <v-card>
-        <v-card-title
-          class="headline grey lighten-2"
-          primary-title
-          
-        >
-          Observaciones: {{seccionObservacion}}
+        <v-card-title class="headline grey lighten-2" primary-title>
+          Observaciones: {{ seccionObservacion }}
         </v-card-title>
 
         <v-card-text>
           <v-row>
-            <v-col cols="12" class="column mt-5">
-              <v-select
-                v-model="observacionSeleccionada"
-                :items="catalogoObservaciones"
-                item-text="texto_observacion"
-                item-value="id_observacion"
-                label="Observación:"
-                
-                outlined
-                dense
-                required
-              ></v-select>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col  cols="12" class="column">
+            <v-col cols="12">
               <v-textarea
                 outlined
                 label="Descripción"
@@ -165,15 +142,15 @@
           <v-btn
             color="primary"
             text
-            @click="dialogObservaciones = false, observacionSeleccionada=null, descripcionObservacion=null"
+            @click="
+              (dialogObservaciones = false),
+                (observacionSeleccionada = null),
+                (descripcionObservacion = null)
+            "
           >
             Cancelar
           </v-btn>
-          <v-btn
-            color="primary"
-            text
-            @click="emitirObservaciones()"
-          >
+          <v-btn color="primary" text @click="emitirObservaciones()">
             Aceptar
           </v-btn>
         </v-card-actions>
@@ -190,11 +167,18 @@ import AnexoCuatroComponent from "../components/app/AnexoCuatroComponent";
 import AnexoCincoComponent from "../components/app/AnexoCincoComponent";
 import AnexoSeisComponent from "../components/app/AnexoSeisComponent";
 import AnexoSieteComponent from "../components/app/AnexoSieteComponent";
+import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
 import { EventBus } from "../utils/event-bus";
 export default {
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user"));
-    this.cargarCatalogoObservaciones()
+
+    if (typeof this.$route.params.id_ficha_tecnica !== "undefined") {
+      this.id_ficha_tecnica = this.$route.params.id_ficha_tecnica;
+      this.buscar();
+    }
+
+    this.cargarCatalogoObservaciones();
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
       console.log("actualizando ficha_tecnica.id_anexo_dos");
       this.ficha_tecnica.id_anexo_dos = id_anexo_dos;
@@ -223,12 +207,16 @@ export default {
       this.id_ficha_tecnica = id_ficha_tecnica;
       this.buscar();
     });
-    EventBus.$on("abreDialogObservacion", (seccion,observaciones) => {
-      this.dialogObservaciones = true
-      this.seccionObservacion = seccion
-      if(observaciones !== null){
-        this.observacionSeleccionada = observaciones.id_observacion
-        this.descripcionObservacion = observaciones.descripcion_observacion
+    EventBus.$on("actualizaPropAnexoOcho", id_anexo_ocho => {
+      console.log("actualizando ficha_tecnica.id_anexo_ocho");
+      this.ficha_tecnica.id_anexo_ocho = id_anexo_ocho;
+    });
+    EventBus.$on("abreDialogObservacion", (seccion, observaciones) => {
+      this.dialogObservaciones = true;
+      this.seccionObservacion = seccion;
+      if (observaciones !== null) {
+        this.observacionSeleccionada = observaciones.id_observacion;
+        this.descripcionObservacion = observaciones.descripcion_observacion;
       }
     });
   },
@@ -239,7 +227,8 @@ export default {
     AnexoCuatroComponent,
     AnexoCincoComponent,
     AnexoSeisComponent,
-    AnexoSieteComponent
+    AnexoSieteComponent,
+    AnexoOchoComponent
   },
   data() {
     return {
@@ -247,25 +236,25 @@ export default {
       tab: null,
       currentTab: "anexo-uno-component",
       update: 0,
-      change:0,
+      change: 0,
       botonVisible: true,
       estatusList: [
         {
           estatus: 1,
-          descripcion: 'Edición'
+          descripcion: "Edición"
         },
         {
           estatus: 2,
-          descripcion: 'Aceptado'
+          descripcion: "Aceptado"
         },
         {
           estatus: 3,
-          descripcion: 'En Revisión'
+          descripcion: "En Revisión"
         },
         {
           estatus: 4,
-          descripcion: 'Observaciones'
-        },
+          descripcion: "Observaciones"
+        }
       ],
       items: [
         {
@@ -302,6 +291,11 @@ export default {
           titulo: "VII. Identificación y cuantíficación de costos y beneficios",
           component: "anexo-siete-component",
           anexo: 7
+        },
+         {
+          titulo: "Consideraciones generales",
+          component: "anexo-ocho-component",
+          anexo: 8
         }
       ],
       id_ficha_tecnica: null,
@@ -318,13 +312,14 @@ export default {
         id_anexo_cuatro: null,
         id_anexo_cinco: null,
         id_anexo_seis: null,
-        id_anexo_siete: null
+        id_anexo_siete: null,
+        id_anexo_ocho: null
       },
       dialogObservaciones: false,
       seccionObservacion: "",
       catalogoObservaciones: [],
       observacionSeleccionada: null,
-      descripcionObservacion: null,
+      descripcionObservacion: null
     };
   },
   computed: {
@@ -358,49 +353,53 @@ export default {
         this.ficha_tecnica.id_anexo_seis !== null &&
         this.ficha_tecnica.id_anexo_siete !== null
       ) {
-         if (confirm("¿Deseas cerrar y envíar la ficha para revisión? Una vez enviado ya no se podrán realizar cambios en la ficha.")) {
-           this.$http
-          .post("/ficha_tecnica/cerrar_ficha", {
-            id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
-            id_ayuntamiento: this.user.id_municipio,
-          })
-          .then(response => {
-            if (response.status == 200) {
-              console.log(response);
-              
-              this.$fire({
-                type: "success",
-                title: `Ficha técnica cerrada y enviada correctamente.`,
-                confirmButtonText: "Cerrar",
-                confirmButtonColor: "#d33"
-              });
-            } else {
+        if (
+          confirm(
+            "¿Deseas cerrar y envíar la ficha para revisión? Una vez enviado ya no se podrán realizar cambios en la ficha."
+          )
+        ) {
+          this.$http
+            .post("/ficha_tecnica/cerrar_ficha", {
+              id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
+              id_ayuntamiento: this.user.id_municipio
+            })
+            .then(response => {
+              if (response.status == 200) {
+                console.log(response);
+
+                this.$fire({
+                  type: "success",
+                  title: `Ficha técnica cerrada y enviada correctamente.`,
+                  confirmButtonText: "Cerrar",
+                  confirmButtonColor: "#d33"
+                });
+              } else {
+                this.$fire({
+                  type: "error",
+                  title: "Error",
+                  text: response.err,
+                  confirmButtonText: "Cerrar",
+                  confirmButtonColor: "#d33"
+                });
+              }
+            })
+            .catch(error => {
               this.$fire({
                 type: "error",
                 title: "Error",
-                text: response.err,
+                text: error,
                 confirmButtonText: "Cerrar",
                 confirmButtonColor: "#d33"
               });
-            }
-          })
-          .catch(error => {
-            this.$fire({
-              type: "error",
-              title: "Error",
-              text: error,
-              confirmButtonText: "Cerrar",
-              confirmButtonColor: "#d33"
             });
-          });
-
-         }
-        console.log("Cerrando ficha técnica")
-      }else{
+        }
+        console.log("Cerrando ficha técnica");
+      } else {
         this.$fire({
           type: "error",
           title: "Error",
-          text: "Aún no se completa el registro de la ficha técnica, por favor verificar las secciones.",
+          text:
+            "Aún no se completa el registro de la ficha técnica, por favor verificar las secciones.",
           confirmButtonText: "Cerrar",
           confirmButtonColor: "#d33"
         });
@@ -427,25 +426,27 @@ export default {
       this.$http
         .post("/ficha_tecnica/buscar_ficha_fefom", {
           id_ficha_tecnica: this.id_ficha_tecnica,
+          usuario: this.user
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
           if (response.status == 200) {
-            if(response.data.length > 0){
-               this.currentTab = "anexo-uno-component";
-                this.ficha_tecnica = response.data[0];
-                this.update += 1;
-                // if(response.data[0].estatus==2 || response.data[0].estatus==3){
-                //   this.botonVisible = false;
-                // }
-            }else{
+            if (response.data.length > 0) {
+              this.currentTab = "anexo-uno-component";
+              this.ficha_tecnica = response.data[0];
+              this.update += 1;
+              // if(response.data[0].estatus==2 || response.data[0].estatus==3){
+              //   this.botonVisible = false;
+              // }
+            } else {
               this.$fire({
-              type: "warning",
-              title: "Atención",
-              text: "No se ha encontrado la Ficha Técnica o aún no se ha enviado para su revisión.",
-              confirmButtonText: "Cerrar",
-              confirmButtonColor: "#d33"
-            });
+                type: "warning",
+                title: "Atención",
+                text:
+                  "No se ha encontrado la Ficha Técnica o aún no se ha enviado para su revisión.",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
             }
           } else {
             this.$fire({
@@ -470,19 +471,21 @@ export default {
     imprimirFicha() {
       EventBus.$emit("abreLoading");
       this.$http
-        .get("/ficha_tecnica/imprimir_ficha", {responseType: 'arraybuffer',params:{
-          id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
-        }})
+        .get("/ficha_tecnica/imprimir_ficha", {
+          responseType: "arraybuffer",
+          params: {
+            id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica
+          }
+        })
         .then(response => {
           // console.log(response);
           EventBus.$emit("cierraLoading");
           if (response.status == 200) {
-             
-           var blob = new Blob([response.data], {type: 'application/pdf'});
+            var blob = new Blob([response.data], { type: "application/pdf" });
 
-            var link = document.createElement('a');
+            var link = document.createElement("a");
             link.href = window.URL.createObjectURL(blob);
-            link.target = "_blank"
+            link.target = "_blank";
             // link.download = "filename.pdf";
             link.click();
           } else {
@@ -496,7 +499,7 @@ export default {
           }
         })
         .catch(error => {
-           EventBus.$emit("cierraLoading");
+          EventBus.$emit("cierraLoading");
           this.$fire({
             type: "error",
             title: "Error",
@@ -506,7 +509,7 @@ export default {
           });
         });
     },
-    cargarCatalogoObservaciones(){
+    cargarCatalogoObservaciones() {
       this.$http
         .get("/catalogos/get_catalogo_observaciones")
         .then(response => {
@@ -516,65 +519,71 @@ export default {
         })
         .catch(err => {});
     },
-    emitirObservaciones(){
-      var observacion= {
-          seccion: this.seccionObservacion,
-          id_observacion: this.observacionSeleccionada,
-          descripcion_observacion: this.descripcionObservacion
-        }
-      
-      EventBus.$emit("emitirObservaciones",observacion);
-      this.seccionObservacion=null
-      this.observacionSeleccionada=null
-      this.descripcionObservacion=null
-      this.dialogObservaciones= false
+    emitirObservaciones() {
+      var observacion = {
+        seccion: this.seccionObservacion,
+        id_observacion: this.observacionSeleccionada,
+        descripcion_observacion: this.descripcionObservacion
+      };
+
+      EventBus.$emit("emitirObservaciones", observacion);
+      this.seccionObservacion = null;
+      this.observacionSeleccionada = null;
+      this.descripcionObservacion = null;
+      this.dialogObservaciones = false;
     },
-    guardarObservaciones(){
+    guardarObservaciones() {
       EventBus.$emit("guardarObservaciones");
     },
-    cerrarFicha(){
+    cerrarFicha(tipo_envio) {
       EventBus.$emit("abreLoading");
       this.$http
         .post("/ficha_tecnica/cerrar_revision", {
+          tipo_envio: tipo_envio,
           id_ficha_tecnica: this.id_ficha_tecnica,
+          id_usuario: this.user.id_usuario,
+          id_ayuntamiento: this.ficha_tecnica.id_ayuntamiento
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
           switch (response.status) {
             case 200:
-                this.$fire({
-                  type: "success",
-                  title: "La revisión de la ficha ha concluido con éxito, todas las secciones han sido validadas.",
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
+              this.$fire({
+                type: "success",
+                title:
+                  "La revisión de la ficha ha concluido con éxito, todas las secciones han sido validadas.",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
               break;
             case 201:
-                this.$fire({
-                  type: "success",
-                  title: "La ficha ha sido regresada al Ayuntamiento con observaciones para su atención.",
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
+              this.$fire({
+                type: "success",
+                title:
+                  "La ficha ha sido regresada al Ayuntamiento con observaciones para su atención.",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
               break;
             case 202:
-                 this.$fire({
-                    type: "warning",
-                    title: "Atención: No se puede cerrar la revisión.",
-                    text: "Aún no se ha revisado la ficha en su totalidad. Por favor validar todas las secciones.",
-                    confirmButtonText: "Cerrar",
-                    confirmButtonColor: "#d33"
-                  });
+              this.$fire({
+                type: "warning",
+                title: "Atención: No se puede cerrar la revisión.",
+                text:
+                  "Aún no se ha revisado la ficha en su totalidad. Por favor validar todas las secciones.",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
               break;
-          
+
             default:
-               this.$fire({
-                  type: "error",
-                  title: "Error",
-                  text: response.err,
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
+              this.$fire({
+                type: "error",
+                title: "Error",
+                text: response.err,
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
               break;
           }
         })

@@ -495,11 +495,9 @@ export default {
       observaciones: [],
       obs_identificacion_costos:{
         observacion: null,
-        id_observacion: null,
       },
       obs_identificacion_beneficios:{
         observacion: null,
-        id_observacion: null,
       },
     };
   },
@@ -557,8 +555,8 @@ export default {
                   color: "green lighten-1",
                   icon: "mdi-check-bold"
                 };
-                this.estatus = "Aceptada";
-                if(this.ficha_tecnica.estatus == 4){
+                this.estatus = "Validada";
+                if(this.ficha_tecnica.estatus == 5){
                   this.visible = false;
                 }
                 break;
@@ -567,8 +565,8 @@ export default {
                   color: "red lighten-1",
                   icon: "mdi-comment-alert"
                 };
-                this.estatus = "Errores y Observaciones";
-                if(this.ficha_tecnica.estatus == 4){
+                this.estatus = "Observaciones";
+                if(this.ficha_tecnica.estatus == 5){
                   this.mostrarObservaciones()
                 }
                 break;
@@ -643,7 +641,7 @@ export default {
               color: "green lighten-1",
               icon: "mdi-check-bold"
             };
-            this.estatus = "Aceptada";
+            this.estatus = "Validada";
           } else {
             this.$fire({
               type: "error",
@@ -670,7 +668,6 @@ export default {
         if (this.observaciones[index].seccion == seccion) {
           observacion_registrada = {
             seccion: this.observaciones[index].seccion,
-            id_observacion: this.observaciones[index].id_observacion,
             descripcion_observacion: this.observaciones[index]
               .descripcion_observacion
           };
@@ -682,7 +679,6 @@ export default {
       var bandera = false;
       for (let index = 0; index < this.observaciones.length; index++) {
         if (this.observaciones[index].seccion == observacion.seccion) {
-          this.observaciones[index].id_observacion = observacion.id_observacion;
           this.observaciones[index].descripcion_observacion =
             observacion.descripcion_observacion;
           bandera = true;
@@ -710,7 +706,7 @@ export default {
               color: "red lighten-1",
               icon: "mdi-comment-alert"
             };
-            this.estatus = "Errores y Observaciones";
+            this.estatus = "Observaciones";
           } else {
             this.$fire({
               type: "error",
@@ -740,11 +736,9 @@ export default {
         switch (element.seccion) {
           case 'identificacion_costos':
             this.obs_identificacion_costos.observacion = element.descripcion_observacion
-            this.obs_identificacion_costos.id_observacion = element.id_observacion
             break;
           case 'identificacion_beneficios':
             this.obs_identificacion_beneficios.observacion = element.descripcion_observacion
-            this.obs_identificacion_beneficios.id_observacion = element.id_observacion
             break;
           default:
             break;

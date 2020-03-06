@@ -31,6 +31,13 @@
       </v-col>
     </v-row>
     <v-row>
+      <v-col cols="12" md="6" offset-md="4" class="column">
+        <v-radio-group v-model="tipo" row>
+          <v-radio label="PPI" :value="1" color="green lighten-1" :disabled="true"></v-radio>
+          <v-radio label="Estudios de Preinversión PPI" :value="2" color="green lighten-1" :disabled="true"></v-radio>
+        </v-radio-group>
+      </v-col>
+    </v-row>
       <v-col cols="12" md="10" offset-md="1" class="column">
         <v-text-field
           v-if="user.tipo_usuario == 1"
@@ -661,6 +668,7 @@ export default {
     id_cartera_proyecto: null,
     visible: true,
     ejercicioSeleccionado: "2020",
+    tipo: 1,
     tipo_ppi: [],
     proyectos: [],
     fuenteSeleccionada: {
@@ -717,23 +725,18 @@ export default {
     transition: "scale-transition",
     obs_monto_total_inversion:{
       observacion: null,
-      id_observacion: null,
     },
     obs_fuentes_financiamiento:{
       observacion: null,
-      id_observacion: null,
     },
     obs_horizonte_evaluacion:{
       observacion: null,
-      id_observacion: null,
     },
     obs_calendario_inversion:{
       observacion: null,
-      id_observacion: null,
     },
     obs_localizacion_geografica:{
       observacion: null,
-      id_observacion: null,
     },
     terminoRevision: false,
   }),
@@ -840,8 +843,8 @@ export default {
                   color: "green lighten-1",
                   icon: "mdi-check-bold"
                 };
-                this.estatus = "Aceptada";
-                if(this.ficha_tecnica.estatus == 4){
+                this.estatus = "Validada";
+                if(this.ficha_tecnica.estatus == 5){
                   this.visible = false;
                 }
                 break;
@@ -850,8 +853,8 @@ export default {
                   color: "red lighten-1",
                   icon: "mdi-comment-alert"
                 };
-                this.estatus = "Errores y Observaciones";
-                if(this.ficha_tecnica.estatus == 4){
+                this.estatus = "Observaciones";
+                if(this.ficha_tecnica.estatus == 5){
                   this.mostrarObservaciones()
                 }
                 break;
@@ -1044,7 +1047,7 @@ export default {
               color: "green lighten-1",
               icon: "mdi-check-bold"
             };
-            this.estatus = "Aceptada";
+            this.estatus = "Validada";
           } else {
             this.$fire({
               type: "error",
@@ -1074,7 +1077,6 @@ export default {
         if (this.observaciones[index].seccion == seccion) {
           observacion_registrada = {
             seccion: this.observaciones[index].seccion,
-            id_observacion: this.observaciones[index].id_observacion,
             descripcion_observacion: this.observaciones[index]
               .descripcion_observacion
           };
@@ -1086,7 +1088,6 @@ export default {
       var bandera = false;
       for (let index = 0; index < this.observaciones.length; index++) {
         if (this.observaciones[index].seccion == observacion.seccion) {
-          this.observaciones[index].id_observacion = observacion.id_observacion;
           this.observaciones[index].descripcion_observacion =
             observacion.descripcion_observacion;
           bandera = true;
@@ -1114,7 +1115,7 @@ export default {
                   color: "red lighten-1",
                   icon: "mdi-comment-alert"
                 };
-                this.estatus = "Errores y Observaciones";
+                this.estatus = "Observaciones";
           } else {
             this.$fire({
               type: "error",
@@ -1141,23 +1142,18 @@ export default {
         switch (element.seccion) {
           case 'monto_total_inversion':
             this.obs_monto_total_inversion.observacion = element.descripcion_observacion
-            this.obs_monto_total_inversion.id_observacion = element.id_observacion
             break;
           case 'fuentes_financiamiento':
             this.obs_fuentes_financiamiento.observacion = element.descripcion_observacion
-            this.obs_fuentes_financiamiento.id_observacion = element.id_observacion
             break;
           case "horizonte_evaluacion":
             this.obs_horizonte_evaluacion.observacion = element.descripcion_observacion
-            this.obs_horizonte_evaluacion.id_observacion = element.id_observacion
             break;
           case "calendario_inversion":
             this.obs_calendario_inversion.observacion = element.descripcion_observacion
-            this.obs_calendario_inversion.id_observacion = element.id_observacion
             break;
           case "localizacion_geografica":
             this.obs_localizacion_geografica.observacion = element.descripcion_observacion
-            this.obs_localizacion_geografica.id_observacion = element.id_observacion
             break;
         
           default:

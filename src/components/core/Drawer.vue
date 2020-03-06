@@ -278,6 +278,14 @@ export default {
           children: [
              {
               icon: "mdi-checkbox-multiple-blank-circle-outline",
+              text: "Listado",
+              to: "/listado_ficha_tecnica",
+              visible: false,
+              tipo_usuario: [1],
+              tipo_rol: [1],
+            },
+             {
+              icon: "mdi-checkbox-multiple-blank-circle-outline",
               text: "Registro",
               to: "/registro_ficha_tecnica",
               visible: false,
@@ -290,7 +298,7 @@ export default {
               to: "/revision_ficha_tecnica",
               visible: false,
               tipo_usuario: [1],
-              tipo_rol: [1,3],
+              tipo_rol: [1,2,3],
             }
           ]
         },

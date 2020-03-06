@@ -61,468 +61,487 @@
     </v-row>
     <!-- <v-row>
       <v-col cols="12" > -->
-        <v-expansion-panels accordion popout focusable class="pa-0 pb-5">
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              color="grey lighten-3"
-              class="font-weight-bold"
+    <v-expansion-panels accordion popout focusable class="pa-0 pb-5">
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          color="grey lighten-3"
+          class="font-weight-bold"
+        >
+          Iluminación municipal
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado:
+            {{ techo_asignado_iluminacion_municipal | currency }}
+            <br />
+            <br />Obras y/o Acciones:
+            <span class="green--text text--lighten-1">{{
+              proyectosIluminacion.length
+            }}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersIluminacion"
+              :items="proyectosIluminacion"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+              class="tablaProyectos"
             >
-              Iluminación municipal
-              <v-spacer></v-spacer>
-              <v-col cols="12" sm="6" md="4" class="text-right pa-0">
-                Techo asignado:
-                {{ techo_asignado_iluminacion_municipal | currency }}
-                <br />
-                <br />Obras y/o Acciones:
-                <span class="green--text text--lighten-1">{{
-                  proyectosIluminacion.length
-                }}</span>
-              </v-col>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card>
-                <v-data-table
-                  :headers="headersIluminacion"
-                  :items="proyectosIluminacion"
-                  hide-default-footer
-                  :disable-pagination="true"
-                  :fixed-header="true"
-                  class="tablaProyectos"
-                >
-                  <template v-slot:item="{ item }">
-                    <tr>
-                      <td width="24%">{{ item.nombre_proyecto }}</td>
-                      <td width="24%">{{ item.descripcion_proyecto }}</td>
-                      <td width="30%" class="text-right">
-                        {{ item.monto | currency }}
-                      </td>
-                      <td width="10%" class="text-center font-weight-black">
-                        {{ item.desc_estatus }}
-                      </td>
-                      <td width="12%">
-                        <v-row
-                          v-if="
-                            item.estatus !== 4 &&
-                              item.estatus !== 3 &&
-                              item.estatus !== 1
-                          "
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td width="20%">{{ item.nombre_proyecto }}</td>
+                  <td width="20%">{{ item.descripcion_proyecto }}</td>
+                  <td width="">{{ item.localidad }}</td>
+                  <td width="" class="text-center">{{ item.total_meta }}</td>
+                  <td width="" class="text-center">
+                    {{ item.unidad_medida_meta }}
+                  </td>
+                  <td width="10%" class="text-right font-weight-bold">
+                    {{ item.monto | currency }}
+                  </td>
+                  <td width="" class="text-center font-weight-black">
+                    {{ item.desc_estatus }}
+                  </td>
+                  <td width="10%">
+                    <v-row
+                      v-if="
+                        item.estatus !== 4 &&
+                          item.estatus !== 3 &&
+                          item.estatus !== 1
+                      "
+                     
+                    >
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="aceptarProyecto(item, 5)"
                         >
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="aceptarProyecto(item, 5)"
-                            >
-                              <v-icon color="green darken-2"
-                                >mdi-check-circle-outline</v-icon
-                              >
-                            </v-btn>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="rechazarProyecto(item, 5)"
-                            >
-                              <v-icon color="red darken-2">mdi-cancel</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-slot:no-data
-                    >No hay proyectos registrados</template
-                  >
-                </v-data-table>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <!--  -->
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              color="grey lighten-3"
-              class="font-weight-bold"
+                          <v-icon color="green darken-2"
+                            >mdi-check-circle-outline</v-icon
+                          >
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="rechazarProyecto(item, 5)"
+                        >
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <!--  -->
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          color="grey lighten-3"
+          class="font-weight-bold"
+        >
+          Seguridad
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado: {{ techo_asignado_seguridad | currency }}
+            <br />
+            <br />Obras y/o Acciones:
+            <span class="green--text text--lighten-1">{{
+              proyectosSeguridad.length
+            }}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersSeguridad"
+              :items="proyectosSeguridad"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+              class="tablaProyectos"
             >
-              Seguridad
-              <v-spacer></v-spacer>
-              <v-col cols="12" sm="6" md="4" class="text-right pa-0">
-                Techo asignado: {{ techo_asignado_seguridad | currency }}
-                <br />
-                <br />Obras y/o Acciones:
-                <span class="green--text text--lighten-1">{{
-                  proyectosSeguridad.length
-                }}</span>
-              </v-col>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card>
-                <v-data-table
-                  :headers="headersSeguridad"
-                  :items="proyectosSeguridad"
-                  hide-default-footer
-                  :disable-pagination="true"
-                  :fixed-header="true"
-                  class="tablaProyectos"
-                >
-                  <template v-slot:item="{ item }">
-                    <tr>
-                      <td width="24%">{{ item.nombre_proyecto }}</td>
-                      <td width="24%">{{ item.descripcion_proyecto }}</td>
-                      <td width="30%" class="text-right">
-                        {{ item.monto | currency }}
-                      </td>
-                      <td width="10%" class="text-center font-weight-black">
-                        {{ item.desc_estatus }}
-                      </td>
-                      <td width="12%">
-                        <v-row
-                          v-if="
-                            item.estatus !== 4 &&
-                              item.estatus !== 3 &&
-                              item.estatus !== 1
-                          "
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td width="20%">{{ item.nombre_proyecto }}</td>
+                  <td width="20%">{{ item.descripcion_proyecto }}</td>
+                  <td width="">{{ item.localidad }}</td>
+                  <td width="" class="text-center">{{ item.total_meta }}</td>
+                  <td width="" class="text-center">
+                    {{ item.unidad_medida_meta }}
+                  </td>
+                  <td width="10%" class="text-right font-weight-bold">
+                    {{ item.monto | currency }}
+                  </td>
+                  <td width="" class="text-center font-weight-black">
+                    {{ item.desc_estatus }}
+                  </td>
+                  <td width="10%">
+                    <v-row
+                      v-if="
+                        item.estatus !== 4 &&
+                          item.estatus !== 3 &&
+                          item.estatus !== 1
+                      "
+                    >
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="aceptarProyecto(item, 5)"
                         >
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="aceptarProyecto(item, 5)"
-                            >
-                              <v-icon color="green darken-2"
-                                >mdi-check-circle-outline</v-icon
-                              >
-                            </v-btn>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="rechazarProyecto(item, 5)"
-                            >
-                              <v-icon color="red darken-2">mdi-cancel</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-slot:no-data
-                    >No hay proyectos registrados</template
-                  >
-                </v-data-table>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <!--  -->
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              color="grey lighten-3"
-              class="font-weight-bold"
+                          <v-icon color="green darken-2"
+                            >mdi-check-circle-outline</v-icon
+                          >
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="rechazarProyecto(item, 5)"
+                        >
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <!--  -->
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          color="grey lighten-3"
+          class="font-weight-bold"
+        >
+          Proyectos de inversión pública
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado:
+            {{ techo_asignado_inversion_publica | currency }}
+            <br />
+            <br />Obras y/o Acciones:
+            <span class="green--text text--lighten-1">{{
+              proyectosInversion.length
+            }}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersInversion"
+              :items="proyectosInversion"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+              class="tablaProyectos"
             >
-              Proyectos de inversión pública
-              <v-spacer></v-spacer>
-              <v-col cols="12" sm="6" md="4" class="text-right pa-0">
-                Techo asignado:
-                {{ techo_asignado_inversion_publica | currency }}
-                <br />
-                <br />Obras y/o Acciones:
-                <span class="green--text text--lighten-1">{{
-                  proyectosInversion.length
-                }}</span>
-              </v-col>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card>
-                <v-data-table
-                  :headers="headersInversion"
-                  :items="proyectosInversion"
-                  hide-default-footer
-                  :disable-pagination="true"
-                  :fixed-header="true"
-                  class="tablaProyectos"
-                >
-                  <template v-slot:item="{ item }">
-                    <tr>
-                      <td width="24%">{{ item.nombre_proyecto }}</td>
-                      <td width="24%">{{ item.descripcion_proyecto }}</td>
-                      <td width="30%" class="text-right">
-                        {{ item.monto | currency }}
-                      </td>
-                      <td width="10%" class="text-center font-weight-black">
-                        {{ item.desc_estatus }}
-                      </td>
-                      <td width="12%">
-                        <v-row
-                          v-if="
-                            item.estatus !== 4 &&
-                              item.estatus !== 3 &&
-                              item.estatus !== 1
-                          "
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td width="20%">{{ item.nombre_proyecto }}</td>
+                  <td width="20%">{{ item.descripcion_proyecto }}</td>
+                  <td width="">{{ item.localidad }}</td>
+                  <td width="" class="text-center">{{ item.total_meta }}</td>
+                  <td width="" class="text-center">
+                    {{ item.unidad_medida_meta }}
+                  </td>
+                  <td width="10%" class="text-right font-weight-bold">
+                    {{ item.monto | currency }}
+                  </td>
+                  <td width="" class="text-center font-weight-black">
+                    {{ item.desc_estatus }}
+                  </td>
+                  <td width="10%">
+                    <v-row
+                      v-if="
+                        item.estatus !== 4 &&
+                          item.estatus !== 3 &&
+                          item.estatus !== 1
+                      "
+                    >
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="aceptarProyecto(item, 5)"
                         >
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="aceptarProyecto(item, 5)"
-                            >
-                              <v-icon color="green darken-2"
-                                >mdi-check-circle-outline</v-icon
-                              >
-                            </v-btn>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="rechazarProyecto(item, 5)"
-                            >
-                              <v-icon color="red darken-2">mdi-cancel</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-slot:no-data
-                    >No hay proyectos registrados</template
-                  >
-                </v-data-table>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <!--  -->
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              color="grey lighten-3"
-              class="font-weight-bold"
+                          <v-icon color="green darken-2"
+                            >mdi-check-circle-outline</v-icon
+                          >
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="rechazarProyecto(item, 5)"
+                        >
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <!--  -->
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          color="grey lighten-3"
+          class="font-weight-bold"
+        >
+          Acciones para el desarrollo
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado: {{ techo_asignado_desarrollo | currency }}
+            <br />
+            <br />Obras y/o Acciones:
+            <span class="green--text text--lighten-1">{{
+              proyectosDesarrollo.length
+            }}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersDesarrollo"
+              :items="proyectosDesarrollo"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+              class="tablaProyectos"
             >
-              Acciones para el desarrollo
-              <v-spacer></v-spacer>
-              <v-col cols="12" sm="6" md="4" class="text-right pa-0">
-                Techo asignado: {{ techo_asignado_desarrollo | currency }}
-                <br />
-                <br />Obras y/o Acciones:
-                <span class="green--text text--lighten-1">{{
-                  proyectosDesarrollo.length
-                }}</span>
-              </v-col>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card>
-                <v-data-table
-                  :headers="headersDesarrollo"
-                  :items="proyectosDesarrollo"
-                  hide-default-footer
-                  :disable-pagination="true"
-                  :fixed-header="true"
-                  class="tablaProyectos"
-                >
-                  <template v-slot:item="{ item }">
-                    <tr>
-                      <td width="24%">{{ item.nombre_proyecto }}</td>
-                      <td width="24%">{{ item.descripcion_proyecto }}</td>
-                      <td width="30%" class="text-right">
-                        {{ item.monto | currency }}
-                      </td>
-                      <td width="10%" class="text-center font-weight-black">
-                        {{ item.desc_estatus }}
-                      </td>
-                      <td width="12%">
-                        <v-row
-                          v-if="
-                            item.estatus !== 4 &&
-                              item.estatus !== 3 &&
-                              item.estatus !== 1
-                          "
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td width="20%">{{ item.nombre_proyecto }}</td>
+                  <td width="20%">{{ item.descripcion_proyecto }}</td>
+                  <td width="">{{ item.localidad }}</td>
+                  <td width="" class="text-center">{{ item.total_meta }}</td>
+                  <td width="" class="text-center">
+                    {{ item.unidad_medida_meta }}
+                  </td>
+                  <td width="10%" class="text-right font-weight-bold">
+                    {{ item.monto | currency }}
+                  </td>
+                  <td width="" class="text-center font-weight-black">
+                    {{ item.desc_estatus }}
+                  </td>
+                  <td width="10%">
+                    <v-row
+                      v-if="
+                        item.estatus !== 4 &&
+                          item.estatus !== 3 &&
+                          item.estatus !== 1
+                      "
+                    >
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="aceptarProyecto(item, 5)"
                         >
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="aceptarProyecto(item, 5)"
-                            >
-                              <v-icon color="green darken-2"
-                                >mdi-check-circle-outline</v-icon
-                              >
-                            </v-btn>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="rechazarProyecto(item, 5)"
-                            >
-                              <v-icon color="red darken-2">mdi-cancel</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-slot:no-data
-                    >No hay proyectos registrados</template
-                  >
-                </v-data-table>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              color="grey lighten-3"
-              class="font-weight-bold"
+                          <v-icon color="green darken-2"
+                            >mdi-check-circle-outline</v-icon
+                          >
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="rechazarProyecto(item, 5)"
+                        >
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          color="grey lighten-3"
+          class="font-weight-bold"
+        >
+          <v-col cols="12" sm="6" md="8" class="text-left pa-0">
+            Protección Civil
+            <!-- <v-icon color="green darken-2">mdi-check-circle-outline</v-icon> -->
+          </v-col>
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado: {{ techo_asignado_proteccion_civil | currency }}
+            <br />
+            <br />Obras y/o Acciones:
+            <span class="green--text text--lighten-1">{{
+              proyectosProteccionCivil.length
+            }}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersProteccionCivil"
+              :items="proyectosProteccionCivil"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+              class="tablaProyectos mt-0"
             >
-              <v-col cols="12" sm="6" md="8" class="text-left pa-0">
-                Protección Civil
-                <!-- <v-icon color="green darken-2">mdi-check-circle-outline</v-icon> -->
-              </v-col>
-              <v-spacer></v-spacer>
-              <v-col cols="12" sm="6" md="4" class="text-right pa-0">
-                Techo asignado: {{ techo_asignado_proteccion_civil | currency }}
-                <br />
-                <br />Obras y/o Acciones:
-                <span class="green--text text--lighten-1">{{
-                  proyectosProteccionCivil.length
-                }}</span>
-              </v-col>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card>
-                <v-data-table
-                  :headers="headersProteccionCivil"
-                  :items="proyectosProteccionCivil"
-                  hide-default-footer
-                  :disable-pagination="true"
-                  :fixed-header="true"
-                  class="tablaProyectos mt-0"
-                >
-                  <template v-slot:item="{ item }">
-                    <tr>
-                      <td width="24%">{{ item.nombre_proyecto }}</td>
-                      <td width="24%">{{ item.descripcion_proyecto }}</td>
-                      <td width="30%" class="text-right">
-                        {{ item.monto | currency }}
-                      </td>
-                      <td width="10%" class="text-center font-weight-black">
-                        {{ item.desc_estatus }}
-                      </td>
-                      <td width="12%">
-                        <v-row
-                          v-if="
-                            item.estatus !== 4 &&
-                              item.estatus !== 3 &&
-                              item.estatus !== 1
-                          "
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td width="20%">{{ item.nombre_proyecto }}</td>
+                  <td width="20%">{{ item.descripcion_proyecto }}</td>
+                  <td width="">{{ item.localidad }}</td>
+                  <td width="" class="text-center">{{ item.total_meta }}</td>
+                  <td width="" class="text-center">
+                    {{ item.unidad_medida_meta }}
+                  </td>
+                  <td width="10%" class="text-right font-weight-bold">
+                    {{ item.monto | currency }}
+                  </td>
+                  <td width="" class="text-center font-weight-black">
+                    {{ item.desc_estatus }}
+                  </td>
+                  <td width="10%">
+                    <v-row
+                      v-if="
+                        item.estatus !== 4 &&
+                          item.estatus !== 3 &&
+                          item.estatus !== 1
+                      "
+                    >
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="aceptarProyecto(item, 5)"
                         >
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="aceptarProyecto(item, 5)"
-                            >
-                              <v-icon color="green darken-2"
-                                >mdi-check-circle-outline</v-icon
-                              >
-                            </v-btn>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="rechazarProyecto(item, 5)"
-                            >
-                              <v-icon color="red darken-2">mdi-cancel</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-slot:no-data
-                    >No hay proyectos registrados</template
-                  >
-                </v-data-table>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-          <!--  -->
-          <v-expansion-panel>
-            <v-expansion-panel-header
-              color="grey lighten-3"
-              class="font-weight-bold"
+                          <v-icon color="green darken-2"
+                            >mdi-check-circle-outline</v-icon
+                          >
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="rechazarProyecto(item, 5)"
+                        >
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+      <!--  -->
+      <v-expansion-panel>
+        <v-expansion-panel-header
+          color="grey lighten-3"
+          class="font-weight-bold"
+        >
+          Recursos no etiquetados
+          <v-spacer></v-spacer>
+          <v-col cols="12" sm="6" md="4" class="text-right pa-0">
+            Techo asignado: {{ techo_asignado_no_etiquetado | currency }}
+            <br />
+            <br />Obras y/o Acciones:
+            <span class="green--text text--lighten-1">{{
+              proyectosNoEtiquetado.length
+            }}</span>
+          </v-col>
+        </v-expansion-panel-header>
+        <v-expansion-panel-content>
+          <v-card>
+            <v-data-table
+              :headers="headersNoEtiquetado"
+              :items="proyectosNoEtiquetado"
+              hide-default-footer
+              :disable-pagination="true"
+              :fixed-header="true"
+              class="tablaProyectos"
             >
-              Recursos no etiquetados
-              <v-spacer></v-spacer>
-              <v-col cols="12" sm="6" md="4" class="text-right pa-0">
-                Techo asignado: {{ techo_asignado_no_etiquetado | currency }}
-                <br />
-                <br />Obras y/o Acciones:
-                <span class="green--text text--lighten-1">{{
-                  proyectosNoEtiquetado.length
-                }}</span>
-              </v-col>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content>
-              <v-card>
-                <v-data-table
-                  :headers="headersNoEtiquetado"
-                  :items="proyectosNoEtiquetado"
-                  hide-default-footer
-                  :disable-pagination="true"
-                  :fixed-header="true"
-                  class="tablaProyectos"
-                >
-                  <template v-slot:item="{ item }">
-                    <tr>
-                      <td width="24%">{{ item.nombre_proyecto }}</td>
-                      <td width="24%">{{ item.descripcion_proyecto }}</td>
-                      <td width="30%" class="text-right">
-                        {{ item.monto | currency }}
-                      </td>
-                      <td width="10%" class="text-center font-weight-black">
-                        {{ item.desc_estatus }}
-                      </td>
-                      <td width="12%">
-                        <v-row
-                          v-if="
-                            item.estatus !== 4 &&
-                              item.estatus !== 3 &&
-                              item.estatus !== 1
-                          "
+              <template v-slot:item="{ item }">
+                <tr>
+                  <td width="20%">{{ item.nombre_proyecto }}</td>
+                  <td width="20%">{{ item.descripcion_proyecto }}</td>
+                  <td width="">{{ item.localidad }}</td>
+                  <td width="" class="text-center">{{ item.total_meta }}</td>
+                  <td width="" class="text-center">
+                    {{ item.unidad_medida_meta }}
+                  </td>
+                  <td width="10%" class="text-right font-weight-bold">
+                    {{ item.monto | currency }}
+                  </td>
+                  <td width="" class="text-center font-weight-black">
+                    {{ item.desc_estatus }}
+                  </td>
+                  <td width="10%">
+                    <v-row
+                      v-if="
+                        item.estatus !== 4 &&
+                          item.estatus !== 3 &&
+                          item.estatus !== 1
+                      "
+                    >
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="aceptarProyecto(item, 5)"
                         >
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="aceptarProyecto(item, 5)"
-                            >
-                              <v-icon color="green darken-2"
-                                >mdi-check-circle-outline</v-icon
-                              >
-                            </v-btn>
-                          </v-col>
-                          <v-col cols="6">
-                            <v-btn
-                              small
-                              height="30px"
-                              @click="rechazarProyecto(item, 5)"
-                            >
-                              <v-icon color="red darken-2">mdi-cancel</v-icon>
-                            </v-btn>
-                          </v-col>
-                        </v-row>
-                      </td>
-                    </tr>
-                  </template>
-                  <template v-slot:no-data
-                    >No hay proyectos registrados</template
-                  >
-                </v-data-table>
-              </v-card>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-      <!-- </v-col>
+                          <v-icon color="green darken-2"
+                            >mdi-check-circle-outline</v-icon
+                          >
+                        </v-btn>
+                      </v-col>
+                      <v-col cols="6" class="pa-0">
+                        <v-btn
+                          small
+                          height="30px"
+                          @click="rechazarProyecto(item, 5)"
+                        >
+                          <v-icon color="red darken-2">mdi-cancel</v-icon>
+                        </v-btn>
+                      </v-col>
+                    </v-row>
+                  </td>
+                </tr>
+              </template>
+              <template v-slot:no-data>No hay proyectos registrados</template>
+            </v-data-table>
+          </v-card>
+        </v-expansion-panel-content>
+      </v-expansion-panel>
+    </v-expansion-panels>
+    <!-- </v-col>
     </v-row> -->
 
     <v-dialog v-model="dialog" max-width="700px" scrollable persistent>
@@ -592,8 +611,26 @@ export default {
       {
         text: "Descripción",
         align: "left",
-        sortable: true,
+        sortable: false,
         value: "descripcion_proyecto"
+      },
+      {
+        text: "Localidad (es)",
+        align: "left",
+        sortable: false,
+        value: "localidad"
+      },
+      {
+        text: "Total a realizar",
+        align: "left",
+        sortable: false,
+        value: "total_meta"
+      },
+      {
+        text: "Unidad de Medida",
+        align: "left",
+        sortable: false,
+        value: "unidad_medida_meta"
       },
       {
         text: "Monto",
@@ -614,8 +651,26 @@ export default {
       {
         text: "Descripción",
         align: "left",
-        sortable: true,
+        sortable: false,
         value: "descripcion_proyecto"
+      },
+      {
+        text: "Localidad (es)",
+        align: "left",
+        sortable: false,
+        value: "localidad"
+      },
+      {
+        text: "Total a realizar",
+        align: "left",
+        sortable: false,
+        value: "total_meta"
+      },
+      {
+        text: "Unidad de Medida",
+        align: "left",
+        sortable: false,
+        value: "unidad_medida_meta"
       },
       {
         text: "Monto",
@@ -627,7 +682,7 @@ export default {
       { text: "Acciones", value: "action", sortable: false }
     ],
     headersInversion: [
-      {
+     {
         text: "Obra y/o Acciones",
         align: "left",
         sortable: true,
@@ -636,8 +691,26 @@ export default {
       {
         text: "Descripción",
         align: "left",
-        sortable: true,
+        sortable: false,
         value: "descripcion_proyecto"
+      },
+      {
+        text: "Localidad (es)",
+        align: "left",
+        sortable: false,
+        value: "localidad"
+      },
+      {
+        text: "Total a realizar",
+        align: "left",
+        sortable: false,
+        value: "total_meta"
+      },
+      {
+        text: "Unidad de Medida",
+        align: "left",
+        sortable: false,
+        value: "unidad_medida_meta"
       },
       {
         text: "Monto",
@@ -658,8 +731,26 @@ export default {
       {
         text: "Descripción",
         align: "left",
-        sortable: true,
+        sortable: false,
         value: "descripcion_proyecto"
+      },
+      {
+        text: "Localidad (es)",
+        align: "left",
+        sortable: false,
+        value: "localidad"
+      },
+      {
+        text: "Total a realizar",
+        align: "left",
+        sortable: false,
+        value: "total_meta"
+      },
+      {
+        text: "Unidad de Medida",
+        align: "left",
+        sortable: false,
+        value: "unidad_medida_meta"
       },
       {
         text: "Monto",
@@ -680,8 +771,26 @@ export default {
       {
         text: "Descripción",
         align: "left",
-        sortable: true,
+        sortable: false,
         value: "descripcion_proyecto"
+      },
+      {
+        text: "Localidad (es)",
+        align: "left",
+        sortable: false,
+        value: "localidad"
+      },
+      {
+        text: "Total a realizar",
+        align: "left",
+        sortable: false,
+        value: "total_meta"
+      },
+      {
+        text: "Unidad de Medida",
+        align: "left",
+        sortable: false,
+        value: "unidad_medida_meta"
       },
       {
         text: "Monto",
@@ -702,8 +811,26 @@ export default {
       {
         text: "Descripción",
         align: "left",
-        sortable: true,
+        sortable: false,
         value: "descripcion_proyecto"
+      },
+      {
+        text: "Localidad (es)",
+        align: "left",
+        sortable: false,
+        value: "localidad"
+      },
+      {
+        text: "Total a realizar",
+        align: "left",
+        sortable: false,
+        value: "total_meta"
+      },
+      {
+        text: "Unidad de Medida",
+        align: "left",
+        sortable: false,
+        value: "unidad_medida_meta"
       },
       {
         text: "Monto",
@@ -1134,10 +1261,12 @@ export default {
 };
 </script>
 <style>
-.tablaProyectos {
-  margin-top: 15px;
-}
 .tablaProyectos table > thead > tr > th {
   background-color: #e8f5e9 !important;
+  font-size: 12px !important;
+  border: 1px solid #e6e6e6;
+}
+.tablaProyectos table > tbody > tr > td {
+  font-size: 11px !important;
 }
 </style>

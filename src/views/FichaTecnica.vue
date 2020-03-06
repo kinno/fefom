@@ -125,22 +125,7 @@
 
         <v-card-text>
           <v-row>
-            <v-col cols="12" class="column mt-5">
-              <v-select
-                v-model="observacionSeleccionada"
-                :items="catalogoObservaciones"
-                item-text="texto_observacion"
-                item-value="id_observacion"
-                label="Observación:"
-                readonly
-                outlined
-                dense
-                required
-              ></v-select>
-            </v-col>
-          </v-row>
-          <v-row>
-            <v-col  cols="12" class="column">
+            <v-col cols="12">
               <v-textarea
                 outlined
                 label="Descripción"
@@ -241,21 +226,41 @@ export default {
       update: 0,
       botonVisible: true,
       estatusList: [
+        // {
+        //   estatus: 1,
+        //   descripcion: 'Edición'
+        // },
+        // {
+        //   estatus: 2,
+        //   descripcion: 'Aceptado'
+        // },
+        // {
+        //   estatus: 3,
+        //   descripcion: 'En Revisión'
+        // },
+        // {
+        //   estatus: 4,
+        //   descripcion: 'Observaciones'
+        // },
         {
           estatus: 1,
           descripcion: 'Edición'
         },
         {
           estatus: 2,
-          descripcion: 'Aceptado'
-        },
-        {
-          estatus: 3,
           descripcion: 'En Revisión'
         },
         {
+          estatus: 3,
+          descripcion: 'En Validación'
+        },
+        {
           estatus: 4,
-          descripcion: 'Observaciones'
+          descripcion: 'En Dictaminación'
+        },
+        {
+          estatus: 5,
+          descripcion: 'Corrección con observaciones'
         },
       ],
       items: [
@@ -356,6 +361,7 @@ export default {
             id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
             id_ayuntamiento: this.user.id_municipio,
             version: this.ficha_tecnica.version,
+            id_usuario : this.user.id_usuario
           })
           .then(response => {
             if (response.status == 200) {
@@ -429,7 +435,7 @@ export default {
                this.currentTab = "anexo-uno-component";
                 this.ficha_tecnica = response.data[0];
                 this.update += 1;
-                if(response.data[0].estatus==2 || response.data[0].estatus==3){
+                if(response.data[0].estatus==2 || response.data[0].estatus==3 || response.data[0].estatus==4){
                   this.botonVisible = false;
                 }
             }else{

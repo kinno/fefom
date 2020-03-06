@@ -1,10 +1,10 @@
 <template>
-<v-container
+<!-- <v-container
     fill-height
     fluid
     grid-list-xl
   >
-    <!-- <v-row justify="center">
+    <v-row justify="center">
       <v-col cols="12">
         <material-card
           color="green"
@@ -34,9 +34,9 @@
           />
         </material-card>
       </v-col>
-    </v-row> -->
-  </v-container>
-  <!-- <v-container fluid>
+    </v-row>
+  </v-container> -->
+  <v-container fluid>
     <v-row>
       <v-col
         cols="12"
@@ -437,7 +437,7 @@
         </material-card> 
       </v-col>
     </v-row>
-  </v-container> -->
+  </v-container>
 </template>
 
 <script>

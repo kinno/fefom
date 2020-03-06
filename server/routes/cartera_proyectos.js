@@ -1,10 +1,10 @@
 const express = require("express");
 const Router = express.Router();
 const connection = require("../db/db");
-const bcrypt = require("bcrypt");
-const multer = require("multer");
-var fs = require("fs");
-var xlsx = require("node-xlsx");
+
+var pdf = require('html-pdf')
+var moment = require('moment');
+var formatoCartera = require('../formatoCartera');
 
 Router.post("/agregar_proyecto", (req, res) => {
     // console.log(req.body)
@@ -13,16 +13,16 @@ Router.post("/agregar_proyecto", (req, res) => {
     // if(proyecto.id == null){
          query = `
          insert into tbl_cartera_proyectos
-         (ejercicio,id_municipio,nombre_proyecto,monto,descripcion_proyecto, id_rubro, estatus)
+         (ejercicio,id_municipio,nombre_proyecto,monto,descripcion_proyecto,localidad,total_meta,unidad_medida_meta, id_rubro, estatus)
           values 
-        (?,?,?,?,?,?,?)`
+        (?,?,?,?,?,?,?,?,?,?)`
     // }else{
     //      query = `
     //      update tbl_techos_financieros
     //     set ejercicio=?, id_municipio=?, nombre_proyecto=?, monto=?, id_rubro=?, estatus=? 
     //     where id=?`
     // }
-  connection.query(query, [proyecto.ejercicio, proyecto.id_municipio, proyecto.nombre_proyecto, proyecto.monto, proyecto.descripcion_proyecto, proyecto.id_rubro, proyecto.estatus], (err, rows, fields) => {
+  connection.query(query, [proyecto.ejercicio, proyecto.id_municipio, proyecto.nombre_proyecto, proyecto.monto, proyecto.descripcion_proyecto,proyecto.localidad,proyecto.total_meta,proyecto.unidad_medida_meta, proyecto.id_rubro, proyecto.estatus], (err, rows, fields) => {
     if (err) return res.status(500).send("Error del servidor." + err);
     // console.log(rows.insertId)
     res.status(200).json({
@@ -164,52 +164,51 @@ Router.post("/get_cartera_simple", (req, res) => {
   })
   
   Router.get("/imprimir_cartera", (req, res) => {
-    // console.log(req.query)
-    var data = req.query;
-    console.log(data)
-        var html = formatoFicha(rows);
-      //  console.log(path.join(__dirname,'../../public/uploads/'))
-        var config = {
-  
-          "format": "Letter", // allowed units: A3, A4, A5, Legal, Letter, Tabloid
-          "border": {
-            "top": "1.5cm",            // default is 0, units: mm, cm, in, px
-            "right": "1.5cm",
-            "bottom": "1.5cm",
-            "left": "1.5cm"
-          },
-          // "border": {
-          //   "top": "50px", // default is 0, units: mm, cm, in, px
-          //   "right": "50px",
-          //   "bottom": "50px",
-          //   "left": "50px",
-          // },
-          
-          paginationOffset: 0, // Override the initial pagination number
-          "footer": {
-            "height": "0.5cm",
+      // console.log(req.query)
+  var data = req.query;
+  query = `
+          SELECT descripcion, titulo, nombre, cargo FROM fefom_db.cat_municipio
+          join cat_cargo on cat_municipio.id_cargo = cat_cargo.id_cargo
+          where cat_municipio.id_municipio = ?;
+           `;
            
-          },
-          // "header": {
-          //   "height": "45mm",
-          //   "contents": '<div style="text-align: center;">Author: Marc Bachmann</div>'
-          // },
-          // "footer": {
-          //   "height": "28mm",
-          //   "contents": {
-          //     first: 'Cover page',
-          //     2: 'Second page', // Any page number is working. 1-based index
-          //     default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
-          //     last: 'Last Page'
-          //   }
-          // },
-          
-        }
-        pdf.create(html, config).toStream(function (err, stream) {
-          res.setHeader('Content-disposition', 'attachment; filename=ficha_tecnica.pdf');
-          res.setHeader('Content-type', 'application/pdf');
-          stream.pipe(res);
-        });
+  connection.query(
+  query,
+  [data.id_municipio],
+    (err, rows, fields) => {      
+      if (err) return res.status(500).send("Error del servidor." + err);
+      var html = formatoCartera(data,rows);
+      var config = {
+
+        "format": "Letter", // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+        "border": {
+          "top": "0.5cm",            // default is 0, units: mm, cm, in, px
+          "right": "1cm",
+          "bottom": "0.5cm",
+          "left": "1cm"
+        },
+        paginationOffset: 1, // Override the initial pagination number
+        "footer": {
+          "height": "35mm",
+          "contents":{
+            default: `<table style="width: 100%;" border="0"><tr><td style="text-align: center; font-family:Arial, sans-serif;font-size:11px; font-weight: normal">
+            {{page}}
+        </td></tr></table>`
+          }
+         
+        },
+        "orientation": "landscape",
+        "header": {
+          "height": "0mm",
+        },
+      }
+      pdf.create(html, config).toStream(function (err, stream) {
+        res.setHeader('Content-disposition', 'attachment; filename=ficha_tecnica.pdf');
+        res.setHeader('Content-type', 'application/pdf');
+        stream.pipe(res);
+      });
+    }
+  );
   });
 
 module.exports = Router;

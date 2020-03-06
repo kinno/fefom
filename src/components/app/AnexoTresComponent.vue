@@ -347,11 +347,9 @@ export default {
       observaciones: [],
       obs_descripcion_problematica:{
         observacion: null,
-        id_observacion: null,
       },
       obs_variables_relevantes:{
         observacion: null,
-        id_observacion: null,
       },
   }),
   watch: {},
@@ -426,8 +424,8 @@ export default {
                   color: "green lighten-1",
                   icon: "mdi-check-bold"
                 };
-                this.estatus = "Aceptada";
-                if(this.ficha_tecnica.estatus == 4){
+                this.estatus = "Validada";
+                if(this.ficha_tecnica.estatus == 5){
                   this.visible = false;
                 }
                 break;
@@ -436,8 +434,8 @@ export default {
                   color: "red lighten-1",
                   icon: "mdi-comment-alert"
                 };
-                this.estatus = "Errores y Observaciones";
-                 if(this.ficha_tecnica.estatus == 4){
+                this.estatus = "Observaciones";
+                 if(this.ficha_tecnica.estatus == 5){
                   this.mostrarObservaciones()
                 }
                 break;
@@ -543,7 +541,7 @@ export default {
               color: "green lighten-1",
               icon: "mdi-check-bold"
             };
-            this.estatus = "Aceptada";
+            this.estatus = "Validada";
           } else {
             this.$fire({
               type: "error",
@@ -570,7 +568,6 @@ export default {
         if (this.observaciones[index].seccion == seccion) {
           observacion_registrada = {
             seccion: this.observaciones[index].seccion,
-            id_observacion: this.observaciones[index].id_observacion,
             descripcion_observacion: this.observaciones[index]
               .descripcion_observacion
           };
@@ -582,7 +579,6 @@ export default {
       var bandera = false;
       for (let index = 0; index < this.observaciones.length; index++) {
         if (this.observaciones[index].seccion == observacion.seccion) {
-          this.observaciones[index].id_observacion = observacion.id_observacion;
           this.observaciones[index].descripcion_observacion =
             observacion.descripcion_observacion;
           bandera = true;
@@ -610,7 +606,7 @@ export default {
                   color: "red lighten-1",
                   icon: "mdi-comment-alert"
                 };
-                this.estatus = "Errores y Observaciones";
+                this.estatus = "Observaciones";
             
           } else {
             this.$fire({
@@ -633,7 +629,7 @@ export default {
         });
     },
     verificarDatos() {
-      if(this.imagenes.length < 4){
+      if(this.imagenes.length < 0){
         this.$fire({
               type: "warning",
               title: "Error",
@@ -661,11 +657,9 @@ export default {
         switch (element.seccion) {
           case 'descripcion_problematica':
             this.obs_descripcion_problematica.observacion = element.descripcion_observacion
-            this.obs_descripcion_problematica.id_observacion = element.id_observacion
             break;
           case 'variables_relevantes':
             this.obs_variables_relevantes.observacion = element.descripcion_observacion
-            this.obs_variables_relevantes.id_observacion = element.id_observacion
             break;
           default:
             break;

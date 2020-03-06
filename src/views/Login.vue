@@ -87,6 +87,7 @@
 </template>
 
 <script>
+import { EventBus } from "../utils/event-bus";
 export default {
   mounted() {
     if (typeof this.$route.params.expired !== "undefined") {
@@ -94,6 +95,8 @@ export default {
         "¡La sesión ha expirado!<br>ingrese nuevamente.";
       this.alertError.show = true;
     }
+
+     EventBus.$emit("cierraLoading");
   },
   data() {
     return {

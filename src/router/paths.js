@@ -5,11 +5,13 @@
  */
 import Login from '../views/Login'
 import Dashboard from '../views/Dashboard'
+import Home from '../views/Home'
 import TechosFinancieros from '../views/TechosFinancieros'
 import ConsultaTechos from '../views/ConsultaTechos'
 import CarteraProyectos from '../views/CarteraProyectos'
 import RevisionCartera from '../views/RevisionCarteraProyectos'
 import FichaTecnica from '../views/FichaTecnica'
+import ListadoFichaTecnica from '../views/ListadoFichaTecnica'
 import RevisionFichaTecnica from '../views/RevisionFichaTecnica'
 import Oficios from '../views/Oficios'
 import Catalogos from '../views/Catalogos'
@@ -28,6 +30,15 @@ export default [{
     // Relative to /src/views
     component: Dashboard,
     name: 'Dashboard',
+    meta: {
+      requiresAuth: true
+    },
+  },
+  {
+    path: '/home',
+    // Relative to /src/views
+    component: Home,
+    name: 'Home',
     meta: {
       requiresAuth: true
     },
@@ -68,6 +79,15 @@ export default [{
     },
   },
   {
+    path: '/listado_ficha_tecnica',
+    name: 'Listado Ficha Tecnica',
+    component: ListadoFichaTecnica,
+    meta: {
+      requiresAuth: true,
+      requiresFefom: true,
+    },
+  },
+  {
     path: '/registro_ficha_tecnica',
     name: 'Registro Ficha Tecnica',
     component: FichaTecnica,
@@ -78,7 +98,7 @@ export default [{
   },
   {
     path: '/revision_ficha_tecnica',
-    name: 'Rvisión Ficha Tecnica',
+    name: 'Revision-Ficha',
     component: RevisionFichaTecnica,
     meta: {
       requiresAuth: true,
