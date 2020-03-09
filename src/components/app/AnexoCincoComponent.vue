@@ -27,7 +27,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('alternativas_solucion')"
+              @click="agregarObservacion('5.1')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -35,7 +35,7 @@
               v-if="user.tipo_usuario == 2 && obs_alternativas_solucion.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('alternativas_solucion')"
+              @click="agregarObservacion('5.1')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -186,7 +186,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('justificacion_solucion_seleccionada')"
+              @click="agregarObservacion('5.2')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -194,7 +194,7 @@
               v-if="user.tipo_usuario == 2 && obs_justificacion_solucion_seleccionada.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('justificacion_solucion_seleccionada')"
+              @click="agregarObservacion('5.2')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -395,7 +395,7 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Validada";
-                if(this.ficha_tecnica.estatus == 4){
+                if(this.ficha_tecnica.estatus == 5){
                   this.visible = false;
                 }
                 break;
@@ -405,7 +405,7 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Observaciones";
-                if(this.ficha_tecnica.estatus == 4){
+                if(this.ficha_tecnica.estatus == 5){
                   this.mostrarObservaciones()
                 }
                 break;
@@ -572,12 +572,12 @@ export default {
     },
     mostrarObservaciones(){
       this.observaciones.forEach(element => {
-        console.log(element)
+         console.log(element)
         switch (element.seccion) {
-          case 'alternativas_solucion':
+          case '5.1':
             this.obs_alternativas_solucion.observacion = element.descripcion_observacion
             break;
-          case 'justificación_solucion_seleccionada':
+          case '5.2':
             this.obs_justificacion_solucion_seleccionada.observacion = element.descripcion_observacion
             break;
           default:

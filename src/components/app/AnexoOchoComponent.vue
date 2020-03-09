@@ -159,9 +159,9 @@ export default {
   props: ["ficha_tecnica"],
   beforeMount() {
     this.user = JSON.parse(localStorage.getItem("user"));
-    if (this.ficha_tecnica.id_anexo_ocho !== null) {
-      this.id_anexo_ocho = this.ficha_tecnica.id_anexo_ocho;
-      this.buscarAnexoOcho();
+    if (this.ficha_tecnica.id_anexo_nueve !== null) {
+      this.id_anexo_nueve = this.ficha_tecnica.id_anexo_nueve;
+      this.buscarAnexoNueve();
     }
 
     if (this.ficha_tecnica.estatus == 2 || this.ficha_tecnica.estatus == 3) {
@@ -170,12 +170,12 @@ export default {
   },
   mounted() {
     EventBus.$on("guardarFicha", data => {
-      this.guardarAnexoOcho(data);
+      this.guardarAnexoNueve(data);
     });
 
     //FEFOM
     EventBus.$on("validarSeccion", data => {
-      this.validarAnexoOcho(data);
+      this.validarAnexoNueve(data);
     });
     EventBus.$on("emitirObservaciones", data => {
       this.registrarObservaciones(data);
@@ -186,7 +186,7 @@ export default {
   },
   data: () => ({
     user: null,
-    id_anexo_ocho: null,
+    id_anexo_nueve: null,
     comentarios_finales: "",
     ramo: "",
     entidad: "",
@@ -211,11 +211,11 @@ export default {
   }),
   watch: {},
   methods: {
-    buscarAnexoOcho() {
+    buscarAnexoNueve() {
       EventBus.$emit("abreLoading");
       this.$http
-        .post("/ficha_tecnica/buscar_anexo_ocho", {
-          id_anexo_ocho: this.id_anexo_ocho
+        .post("/ficha_tecnica/buscar_anexo_nueve", {
+          id_anexo_nueve: this.id_anexo_nueve
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
@@ -272,12 +272,12 @@ export default {
           console.error(error);
         });
     },
-    guardarAnexoOcho(data) {
+    guardarAnexoNueve(data) {
       if (this.verificarDatos()) {
         this.$http
-          .post("/ficha_tecnica/guardar_anexo_ocho", {
+          .post("/ficha_tecnica/guardar_anexo_nueve", {
             id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
-            id_anexo_ocho: this.ficha_tecnica.id_anexo_ocho,
+            id_anexo_nueve: this.ficha_tecnica.id_anexo_nueve,
             comentarios_finales: this.comentarios_finales,
             ramo: this.ramo,
             entidad: this.entidad,
@@ -293,8 +293,8 @@ export default {
             if (response.status == 200) {
               console.log(response);
               EventBus.$emit(
-                "actualizaPropAnexoOcho",
-                response.data.id_anexo_ocho
+                "actualizaPropAnexoNueve",
+                response.data.id_anexo_nueve
               );
               this.$fire({
                 type: "success",
@@ -323,10 +323,10 @@ export default {
           });
       }
     },
-    validarAnexoOcho(data) {
+    validarAnexoNueve(data) {
       this.$http
-        .post("/ficha_tecnica/validar_anexo_ocho", {
-          id_anexo_ocho: this.id_anexo_ocho
+        .post("/ficha_tecnica/validar_anexo_nueve", {
+          id_anexo_nueve: this.id_anexo_nueve
         })
         .then(response => {
           if (response.status == 200) {
@@ -389,8 +389,8 @@ export default {
     },
     guardarObservaciones() {
       this.$http
-        .post("/ficha_tecnica/guardar_observaciones_anexo_ocho", {
-          id_anexo_ocho: this.id_anexo_ocho,
+        .post("/ficha_tecnica/guardar_observaciones_anexo_nueve", {
+          id_anexo_nueve: this.id_anexo_nueve,
           observaciones: JSON.stringify(this.observaciones)
         })
         .then(response => {

@@ -20,6 +20,7 @@
                         label="No. Ficha Técnica:"
                         dense
                         class="mt-5"
+                        v-on:keyup.enter="buscar"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
@@ -111,7 +112,7 @@
     </v-layout>
     <v-dialog
       v-model="dialogObservaciones"
-      width="500"
+      min-width="500px"
       persistent
     >
       <v-card>
@@ -120,18 +121,24 @@
           primary-title
           
         >
-          Observaciones: {{seccionObservacion}}
+          Observaciones: {{seccionComputed}}
         </v-card-title>
 
         <v-card-text>
           <v-row>
-            <v-col cols="12">
+            <v-col cols="6">
               <v-textarea
                 outlined
-                label="Descripción"
+                label="Observación registrada:"
                 v-model="descripcionObservacion"
                 readonly
+                rows="13"
+                row-height="30"
               ></v-textarea>
+            </v-col>
+            <v-col cols="6">
+                Sugerencia Metodológica:<br><br>
+                <p style="white-space: pre-line !important;" >{{this.sugerenciaSeleccionada}}</p>
             </v-col>
           </v-row>
         </v-card-text>
@@ -143,7 +150,7 @@
           <v-btn
             color="primary"
             text
-            @click="dialogObservaciones = false, observacionSeleccionada=null, descripcionObservacion=null"
+            @click="dialogObservaciones = false, sugerenciaSeleccionada=null, descripcionObservacion=null"
           >
             Cerrar
           </v-btn>
@@ -162,11 +169,12 @@ import AnexoCincoComponent from "../components/app/AnexoCincoComponent";
 import AnexoSeisComponent from "../components/app/AnexoSeisComponent";
 import AnexoSieteComponent from "../components/app/AnexoSieteComponent";
 import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
+import AnexoNueveComponent from "../components/app/AnexoNueveComponent";
 import { EventBus } from "../utils/event-bus";
 export default {
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user"));
-    this.cargarCatalogoObservaciones()
+    this.cargarCatalogoSugerencias()
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
       console.log("actualizando ficha_tecnica.id_anexo_dos");
       this.ficha_tecnica.id_anexo_dos = id_anexo_dos;
@@ -195,6 +203,10 @@ export default {
       console.log("actualizando ficha_tecnica.id_anexo_ocho");
       this.ficha_tecnica.id_anexo_ocho = id_anexo_ocho;
     });
+    EventBus.$on("actualizaPropAnexoNueve", id_anexo_nueve => {
+      console.log("actualizando ficha_tecnica.id_anexo_nueve");
+      this.ficha_tecnica.id_anexo_nueve = id_anexo_nueve;
+    });
     EventBus.$on("buscarFicha", id_ficha_tecnica => {
       this.id_ficha_tecnica = id_ficha_tecnica;
       this.buscar();
@@ -202,8 +214,15 @@ export default {
     EventBus.$on("abreDialogObservacion", (seccion,observaciones) => {
       this.dialogObservaciones = true
       this.seccionObservacion = seccion
+      console.log(observaciones)
       if(observaciones !== null){
-        this.observacionSeleccionada = observaciones.id_observacion
+        this.catalogoSugerencias.forEach(sugerencia => {
+          if(sugerencia.punto == seccion){
+            this.sugerenciaSeleccionada = sugerencia.sugerencia
+            return
+          }
+        });
+        // this.sugerenciaSeleccionada = this.catalogoSugerencias.find(sugerencia => sugerencia.punto === seccion)
         this.descripcionObservacion = observaciones.descripcion_observacion
       }
     });
@@ -216,7 +235,7 @@ export default {
     AnexoCincoComponent,
     AnexoSeisComponent,
     AnexoSieteComponent,
-    AnexoOchoComponent,
+    AnexoNueveComponent,
   },
   data() {
     return {
@@ -301,7 +320,7 @@ export default {
         },
         {
           titulo: "Consideraciones generales",
-          component: "anexo-ocho-component",
+          component: "anexo-nueve-component",
           anexo: 8
         }
       ],
@@ -320,18 +339,135 @@ export default {
         id_anexo_cinco: null,
         id_anexo_seis: null,
         id_anexo_siete: null,
-        id_anexo_ocho: null
+        id_anexo_ocho: null,
+        id_anexo_nueve: null
       },
       dialogObservaciones: false,
       seccionObservacion: "",
-      catalogoObservaciones: [],
-      observacionSeleccionada: null,
+      catalogoSugerencias: [],
+      sugerenciaSeleccionada: null,
       descripcionObservacion: null,
     };
   },
   computed: {
     currentTabComponent: function() {
       return this.currentTab;
+    },
+     seccionComputed: function() {
+      switch (this.seccionObservacion) {
+        case "1.1":
+          return "Programas y Proyectos de Inversión (PPI)";
+          break;
+        case "1.2":
+          return "Nombre del PPI";
+          break;
+        case "1.3":
+          return "Tipo de PPI";
+          break;
+        case "1.4":
+          return "Fuentes de financiamiento";
+          break;
+        case "1.5":
+          return "Monto total de inversión";
+          break;
+        case "1.6":
+          return "Horizonte de evaluación.";
+          break;
+        case "1.7":
+          return "Calendario de Inversión";
+          break;
+        case "1.8":
+          return "Localización geográfica";
+          break;
+        case "2.1":
+          return `Programa(s) Relacionado(s)
+                  Objetivo(s) / Estrategia(s)
+                  Líneas de acción
+                  `;
+          break;
+        case "2.2":
+          return "Programas o proyectos complementarios o relacionados.";
+          break;
+        case "3.1":
+          return "Descripción de la problemática.";
+          break;
+        case "3.2":
+          return "Análisis de la oferta.";
+          break;
+        case "3.3":
+          return "Análisis de la demanda.";
+          break;
+        case "3.4":
+          return "Variables relevantes.";
+          break;
+        case "4.1":
+          return "Posibles medidas de optimización.";
+          break;
+        case "4.2":
+          return "Análisis de la oferta sin proyecto; Análisis de la demanda sin proyecto.";
+          break;
+        case "5.1":
+          return "Descripción de las alternativas de solución desechadas.";
+          break;
+        case "5.2":
+          return "Justificación de la alternativa de solución seleccionada.";
+          break;
+        case "6.1":
+          return "Descripción general.";
+          break;
+        case "6.2":
+          return "Descripción de los componentes del proyecto.";
+          break;
+        case "6.3":
+          return "Aspectos técnicos, legales y ambientales más relevantes.";
+          break;
+        case "6.4":
+          return "Plano de localización del proyecto";
+          break;
+        case "6.5":
+          return "Análisis de la oferta con proyecto.";
+          break;
+        case "6.6":
+          return "Análisis de la demanda con proyecto.";
+        case "6.7":
+          return "Diagnóstico de la situación con proyecto.";
+          break;
+        case "7.1":
+          return "Identificación de costos";
+          break;
+        case "7.2":
+          return "Identificación de beneficios";
+          break;
+        case "8.1":
+          return "Nombre del estudio";
+          break;
+        case "8.2":
+          return "Tipo de estudio";
+          break;
+        case "8.3":
+          return "Fecha estimada de realización";
+          break;
+        case "8.4":
+          return "Justificación de su realización";
+          break;
+        case "8.5":
+          return "Descripción";
+          break;
+        case "8.6":
+          return "Vigencia del Estudio";
+          break;
+        case "8.7":
+          return "Monto estimado (incluye IVA)";
+          break;
+        case "9.1":
+          return "Comentarios finales.";
+          break;
+        case "9.2":
+          return "Responsables de la Información.";
+          break;
+        default:
+          break;
+      }
     }
   },
   watch: {
@@ -353,7 +489,7 @@ export default {
         this.ficha_tecnica.id_anexo_cinco !== null &&
         this.ficha_tecnica.id_anexo_seis !== null &&
         this.ficha_tecnica.id_anexo_siete !== null &&
-        this.ficha_tecnica.id_anexo_ocho !== null 
+        this.ficha_tecnica.id_anexo_nueve !== null 
       ) {
          if (confirm("¿Deseas cerrar y envíar la ficha para revisión? Una vez enviado ya no se podrán realizar cambios en la ficha.")) {
            this.$http
@@ -506,12 +642,12 @@ export default {
           });
         });
     },
-     cargarCatalogoObservaciones(){
+     cargarCatalogoSugerencias(){
       this.$http
-        .get("/catalogos/get_catalogo_observaciones")
+        .get("/catalogos/get_catalogo_sugerencias")
         .then(response => {
           response.data.rows.forEach(element => {
-            this.catalogoObservaciones.push(element);
+            this.catalogoSugerencias.push(element);
           });
         })
         .catch(err => {});
@@ -526,6 +662,7 @@ export default {
     EventBus.$off("actualizaPropAnexoSeis");
     EventBus.$off("actualizaPropAnexoSiete");
     EventBus.$off("actualizaPropAnexoOcho");
+    EventBus.$off("actualizaPropAnexoNueve");
     EventBus.$off("abreDialogObservacion");
   }
 };

@@ -172,13 +172,13 @@ Router.post("/buscar_anexo_siete", (req, res) => {
   });
 });
 
-Router.post("/buscar_anexo_ocho", (req, res) => {
+Router.post("/buscar_anexo_nueve", (req, res) => {
   var data = req.body;
   query = `
-            SELECT * FROM tbl_anexo_ocho
-            WHERE id_anexo_ocho = ?
+            SELECT * FROM tbl_anexo_nueve
+            WHERE id_anexo_nueve = ?
            `;
-  connection.query(query, [data.id_anexo_ocho], (err, rows, fields) => {
+  connection.query(query, [data.id_anexo_nueve], (err, rows, fields) => {
     if (err) return res.status(500).send("Error del servidor." + err);
     res.status(200).send(rows);
   });
@@ -638,17 +638,17 @@ Router.post("/guardar_anexo_siete", (req, res) => {
   );
 });
 
-Router.post("/guardar_anexo_ocho", (req, res) => {
+Router.post("/guardar_anexo_nueve", (req, res) => {
   var data = req.body;
   var query = "";
-  if (data.id_anexo_ocho == null) {
-    query = `insert into tbl_anexo_ocho
+  if (data.id_anexo_nueve == null) {
+    query = `insert into tbl_anexo_nueve
          (estatus,comentarios_finales,ramo,entidad,area_responsable,nombre,cargo,responsable_informacion,cargo_responsable_informacion,telefono_responsable_informacion,email_responsable_informacion)
          values
          (1, ?, ?, ?, ?, ?, ?, ?, ? ,? ,?)`;
   } else {
     query = `
-         UPDATE tbl_anexo_ocho SET
+         UPDATE tbl_anexo_nueve SET
          estatus=1,
           comentarios_finales = ?,
           ramo = ?,
@@ -661,7 +661,7 @@ Router.post("/guardar_anexo_ocho", (req, res) => {
           telefono_responsable_informacion = ?,
           email_responsable_informacion = ?
           WHERE 
-            id_anexo_ocho=?
+            id_anexo_nueve=?
            `;
   }
 
@@ -678,14 +678,14 @@ Router.post("/guardar_anexo_ocho", (req, res) => {
       data.cargo_responsable_informacion,
       data.telefono_responsable_informacion,
       data.email_responsable_informacion,
-      data.id_anexo_ocho
+      data.id_anexo_nueve
     ],
     (err, rows, fields) => {
       if (err) return res.status(500).send(err);
-      if (data.id_anexo_ocho == null) {
+      if (data.id_anexo_nueve == null) {
         query2 = `
          UPDATE tbl_ficha_tecnica SET
-          id_anexo_ocho=?
+          id_anexo_nueve=?
           WHERE 
             id_ficha_tecnica=?
            `;
@@ -694,11 +694,11 @@ Router.post("/guardar_anexo_ocho", (req, res) => {
           [rows.insertId, data.id_ficha_tecnica],
           (err2, rows2, fields) => {
             if (err2) return res.status(500).send(err2);
-            res.status(200).send({ id_anexo_ocho: rows.insertId });
+            res.status(200).send({ id_anexo_nueve: rows.insertId });
           }
         );
       } else {
-        res.status(200).send({ id_anexo_ocho: data.id_anexo_ocho });
+        res.status(200).send({ id_anexo_nueve: data.id_anexo_nueve });
       }
     }
   );
@@ -916,18 +916,18 @@ Router.post("/guardar_observaciones_anexo_siete", (req, res) => {
   );
 });
 
-Router.post("/guardar_observaciones_anexo_ocho", (req, res) => {
+Router.post("/guardar_observaciones_anexo_nueve", (req, res) => {
   var data = req.body;
   query = `
-    UPDATE tbl_anexo_ocho SET
+    UPDATE tbl_anexo_nueve SET
       estatus = 3,
       observaciones = ?
     WHERE 
-      id_anexo_ocho=?
+      id_anexo_nueve=?
            `;
   connection.query(
     query,
-    [data.observaciones, data.id_anexo_ocho],
+    [data.observaciones, data.id_anexo_nueve],
     (err, rows, fields) => {
       if (err) return res.status(500).send("Error del servidor." + err);
       res.status(200).send(rows);
@@ -1046,6 +1046,36 @@ Router.post("/validar_anexo_siete", (req, res) => {
     res.status(200).send("ok");
   });
 });
+Router.post("/validar_anexo_ocho", (req, res) => {
+  var data = req.body;
+  var query = "";
+  query = `
+         UPDATE tbl_anexo_siete SET
+            estatus = 2,
+            observaciones = null
+          WHERE 
+            id_anexo_siete=?;
+           `;
+  connection.query(query, [data.id_anexo_siete], (err, rows, fields) => {
+    if (err) return res.status(500).send(err);
+    res.status(200).send("ok");
+  });
+});
+Router.post("/validar_anexo_nueve", (req, res) => {
+  var data = req.body;
+  var query = "";
+  query = `
+         UPDATE tbl_anexo_nueve SET
+            estatus = 2,
+            observaciones = null
+          WHERE 
+            id_anexo_nueve=?;
+           `;
+  connection.query(query, [data.id_anexo_nueve], (err, rows, fields) => {
+    if (err) return res.status(500).send(err);
+    res.status(200).send("ok");
+  });
+});
 
 Router.post("/regresar_ficha", (req, res) => {
   var data = req.body;
@@ -1089,7 +1119,7 @@ Router.post("/cerrar_revision", (req, res) => {
       cinco.estatus AS estatus_cinco,
       seis.estatus AS estatus_seis,
       siete.estatus AS estatus_siete,
-      ocho.estatus AS estatus_ocho
+      nueve.estatus AS estatus_nueve
   FROM
       tbl_ficha_tecnica AS ficha
           JOIN
@@ -1107,7 +1137,7 @@ Router.post("/cerrar_revision", (req, res) => {
           JOIN
       tbl_anexo_siete AS siete ON siete.id_anexo_siete = ficha.id_anexo_siete
           JOIN
-      tbl_anexo_ocho AS ocho ON ocho.id_anexo_ocho = ficha.id_anexo_ocho
+      tbl_anexo_nueve AS nueve ON nueve.id_anexo_nueve = ficha.id_anexo_nueve
   WHERE
       id_ficha_tecnica = ?
           AND (uno.estatus != 1 AND dos.estatus != 1
@@ -1116,7 +1146,7 @@ Router.post("/cerrar_revision", (req, res) => {
           AND cinco.estatus != 1
           AND seis.estatus != 1
           AND siete.estatus != 1
-          AND ocho.estatus != 1)
+          AND nueve.estatus != 1)
            `;
   connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
     if (err) return res.status(500).send(err);
@@ -1217,7 +1247,7 @@ Router.post("/cerrar_revision", (req, res) => {
       cinco.estatus AS estatus_cinco,
       seis.estatus AS estatus_seis,
       siete.estatus AS estatus_siete,
-      ocho.estatus AS estatus_ocho,
+      nueve.estatus AS estatus_nueve,
   FROM
       tbl_ficha_tecnica AS ficha
           JOIN
@@ -1235,7 +1265,7 @@ Router.post("/cerrar_revision", (req, res) => {
           JOIN
       tbl_anexo_siete AS siete ON siete.id_anexo_siete = ficha.id_anexo_siete
           JOIN
-      tbl_anexo_ocho AS ocho ON ocho.id_anexo_ocho = ficha.id_anexo_ocho
+      tbl_anexo_nueve AS nueve ON nueve.id_anexo_nueve = ficha.id_anexo_nueve
   WHERE
       id_ficha_tecnica = ?
           AND (uno.estatus != 1 AND dos.estatus != 1
@@ -1244,7 +1274,7 @@ Router.post("/cerrar_revision", (req, res) => {
           AND cinco.estatus != 1
           AND seis.estatus != 1
           AND siete.estatus != 1
-          AND ocho.estatus != 1)
+          AND nueve.estatus != 1)
            `;
   connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
     if (err) return res.status(500).send(err);
@@ -1260,7 +1290,7 @@ Router.post("/cerrar_revision", (req, res) => {
         rows[0].estatus_cinco == 2 &&
         rows[0].estatus_seis == 2 &&
         rows[0].estatus_siete == 2 &&
-        rows[0].estatus_ocho == 2
+        rows[0].estatus_nueve == 2
       ) {
         //Todas las secciones validadas
         // console.log("Todas las secciones validadas")
@@ -1317,7 +1347,7 @@ Router.get("/imprimir_ficha", (req, res) => {
             join tbl_anexo_cinco as cinco on ficha.id_anexo_cinco = cinco.id_anexo_cinco
             join tbl_anexo_seis as seis on ficha.id_anexo_seis = seis.id_anexo_seis
             join tbl_anexo_siete as siete on ficha.id_anexo_siete = siete.id_anexo_siete
-            join tbl_anexo_ocho as ocho on ficha.id_anexo_ocho = ocho.id_anexo_ocho
+            join tbl_anexo_nueve as nueve on ficha.id_anexo_nueve = nueve.id_anexo_nueve
             where ficha.id_ficha_tecnica = ?
            `;
   connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {

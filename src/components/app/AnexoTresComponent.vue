@@ -22,20 +22,23 @@
         <v-card outlined>
           <v-toolbar dense flat color="grey lighten-2">
             <v-toolbar-title>Descripción de la problemática</v-toolbar-title>
-             <v-spacer></v-spacer>
+            <v-spacer></v-spacer>
             <v-btn
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('descripcion_problematica')"
+              @click="agregarObservacion('3.1')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
             <v-btn
-              v-if="user.tipo_usuario == 2 && obs_descripcion_problematica.observacion !== null"
+              v-if="
+                user.tipo_usuario == 2 &&
+                  obs_descripcion_problematica.observacion !== null
+              "
               icon
               color="red lighten-1"
-              @click="agregarObservacion('descripcion_problematica')"
+              @click="agregarObservacion('3.1')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -113,31 +116,95 @@
               </v-col>
             </v-row>
             <v-row>
-              <v-col cols="6" class="column mt-5">
-                <v-textarea
-                  label="Análisis de la oferta:"
-                  auto-grow
-                  outlined
-                  rows="5"
-                  row-height="15"
-                  maxlength="1000"
-                  counter="1000"
-                  v-model="analisis_oferta"
-                  :disabled="!visible"
-                ></v-textarea>
+              <v-col cols="6">
+                <v-card outlined>
+                  <v-toolbar dense flat color="grey lighten-2">
+                    <v-toolbar-title class="subtitle-2 text-center"
+                      >Análisis de la oferta</v-toolbar-title
+                    >
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      v-if="user.tipo_usuario == 1"
+                      icon
+                      color="red lighten-1"
+                      @click="agregarObservacion('3.2')"
+                    >
+                      <v-icon dark>mdi-comment-remove-outline</v-icon>
+                    </v-btn>
+                    <v-btn
+                      v-if="
+                        user.tipo_usuario == 2 &&
+                          obs_analisis_oferta.observacion !== null
+                      "
+                      icon
+                      color="red lighten-1"
+                      @click="agregarObservacion('3.2')"
+                    >
+                      <v-icon dark>mdi-message-alert</v-icon>
+                    </v-btn>
+                  </v-toolbar>
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12" class="column">
+                        <v-textarea
+                          auto-grow
+                          outlined
+                          rows="5"
+                          row-height="15"
+                          maxlength="1000"
+                          counter="1000"
+                          v-model="analisis_oferta"
+                          :disabled="!visible"
+                        ></v-textarea>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
               </v-col>
-              <v-col cols="6" class="column mt-5">
-                <v-textarea
-                  label="Análisis de la demanda:"
-                  auto-grow
-                  outlined
-                  rows="5"
-                  row-height="15"
-                  maxlength="1000"
-                  counter="1000"
-                  v-model="analisis_demanda"
-                  :disabled="!visible"
-                ></v-textarea>
+              <v-col cols="6">
+                <v-card outlined>
+                  <v-toolbar dense flat color="grey lighten-2">
+                    <v-toolbar-title class="subtitle-2 text-center"
+                      >Análisis de la demanda</v-toolbar-title
+                    >
+                    <v-spacer></v-spacer>
+                    <v-btn
+                      v-if="user.tipo_usuario == 1"
+                      icon
+                      color="red lighten-1"
+                      @click="agregarObservacion('3.3')"
+                    >
+                      <v-icon dark>mdi-comment-remove-outline</v-icon>
+                    </v-btn>
+                    <v-btn
+                      v-if="
+                        user.tipo_usuario == 2 &&
+                          obs_analisis_demanda.observacion !== null
+                      "
+                      icon
+                      color="red lighten-1"
+                      @click="agregarObservacion('3.3')"
+                    >
+                      <v-icon dark>mdi-message-alert</v-icon>
+                    </v-btn>
+                  </v-toolbar>
+                  <v-card-text>
+                    <v-row>
+                      <v-col cols="12" class="column">
+                        <v-textarea
+                          auto-grow
+                          outlined
+                          rows="5"
+                          row-height="15"
+                          maxlength="1000"
+                          counter="1000"
+                          v-model="analisis_demanda"
+                          :disabled="!visible"
+                        ></v-textarea>
+                      </v-col>
+                    </v-row>
+                  </v-card-text>
+                </v-card>
               </v-col>
             </v-row>
           </v-card-text>
@@ -153,23 +220,26 @@
                 <v-toolbar-title>
                   Variables relevantes
                 </v-toolbar-title>
-                 <v-spacer></v-spacer>
-            <v-btn
-              v-if="user.tipo_usuario == 1"
-              icon
-              color="red lighten-1"
-              @click="agregarObservacion('variables_relevantes')"
-            >
-              <v-icon dark>mdi-comment-remove-outline</v-icon>
-            </v-btn>
-            <v-btn
-              v-if="user.tipo_usuario == 2 && obs_variables_relevantes.observacion !== null"
-              icon
-              color="red lighten-1"
-              @click="agregarObservacion('variables_relevantes')"
-            >
-              <v-icon dark>mdi-message-alert</v-icon>
-            </v-btn>
+                <v-spacer></v-spacer>
+                <v-btn
+                  v-if="user.tipo_usuario == 1"
+                  icon
+                  color="red lighten-1"
+                  @click="agregarObservacion('3.4')"
+                >
+                  <v-icon dark>mdi-comment-remove-outline</v-icon>
+                </v-btn>
+                <v-btn
+                  v-if="
+                    user.tipo_usuario == 2 &&
+                      obs_variables_relevantes.observacion !== null
+                  "
+                  icon
+                  color="red lighten-1"
+                  @click="agregarObservacion('3.4')"
+                >
+                  <v-icon dark>mdi-message-alert</v-icon>
+                </v-btn>
               </v-toolbar>
               <v-card-text>
                 <v-row>
@@ -177,7 +247,7 @@
                   <v-col cols="12" md="6" class="column">
                     <div class="my-2">
                       <v-btn
-                      v-if="visible"
+                        v-if="visible"
                         text
                         color="green brighten-5"
                         @click="agregarComponente"
@@ -216,7 +286,10 @@
                           </template>
                         </v-edit-dialog>
                       </template>
-                      <template v-slot:item.situacionActual="props" v-if="visible">
+                      <template
+                        v-slot:item.situacionActual="props"
+                        v-if="visible"
+                      >
                         <v-edit-dialog
                           :return-value.sync="props.item.situacionActual"
                           @save="save"
@@ -301,7 +374,7 @@ export default {
   },
   data: () => ({
     user: null,
-     iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
+    iconos_estatus: { color: "light-blue lighten-2", icon: "mdi-clock" },
     id_anexo_tres: null,
     visible: true,
     imagenes: [
@@ -344,13 +417,19 @@ export default {
     ],
     variables_relevantes: [],
     estatus: "En Edición",
-      observaciones: [],
-      obs_descripcion_problematica:{
-        observacion: null,
-      },
-      obs_variables_relevantes:{
-        observacion: null,
-      },
+    observaciones: [],
+    obs_descripcion_problematica: {
+      observacion: null
+    },
+    obs_analisis_oferta: {
+      observacion: null
+    },
+    obs_analisis_demanda: {
+      observacion: null
+    },
+    obs_variables_relevantes: {
+      observacion: null
+    }
   }),
   watch: {},
   methods: {
@@ -414,7 +493,7 @@ export default {
             this.analisis_demanda = data.analisis_demanda;
             this.variables_relevantes = JSON.parse(data.variables_relevantes);
 
-             data.observaciones !== null
+            data.observaciones !== null
               ? (this.observaciones = JSON.parse(data.observaciones))
               : (this.observaciones = []);
 
@@ -425,7 +504,7 @@ export default {
                   icon: "mdi-check-bold"
                 };
                 this.estatus = "Validada";
-                if(this.ficha_tecnica.estatus == 5){
+                if (this.ficha_tecnica.estatus == 5) {
                   this.visible = false;
                 }
                 break;
@@ -435,8 +514,8 @@ export default {
                   icon: "mdi-comment-alert"
                 };
                 this.estatus = "Observaciones";
-                 if(this.ficha_tecnica.estatus == 5){
-                  this.mostrarObservaciones()
+                if (this.ficha_tecnica.estatus == 5) {
+                  this.mostrarObservaciones();
                 }
                 break;
               default:
@@ -603,11 +682,10 @@ export default {
               confirmButtonColor: "#d33"
             });
             this.iconos_estatus = {
-                  color: "red lighten-1",
-                  icon: "mdi-comment-alert"
-                };
-                this.estatus = "Observaciones";
-            
+              color: "red lighten-1",
+              icon: "mdi-comment-alert"
+            };
+            this.estatus = "Observaciones";
           } else {
             this.$fire({
               type: "error",
@@ -629,43 +707,53 @@ export default {
         });
     },
     verificarDatos() {
-      if(this.imagenes.length < 0){
+      if (this.imagenes.length < 0) {
         this.$fire({
-              type: "warning",
-              title: "Error",
-              text: "Se deben cargar por lo menos 4 imágenes",
-              confirmButtonText: "Cerrar",
-              confirmButtonColor: "#d33"
-            });
+          type: "warning",
+          title: "Error",
+          text: "Se deben cargar por lo menos 4 imágenes",
+          confirmButtonText: "Cerrar",
+          confirmButtonColor: "#d33"
+        });
         return false;
-      } 
-      if(this.imagenes.length > 6){
+      }
+      if (this.imagenes.length > 6) {
         this.$fire({
-              type: "warning",
-              title: "Error",
-              text: "Se deben cargar máximo 6 imágenes",
-              confirmButtonText: "Cerrar",
-              confirmButtonColor: "#d33"
-            });
+          type: "warning",
+          title: "Error",
+          text: "Se deben cargar máximo 6 imágenes",
+          confirmButtonText: "Cerrar",
+          confirmButtonColor: "#d33"
+        });
         return false;
-      } 
+      }
       return true;
     },
-    mostrarObservaciones(){
+    mostrarObservaciones() {
       this.observaciones.forEach(element => {
-        console.log(element)
+        console.log(element);
         switch (element.seccion) {
-          case 'descripcion_problematica':
-            this.obs_descripcion_problematica.observacion = element.descripcion_observacion
+          case "3.1":
+            this.obs_descripcion_problematica.observacion =
+              element.descripcion_observacion;
             break;
-          case 'variables_relevantes':
-            this.obs_variables_relevantes.observacion = element.descripcion_observacion
+          case "3.2":
+            this.obs_analisis_oferta.observacion =
+              element.descripcion_observacion;
+            break;
+          case "3.3":
+            this.obs_analisis_demanda.observacion =
+              element.descripcion_observacion;
+            break;
+          case "3.4":
+            this.obs_variables_relevantes.observacion =
+              element.descripcion_observacion;
             break;
           default:
             break;
         }
       });
-    },
+    }
   },
   beforeDestroy() {
     EventBus.$off("guardarFicha");

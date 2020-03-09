@@ -107,7 +107,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('monto_total_inversion')"
+              @click="agregarObservacion('1.5')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -115,7 +115,7 @@
               v-if="user.tipo_usuario == 2 && obs_monto_total_inversion.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('monto_total_inversion')"
+              @click="agregarObservacion('1.5')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -172,7 +172,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('fuentes_financiamiento')"
+              @click="agregarObservacion('1.4')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -180,7 +180,7 @@
               v-if="user.tipo_usuario == 2 && obs_fuentes_financiamiento.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('fuentes_financiamiento')"
+              @click="agregarObservacion('1.4')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -253,7 +253,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('horizonte_evaluacion')"
+              @click="agregarObservacion('1.6')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -261,7 +261,7 @@
               v-if="user.tipo_usuario == 2 && obs_horizonte_evaluacion.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('horizonte_evaluacion')"
+              @click="agregarObservacion('1.6')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -358,7 +358,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('calendario_inversion')"
+              @click="agregarObservacion('1.7')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -366,7 +366,7 @@
               v-if="user.tipo_usuario == 2 && obs_calendario_inversion.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('calendario_inversion')"
+              @click="agregarObservacion('1.7')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -486,7 +486,7 @@
             v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('localizacion_geografica')"
+              @click="agregarObservacion('1.8')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -494,7 +494,7 @@
               v-if="user.tipo_usuario == 2 && obs_localizacion_geografica.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('localizacion_geografica')"
+              @click="agregarObservacion('1.8')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -1140,19 +1140,19 @@ export default {
       this.observaciones.forEach(element => {
         console.log(element)
         switch (element.seccion) {
-          case 'monto_total_inversion':
+          case '1.5':
             this.obs_monto_total_inversion.observacion = element.descripcion_observacion
             break;
-          case 'fuentes_financiamiento':
+          case '1.4':
             this.obs_fuentes_financiamiento.observacion = element.descripcion_observacion
             break;
-          case "horizonte_evaluacion":
+          case "1.6":
             this.obs_horizonte_evaluacion.observacion = element.descripcion_observacion
             break;
-          case "calendario_inversion":
+          case "1.7":
             this.obs_calendario_inversion.observacion = element.descripcion_observacion
             break;
-          case "localizacion_geografica":
+          case "1.8":
             this.obs_localizacion_geografica.observacion = element.descripcion_observacion
             break;
         

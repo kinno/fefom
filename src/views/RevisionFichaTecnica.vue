@@ -20,6 +20,7 @@
                         label="No. Ficha Técnica:"
                         dense
                         class="mt-5"
+                        v-on:keyup.enter="buscar"
                       ></v-text-field>
                     </v-col>
                     <v-col cols="12" sm="6" md="2">
@@ -43,7 +44,7 @@
                         <v-icon right dark>mdi-magnify</v-icon>
                       </v-btn>
                       <v-btn
-                      v-if="botonVisible"
+                        v-if="botonVisible"
                         color="green"
                         class="ma-2 white--text"
                         small
@@ -53,7 +54,7 @@
                         <v-icon right dark>mdi-checkbox-marked-outline</v-icon>
                       </v-btn>
                       <v-btn
-                      v-if="botonVisible"
+                        v-if="botonVisible"
                         color="green"
                         class="ma-2 white--text"
                         small
@@ -63,7 +64,7 @@
                         <v-icon right dark>mdi-comment-remove-outline</v-icon>
                       </v-btn>
                       <v-btn
-                       v-if="botonVisible"
+                        v-if="botonVisible"
                         color="green"
                         class="ma-2 white--text"
                         small
@@ -73,7 +74,7 @@
                         <v-icon right dark>mdi-arrow-top-left-thick</v-icon>
                       </v-btn>
                       <v-btn
-                       v-if="botonVisible"
+                        v-if="botonVisible"
                         color="green"
                         class="ma-2 white--text"
                         small
@@ -117,10 +118,10 @@
         </material-card>
       </v-flex>
     </v-layout>
-    <v-dialog v-model="dialogObservaciones" width="500" persistent>
+    <v-dialog v-model="dialogObservaciones" min-width="500px" persistent>
       <v-card>
         <v-card-title class="headline grey lighten-2" primary-title>
-          Observaciones: {{ seccionObservacion }}
+          Observaciones: {{ seccionComputed }}
         </v-card-title>
 
         <v-card-text>
@@ -167,7 +168,8 @@ import AnexoCuatroComponent from "../components/app/AnexoCuatroComponent";
 import AnexoCincoComponent from "../components/app/AnexoCincoComponent";
 import AnexoSeisComponent from "../components/app/AnexoSeisComponent";
 import AnexoSieteComponent from "../components/app/AnexoSieteComponent";
-import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
+// import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
+import AnexoNueveComponent from "../components/app/AnexoNueveComponent";
 import { EventBus } from "../utils/event-bus";
 export default {
   mounted() {
@@ -178,7 +180,7 @@ export default {
       this.buscar();
     }
 
-    this.cargarCatalogoObservaciones();
+    // this.cargarCatalogoObservaciones();
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
       console.log("actualizando ficha_tecnica.id_anexo_dos");
       this.ficha_tecnica.id_anexo_dos = id_anexo_dos;
@@ -211,6 +213,10 @@ export default {
       console.log("actualizando ficha_tecnica.id_anexo_ocho");
       this.ficha_tecnica.id_anexo_ocho = id_anexo_ocho;
     });
+    EventBus.$on("actualizaPropAnexoNueve", id_anexo_nueve => {
+      console.log("actualizando ficha_tecnica.id_anexo_nueve");
+      this.ficha_tecnica.id_anexo_nueve = id_anexo_nueve;
+    });
     EventBus.$on("abreDialogObservacion", (seccion, observaciones) => {
       this.dialogObservaciones = true;
       this.seccionObservacion = seccion;
@@ -228,7 +234,7 @@ export default {
     AnexoCincoComponent,
     AnexoSeisComponent,
     AnexoSieteComponent,
-    AnexoOchoComponent
+    AnexoNueveComponent,
   },
   data() {
     return {
@@ -292,10 +298,10 @@ export default {
           component: "anexo-siete-component",
           anexo: 7
         },
-         {
+        {
           titulo: "Consideraciones generales",
-          component: "anexo-ocho-component",
-          anexo: 8
+          component: "anexo-nueve-component",
+          anexo: 9
         }
       ],
       id_ficha_tecnica: null,
@@ -313,7 +319,8 @@ export default {
         id_anexo_cinco: null,
         id_anexo_seis: null,
         id_anexo_siete: null,
-        id_anexo_ocho: null
+        id_anexo_ocho: null,
+        id_anexo_nueve: null,
       },
       dialogObservaciones: false,
       seccionObservacion: "",
@@ -326,6 +333,122 @@ export default {
     currentTabComponent: function() {
       this.change++;
       return this.currentTab;
+    },
+    seccionComputed: function() {
+      switch (this.seccionObservacion) {
+        case "1.1":
+          return "Programas y Proyectos de Inversión (PPI)";
+          break;
+        case "1.2":
+          return "Nombre del PPI";
+          break;
+        case "1.3":
+          return "Tipo de PPI";
+          break;
+        case "1.4":
+          return "Fuentes de financiamiento";
+          break;
+        case "1.5":
+          return "Monto total de inversión";
+          break;
+        case "1.6":
+          return "Horizonte de evaluación.";
+          break;
+        case "1.7":
+          return "Calendario de Inversión";
+          break;
+        case "1.8":
+          return "Localización geográfica";
+          break;
+        case "2.1":
+          return `Programa(s) Relacionado(s)
+                  Objetivo(s) / Estrategia(s)
+                  Líneas de acción
+                  `;
+          break;
+        case "2.2":
+          return "Programas o proyectos complementarios o relacionados.";
+          break;
+        case "3.1":
+          return "Descripción de la problemática.";
+          break;
+        case "3.2":
+          return "Análisis de la oferta.";
+          break;
+        case "3.3":
+          return "Análisis de la demanda.";
+          break;
+        case "3.4":
+          return "Variables relevantes.";
+          break;
+        case "4.1":
+          return "Posibles medidas de optimización.";
+          break;
+        case "4.2":
+          return "Análisis de la oferta sin proyecto; Análisis de la demanda sin proyecto.";
+          break;
+        case "5.1":
+          return "Descripción de las alternativas de solución desechadas.";
+          break;
+        case "5.2":
+          return "Justificación de la alternativa de solución seleccionada.";
+          break;
+        case "6.1":
+          return "Descripción general.";
+          break;
+        case "6.2":
+          return "Descripción de los componentes del proyecto.";
+          break;
+        case "6.3":
+          return "Aspectos técnicos, legales y ambientales más relevantes.";
+          break;
+        case "6.4":
+          return "Plano de localización del proyecto";
+          break;
+        case "6.5":
+          return "Análisis de la oferta con proyecto.";
+          break;
+        case "6.6":
+          return "Análisis de la demanda con proyecto.";
+        case "6.7":
+          return "Diagnóstico de la situación con proyecto.";
+          break;
+        case "7.1":
+          return "Identificación de costos";
+          break;
+        case "7.2":
+          return "Identificación de beneficios";
+          break;
+        case "8.1":
+          return "Nombre del estudio";
+          break;
+        case "8.2":
+          return "Tipo de estudio";
+          break;
+        case "8.3":
+          return "Fecha estimada de realización";
+          break;
+        case "8.4":
+          return "Justificación de su realización";
+          break;
+        case "8.5":
+          return "Descripción";
+          break;
+        case "8.6":
+          return "Vigencia del Estudio";
+          break;
+        case "8.7":
+          return "Monto estimado (incluye IVA)";
+          break;
+        case "9.1":
+          return "Comentarios finales.";
+          break;
+        case "9.2":
+          return "Responsables de la Información.";
+          break;
+        default:
+          break;
+      }
     }
   },
   watch: {

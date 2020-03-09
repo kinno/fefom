@@ -27,7 +27,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('alineacion_estrategica')"
+              @click="agregarObservacion('2.1')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -35,7 +35,7 @@
               v-if="user.tipo_usuario == 2 && obs_alineacion_estrategica.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('alineacion_estrategica')"
+              @click="agregarObservacion('2.1')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -151,7 +151,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('programas_proyectos_complementarios')"
+              @click="agregarObservacion('2.2')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -159,7 +159,7 @@
               v-if="user.tipo_usuario == 2 && obs_programas_proyectos_complementarios.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('programas_proyectos_complementarios')"
+              @click="agregarObservacion('2.2')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -521,10 +521,10 @@ export default {
       this.observaciones.forEach(element => {
         console.log(element)
         switch (element.seccion) {
-          case 'alineacion_estrategica':
+          case '2.1':
             this.obs_alineacion_estrategica.observacion = element.descripcion_observacion
             break;
-          case 'programas_proyectos_complementarios':
+          case '2.2':
             this.obs_programas_proyectos_complementarios.observacion = element.descripcion_observacion
             break;
           default:

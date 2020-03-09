@@ -29,7 +29,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('identificacion_costos')"
+              @click="agregarObservacion('7.1')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -37,7 +37,7 @@
               v-if="user.tipo_usuario == 2 && obs_identificacion_costos.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('identificacion_costos')"
+              @click="agregarObservacion('7.1')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -170,7 +170,7 @@
               v-if="user.tipo_usuario == 1"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('identificacion_beneficios')"
+              @click="agregarObservacion('7.2')"
             >
               <v-icon dark>mdi-comment-remove-outline</v-icon>
             </v-btn>
@@ -178,7 +178,7 @@
               v-if="user.tipo_usuario == 2 && obs_identificacion_beneficios.observacion !== null"
               icon
               color="red lighten-1"
-              @click="agregarObservacion('identificacion_beneficios')"
+              @click="agregarObservacion('7.2')"
             >
               <v-icon dark>mdi-message-alert</v-icon>
             </v-btn>
@@ -734,10 +734,10 @@ export default {
       this.observaciones.forEach(element => {
         console.log(element)
         switch (element.seccion) {
-          case 'identificacion_costos':
+          case '7.1':
             this.obs_identificacion_costos.observacion = element.descripcion_observacion
             break;
-          case 'identificacion_beneficios':
+          case '7.2':
             this.obs_identificacion_beneficios.observacion = element.descripcion_observacion
             break;
           default:
