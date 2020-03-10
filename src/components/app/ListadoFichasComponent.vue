@@ -12,6 +12,7 @@
         <template v-slot:item="{ item }">
           <tr>
             <td class="text-center">{{ item.id_ficha_tecnica }}</td>
+            <td class="text-center">{{ item.version }}</td>
             <td class="text-center">
               {{item.ayuntamiento}}
             </td>
@@ -70,6 +71,7 @@ export default {
             sortable: false,
             value: 'id_ficha_tecnica',
           },
+          { text: 'Version', value: 'version', sortable: false,align: 'center',},
           { text: 'Ayuntamiento', value: 'ayuntamiento', sortable: false,align: 'center',},
           { text: 'Proyecto', value: 'nombre_proyecto', sortable: false,align: 'center',},
           { text: 'Monto', value: 'monto', sortable: false,align: 'right',},
@@ -99,6 +101,7 @@ export default {
             response.data.forEach(element => {
                 this.asignaciones.push({
                 id_ficha_tecnica: element.id_ficha_tecnica,
+                version: element.version,
                 ayuntamiento: element.ayuntamiento,
                 nombre_proyecto: element.nombre_proyecto,
                 monto: element.monto_con_iva,

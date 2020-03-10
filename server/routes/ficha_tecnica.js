@@ -189,6 +189,7 @@ Router.post("/buscar_asignaciones", (req, res) => {
   query = `
       SELECT 
         ficha.id_ficha_tecnica,
+        ficha.version,
         municipio.descripcion AS ayuntamiento,
         cartera.nombre_proyecto,
         ficha.monto_con_iva,
