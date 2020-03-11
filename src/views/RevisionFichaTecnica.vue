@@ -34,16 +34,112 @@
                     </v-col>
                     <v-spacer></v-spacer>
                     <v-col cols="12" md="8">
-                      <v-btn
-                        color="green"
-                        class="ma-0 tile white--text"
-                        small
-                        @click="buscar()"
-                      >
-                        Buscar
-                        <v-icon right dark>mdi-magnify</v-icon>
-                      </v-btn>
-                      <v-btn
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="green"
+                            class="ma-2 tile white--text"
+                            small
+                            v-on="on"
+                            @click="buscar()"
+                          >
+                            <v-icon center dark>mdi-magnify</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Buscar</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            v-if="botonVisible"
+                            color="green"
+                            class="ma-2 white--text"
+                            small
+                            v-on="on"
+                            @click="validarSeccion()"
+                          >
+                            
+                            <v-icon center dark>mdi-checkbox-marked-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Validar Sección</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                         <v-btn
+                          v-if="botonVisible"
+                          color="green"
+                          class="ma-2 white--text"
+                          small
+                          v-on="on"
+                          @click="guardarObservaciones()"
+                        >
+                          <v-icon center dark>mdi-comment-remove-outline</v-icon>
+                        </v-btn>
+                        </template>
+                        <span>Guardar Observaciones</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            v-if="botonVisible"
+                            color="green"
+                            class="ma-2 white--text"
+                            small
+                            v-on="on"
+                            @click="cerrarFicha(1)"
+                          >
+                            
+                            <v-icon center dark>mdi-clipboard-arrow-left-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Regresar al Ayuntamiento con Observaciones</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            v-if="botonVisible"
+                            color="green"
+                            class="ma-2 white--text"
+                            small
+                            v-on="on"
+                            @click="cerrarFicha(2)"
+                          >
+                            <v-icon center dark>mdi-file-check-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Enviar a validación</span>
+                      </v-tooltip>
+                      <v-tooltip bottom v-if="this.user.tipo_rol == 2">
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="green"
+                            class="ma-2 tile white--text"
+                            small
+                            v-on="on"
+                            @click="buscar()"
+                          >
+                            <v-icon center dark>mdi-file-restore-outline</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Regresar a Revisión</span>
+                      </v-tooltip>
+                      <!-- <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="green"
+                            class="ma-0 tile white--text"
+                            small
+                            v-on="on"
+                            @click="buscar()"
+                          >
+                            <v-icon center dark>mdi-magnify</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Buscar</span>
+                      </v-tooltip> -->
+                      
+                      <!-- <v-btn
                         v-if="botonVisible"
                         color="green"
                         class="ma-2 white--text"
@@ -70,7 +166,7 @@
                         small
                         @click="cerrarFicha(1)"
                       >
-                        Regresar con Observaciones
+                        Regresar al Ayuntamiento con Observaciones
                         <v-icon right dark>mdi-arrow-top-left-thick</v-icon>
                       </v-btn>
                       <v-btn
@@ -82,7 +178,7 @@
                       >
                         Enviar a validación
                         <v-icon right dark>mdi-arrow-top-right-thick</v-icon>
-                      </v-btn>
+                      </v-btn> -->
                     </v-col>
                   </v-toolbar>
                 </v-col>
@@ -172,8 +268,11 @@ import AnexoSieteComponent from "../components/app/AnexoSieteComponent";
 import AnexoNueveComponent from "../components/app/AnexoNueveComponent";
 import { EventBus } from "../utils/event-bus";
 export default {
+  beforeMount(){
+     this.user = JSON.parse(localStorage.getItem("user"));
+  },
   mounted() {
-    this.user = JSON.parse(localStorage.getItem("user"));
+   
 
     if (typeof this.$route.params.id_ficha_tecnica !== "undefined") {
       this.id_ficha_tecnica = this.$route.params.id_ficha_tecnica;
@@ -465,69 +564,70 @@ export default {
         id_ficha_tecnica: this.id_ficha_tecnica
       });
     },
-    cerrarFicha() {
-      if (
-        this.ficha_tecnica.id_ficha_tecnica !== null &&
-        this.ficha_tecnica.id_anexo_uno !== null &&
-        this.ficha_tecnica.id_anexo_dos !== null &&
-        this.ficha_tecnica.id_anexo_tres !== null &&
-        this.ficha_tecnica.id_anexo_cuatro !== null &&
-        this.ficha_tecnica.id_anexo_cinco !== null &&
-        this.ficha_tecnica.id_anexo_seis !== null &&
-        this.ficha_tecnica.id_anexo_siete !== null
-      ) {
-        if (
-          confirm(
-            "¿Deseas cerrar y envíar la ficha para revisión? Una vez enviado ya no se podrán realizar cambios en la ficha."
-          )
-        ) {
-          this.$http
-            .post("/ficha_tecnica/cerrar_ficha", {
-              id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
-              id_ayuntamiento: this.user.id_municipio
-            })
-            .then(response => {
-              if (response.status == 200) {
-                console.log(response);
+    // cerrarFicha() {
+    //   if (
+    //     this.ficha_tecnica.id_ficha_tecnica !== null &&
+    //     this.ficha_tecnica.id_anexo_uno !== null &&
+    //     this.ficha_tecnica.id_anexo_dos !== null &&
+    //     this.ficha_tecnica.id_anexo_tres !== null &&
+    //     this.ficha_tecnica.id_anexo_cuatro !== null &&
+    //     this.ficha_tecnica.id_anexo_cinco !== null &&
+    //     this.ficha_tecnica.id_anexo_seis !== null &&
+    //     this.ficha_tecnica.id_anexo_siete !== null &&
+    //     this.ficha_tecnica.id_anexo_nueve !== null 
+    //   ) {
+    //     if (
+    //       confirm(
+    //         "¿Deseas terminar la revisión? Una vez enviado ya no se podrán realizar cambios en la ficha."
+    //       )
+    //     ) {
+    //       this.$http
+    //         .post("/ficha_tecnica/cerrar_ficha", {
+    //           id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
+    //           id_ayuntamiento: this.user.id_municipio
+    //         })
+    //         .then(response => {
+    //           if (response.status == 200) {
+    //             console.log(response);
 
-                this.$fire({
-                  type: "success",
-                  title: `Ficha técnica cerrada y enviada correctamente.`,
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
-              } else {
-                this.$fire({
-                  type: "error",
-                  title: "Error",
-                  text: response.err,
-                  confirmButtonText: "Cerrar",
-                  confirmButtonColor: "#d33"
-                });
-              }
-            })
-            .catch(error => {
-              this.$fire({
-                type: "error",
-                title: "Error",
-                text: error,
-                confirmButtonText: "Cerrar",
-                confirmButtonColor: "#d33"
-              });
-            });
-        }
-        console.log("Cerrando ficha técnica");
-      } else {
-        this.$fire({
-          type: "error",
-          title: "Error",
-          text:
-            "Aún no se completa el registro de la ficha técnica, por favor verificar las secciones.",
-          confirmButtonText: "Cerrar",
-          confirmButtonColor: "#d33"
-        });
-      }
-    },
+    //             this.$fire({
+    //               type: "success",
+    //               title: `Ficha técnica cerrada y enviada correctamente.`,
+    //               confirmButtonText: "Cerrar",
+    //               confirmButtonColor: "#d33"
+    //             });
+    //           } else {
+    //             this.$fire({
+    //               type: "error",
+    //               title: "Error",
+    //               text: response.err,
+    //               confirmButtonText: "Cerrar",
+    //               confirmButtonColor: "#d33"
+    //             });
+    //           }
+    //         })
+    //         .catch(error => {
+    //           this.$fire({
+    //             type: "error",
+    //             title: "Error",
+    //             text: error,
+    //             confirmButtonText: "Cerrar",
+    //             confirmButtonColor: "#d33"
+    //           });
+    //         });
+    //     }
+    //     console.log("Cerrando ficha técnica");
+    //   } else {
+    //     this.$fire({
+    //       type: "error",
+    //       title: "Error",
+    //       text:
+    //         "Aún no se completa el registro de la ficha técnica, por favor verificar las secciones.",
+    //       confirmButtonText: "Cerrar",
+    //       confirmButtonColor: "#d33"
+    //     });
+    //   }
+    // },
     emiteEvento(anexo) {
       var tipo = "";
       switch (anexo) {

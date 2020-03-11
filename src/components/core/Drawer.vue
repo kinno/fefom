@@ -281,8 +281,9 @@ export default {
               text: "Listado",
               to: "/listado_ficha_tecnica",
               visible: false,
-              tipo_usuario: [1],
-              tipo_rol: [1],
+              tipo_usuario: [1,2],
+              tipo_rol: null,
+              // tipo_rol: [1,2,3],
             },
              {
               icon: "mdi-checkbox-multiple-blank-circle-outline",
@@ -322,7 +323,7 @@ export default {
           ]
         },
         {
-          icon: "mdi-settings",
+          icon: "mdi-cogs",
           text: "Catálogos",
           to: "/catalogos",
           visible: false,

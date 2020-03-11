@@ -209,9 +209,10 @@ Router.post("/buscar_asignaciones", (req, res) => {
         cat_usuario usuario ON asignacion.id_usuario_remitente = usuario.id_usuario
       WHERE
         asignacion.id_usuario_destinatario = ?
-            AND ficha.estatus = 2
+            AND ficha.estatus in (2,3,4)
       ORDER BY fecha_asignacion DESC;
            `;
+  // console.log(query, data.id_usuario)
   connection.query(query, [data.id_usuario], (err, rows, fields) => {
     if (err) return res.status(500).send("Error del servidor." + err);
     res.status(200).send(rows);
@@ -220,7 +221,7 @@ Router.post("/buscar_asignaciones", (req, res) => {
 
 Router.post("/guardar_anexo_uno", (req, res) => {
   var data = req.body;
-  console.log(data);
+  // console.log(data);
   var query = "";
   if (data.id_anexo_uno == null) {
     query = `insert into tbl_anexo_uno
@@ -1235,103 +1236,103 @@ Router.post("/cerrar_revision", (req, res) => {
   });
 });
 
-Router.post("/cerrar_revision", (req, res) => {
-  var data = req.body;
-  var query = "";
-  query = `
-    SELECT 
-    ficha.id_ficha_tecnica,
-      uno.estatus AS estatus_uno,
-      dos.estatus AS estatus_dos,
-      tres.estatus AS estatus_tres,
-      cuatro.estatus AS estatus_cuatro,
-      cinco.estatus AS estatus_cinco,
-      seis.estatus AS estatus_seis,
-      siete.estatus AS estatus_siete,
-      nueve.estatus AS estatus_nueve,
-  FROM
-      tbl_ficha_tecnica AS ficha
-          JOIN
-      tbl_anexo_uno AS uno ON uno.id_anexo_uno = ficha.id_anexo_uno
-          JOIN
-      tbl_anexo_dos AS dos ON dos.id_anexo_dos = ficha.id_anexo_dos
-          JOIN
-      tbl_anexo_tres AS tres ON tres.id_anexo_tres = ficha.id_anexo_tres
-          JOIN
-      tbl_anexo_cuatro AS cuatro ON cuatro.id_anexo_cuatro = ficha.id_anexo_cuatro
-          JOIN
-      tbl_anexo_cinco AS cinco ON cinco.id_anexo_cinco = ficha.id_anexo_cinco
-          JOIN
-      tbl_anexo_seis AS seis ON seis.id_anexo_seis = ficha.id_anexo_seis
-          JOIN
-      tbl_anexo_siete AS siete ON siete.id_anexo_siete = ficha.id_anexo_siete
-          JOIN
-      tbl_anexo_nueve AS nueve ON nueve.id_anexo_nueve = ficha.id_anexo_nueve
-  WHERE
-      id_ficha_tecnica = ?
-          AND (uno.estatus != 1 AND dos.estatus != 1
-          AND tres.estatus != 1
-          AND cuatro.estatus != 1
-          AND cinco.estatus != 1
-          AND seis.estatus != 1
-          AND siete.estatus != 1
-          AND nueve.estatus != 1)
-           `;
-  connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
-    if (err) return res.status(500).send(err);
-    if (rows.length == 0) {
-      return res.status(202).send({ error: 1 });
-    } else {
-      console.log(rows);
-      if (
-        rows[0].estatus_uno == 2 &&
-        rows[0].estatus_dos == 2 &&
-        rows[0].estatus_tres == 2 &&
-        rows[0].estatus_cuatro == 2 &&
-        rows[0].estatus_cinco == 2 &&
-        rows[0].estatus_seis == 2 &&
-        rows[0].estatus_siete == 2 &&
-        rows[0].estatus_nueve == 2
-      ) {
-        //Todas las secciones validadas
-        // console.log("Todas las secciones validadas")
-        var query = "";
-        query = `
-              UPDATE tbl_ficha_tecnica SET
-                estatus = 2
-              WHERE 
-                  id_ficha_tecnica=?;
-                `;
-        connection.query(
-          query,
-          [data.id_ficha_tecnica],
-          (err, rows, fields) => {
-            if (err) return res.status(500).send(err);
-            res.status(200).send("ok");
-          }
-        );
-      } else {
-        //Alguna sin validar
-        // console.log("Regresar a ayuntamiento")
-        var query = "";
-        query = `
-              UPDATE tbl_ficha_tecnica SET
-                estatus = 4
-              WHERE 
-                  id_ficha_tecnica=?;
-                `;
-        connection.query(
-          query,
-          [data.id_ficha_tecnica],
-          (err, rows, fields) => {
-            if (err) return res.status(500).send(err);
-            res.status(201).send("ok");
-          }
-        );
-      }
-    }
-  });
-});
+// Router.post("/cerrar_revision", (req, res) => {
+//   var data = req.body;
+//   var query = "";
+//   query = `
+//     SELECT 
+//     ficha.id_ficha_tecnica,
+//       uno.estatus AS estatus_uno,
+//       dos.estatus AS estatus_dos,
+//       tres.estatus AS estatus_tres,
+//       cuatro.estatus AS estatus_cuatro,
+//       cinco.estatus AS estatus_cinco,
+//       seis.estatus AS estatus_seis,
+//       siete.estatus AS estatus_siete,
+//       nueve.estatus AS estatus_nueve,
+//   FROM
+//       tbl_ficha_tecnica AS ficha
+//           JOIN
+//       tbl_anexo_uno AS uno ON uno.id_anexo_uno = ficha.id_anexo_uno
+//           JOIN
+//       tbl_anexo_dos AS dos ON dos.id_anexo_dos = ficha.id_anexo_dos
+//           JOIN
+//       tbl_anexo_tres AS tres ON tres.id_anexo_tres = ficha.id_anexo_tres
+//           JOIN
+//       tbl_anexo_cuatro AS cuatro ON cuatro.id_anexo_cuatro = ficha.id_anexo_cuatro
+//           JOIN
+//       tbl_anexo_cinco AS cinco ON cinco.id_anexo_cinco = ficha.id_anexo_cinco
+//           JOIN
+//       tbl_anexo_seis AS seis ON seis.id_anexo_seis = ficha.id_anexo_seis
+//           JOIN
+//       tbl_anexo_siete AS siete ON siete.id_anexo_siete = ficha.id_anexo_siete
+//           JOIN
+//       tbl_anexo_nueve AS nueve ON nueve.id_anexo_nueve = ficha.id_anexo_nueve
+//   WHERE
+//       id_ficha_tecnica = ?
+//           AND (uno.estatus != 1 AND dos.estatus != 1
+//           AND tres.estatus != 1
+//           AND cuatro.estatus != 1
+//           AND cinco.estatus != 1
+//           AND seis.estatus != 1
+//           AND siete.estatus != 1
+//           AND nueve.estatus != 1)
+//            `;
+//   connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
+//     if (err) return res.status(500).send(err);
+//     if (rows.length == 0) {
+//       return res.status(202).send({ error: 1 });
+//     } else {
+//       console.log(rows);
+//       if (
+//         rows[0].estatus_uno == 2 &&
+//         rows[0].estatus_dos == 2 &&
+//         rows[0].estatus_tres == 2 &&
+//         rows[0].estatus_cuatro == 2 &&
+//         rows[0].estatus_cinco == 2 &&
+//         rows[0].estatus_seis == 2 &&
+//         rows[0].estatus_siete == 2 &&
+//         rows[0].estatus_nueve == 2
+//       ) {
+//         //Todas las secciones validadas
+//         // console.log("Todas las secciones validadas")
+//         var query = "";
+//         query = `
+//               UPDATE tbl_ficha_tecnica SET
+//                 estatus = 2
+//               WHERE 
+//                   id_ficha_tecnica=?;
+//                 `;
+//         connection.query(
+//           query,
+//           [data.id_ficha_tecnica],
+//           (err, rows, fields) => {
+//             if (err) return res.status(500).send(err);
+//             res.status(200).send("ok");
+//           }
+//         );
+//       } else {
+//         //Alguna sin validar
+//         // console.log("Regresar a ayuntamiento")
+//         var query = "";
+//         query = `
+//               UPDATE tbl_ficha_tecnica SET
+//                 estatus = 4
+//               WHERE 
+//                   id_ficha_tecnica=?;
+//                 `;
+//         connection.query(
+//           query,
+//           [data.id_ficha_tecnica],
+//           (err, rows, fields) => {
+//             if (err) return res.status(500).send(err);
+//             res.status(201).send("ok");
+//           }
+//         );
+//       }
+//     }
+//   });
+// });
 
 Router.get("/imprimir_ficha", (req, res) => {
   // console.log(req.query)

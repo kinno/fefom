@@ -96,6 +96,7 @@ Router.post("/get_cartera_simple", (req, res) => {
            where id_municipio = ? and ejercicio like ?
            and estatus = 3
            `
+           console.log(query,condition.id_municipio)
     connection.query(query,[condition.id_municipio, condition.ejercicio],(err, rows, fields) => {
       if (err) return res.status(500).send('Error del servidor.' + err);
       res.status(200).json({

@@ -39,44 +39,64 @@
                     </v-col>
                     <v-spacer></v-spacer>
                     <v-col cols="12" md="7">
-                      <v-btn
-                        color="green"
-                        class="ma-2 white--text"
-                        small
-                        @click="buscar()"
-                      >
-                        Buscar
-                        <v-icon right dark>mdi-magnify</v-icon>
-                      </v-btn>
-                      <v-btn
-                      v-if="botonVisible"
-                        color="green"
-                        class="ma-2 white--text"
-                        small
-                        @click="guardarFicha()"
-                      >
-                        Guardar
-                        <v-icon right dark>mdi-content-save-outline</v-icon>
-                      </v-btn>
-                      <v-btn
-                        color="green"
-                        class="ma-2 white--text"
-                        small
-                        @click="imprimirFicha()"
-                      >
-                        Imprimir
-                        <v-icon right dark>mdi-printer</v-icon>
-                      </v-btn>
-                      <v-btn
-                       v-if="botonVisible"
-                        color="green"
-                        class="ma-2 white--text"
-                        small
-                        @click="cerrarFicha()"
-                      >
-                        Envíar
-                        <v-icon right dark>mdi-send-clock</v-icon>
-                      </v-btn>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="green"
+                            class="ma-2 tile white--text"
+                            small
+                            v-on="on"
+                            @click="buscar()"
+                          >
+                            <v-icon center dark>mdi-magnify</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Buscar</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                           <v-btn
+                            v-if="botonVisible"
+                              color="green"
+                              class="ma-2 white--text"
+                              small
+                              v-on="on"
+                              @click="guardarFicha()"
+                            >
+                              <v-icon center dark>mdi-content-save-outline</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>Guardar</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            v-if="botonVisible"
+                              color="green"
+                              class="ma-2 white--text"
+                              small
+                              v-on="on"
+                              @click="cerrarFicha()"
+                            >
+                              <v-icon center dark>mdi-file-export-outline</v-icon>
+                            </v-btn>
+                        </template>
+                        <span>Envíar a Revisión</span>
+                      </v-tooltip>
+                      <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                         <v-btn
+                          color="green"
+                          class="ma-2 white--text"
+                          small
+                          v-on="on"
+                          @click="imprimirFicha()"
+                        >
+                          <v-icon center dark>mdi-printer</v-icon>
+                        </v-btn>
+                        </template>
+                        <span>Imprimir</span>
+                      </v-tooltip>
                     </v-col>
                   </v-toolbar>
                 </v-col>
