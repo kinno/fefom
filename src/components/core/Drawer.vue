@@ -287,6 +287,14 @@ export default {
             },
              {
               icon: "mdi-checkbox-multiple-blank-circle-outline",
+              text: "Control",
+              to: "/control_fichas_tecnicas",
+              visible: false,
+              tipo_usuario: [1],
+              tipo_rol: [2,3],
+            },
+             {
+              icon: "mdi-checkbox-multiple-blank-circle-outline",
               text: "Registro",
               to: "/registro_ficha_tecnica",
               visible: false,

@@ -12,6 +12,7 @@ import CarteraProyectos from '../views/CarteraProyectos'
 import RevisionCartera from '../views/RevisionCarteraProyectos'
 import FichaTecnica from '../views/FichaTecnica'
 import ListadoFichaTecnica from '../views/ListadoFichaTecnica'
+import ControlFichasTecnicas from '../views/ControlFichasTecnicas'
 import RevisionFichaTecnica from '../views/RevisionFichaTecnica'
 import Oficios from '../views/Oficios'
 import Catalogos from '../views/Catalogos'
@@ -84,12 +85,21 @@ export default [{
     component: ListadoFichaTecnica,
     meta: {
       requiresAuth: true,
+      requiresFefom: false,
+    },
+  },
+  {
+    path: '/control_fichas_tecnicas',
+    name: 'Control-Fichas',
+    component: ControlFichasTecnicas,
+    meta: {
+      requiresAuth: true,
       requiresFefom: true,
     },
   },
   {
     path: '/registro_ficha_tecnica',
-    name: 'Registro Ficha Tecnica',
+    name: 'Registro-Ficha',
     component: FichaTecnica,
     meta: {
       requiresAuth: true,

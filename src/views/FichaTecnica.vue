@@ -192,8 +192,14 @@ import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
 import AnexoNueveComponent from "../components/app/AnexoNueveComponent";
 import { EventBus } from "../utils/event-bus";
 export default {
+  beforeMount(){
+     this.user = JSON.parse(localStorage.getItem("user"));
+  },
   mounted() {
-    this.user = JSON.parse(localStorage.getItem("user"));
+     if (typeof this.$route.params.id_ficha_tecnica !== "undefined") {
+      this.id_ficha_tecnica = this.$route.params.id_ficha_tecnica;
+      this.buscar();
+    }
     this.cargarCatalogoSugerencias()
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
       console.log("actualizando ficha_tecnica.id_anexo_dos");
@@ -517,7 +523,8 @@ export default {
             id_ficha_tecnica: this.ficha_tecnica.id_ficha_tecnica,
             id_ayuntamiento: this.user.id_municipio,
             version: this.ficha_tecnica.version,
-            id_usuario : this.user.id_usuario
+            id_usuario : this.user.id_usuario,
+            id_analista_asignado : this.ficha_tecnica.id_analista_asignado
           })
           .then(response => {
             if (response.status == 200) {
@@ -528,7 +535,10 @@ export default {
                 title: `Ficha técnica cerrada y enviada correctamente.`,
                 confirmButtonText: "Cerrar",
                 confirmButtonColor: "#d33"
-              });
+              }).then(r => {
+                  this.$router.push({path: "/listado_ficha_tecnica"})
+                })
+              ;
             } else {
               this.$fire({
                 type: "error",

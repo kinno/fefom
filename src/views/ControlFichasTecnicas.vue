@@ -4,14 +4,13 @@
       <v-flex xs12 md12>
         <material-card
           color="green"
-         :title="titulo"
-         :text="subtitulo"
+          title="Control de las Fichas Técnicas"
+          text="Detalle de las asignaciones de las fichas técnicas"
           class="mt-8"
           style="margin-bottom: 65px !important"
           
         >
-          <listado-fichas-component v-if="this.user.tipo_usuario == 1"></listado-fichas-component>
-          <listado-fichas-ayuntamiento-component v-else></listado-fichas-ayuntamiento-component>
+          <control-fichas-component></control-fichas-component>
         </material-card>
       </v-flex>
     </v-layout>
@@ -19,8 +18,7 @@
 </template>
 
 <script>
-import ListadoFichasComponent from "../components/app/ListadoFichasComponent";
-import ListadoFichasAyuntamientoComponent from "../components/app/ListadoFichasAyuntamientoComponent";
+import ControlFichasComponent from "../components/app/ControlFichasComponent";
 
 import { EventBus } from "../utils/event-bus";
 export default {
@@ -34,7 +32,7 @@ export default {
     
   },
   components: {
-    ListadoFichasComponent,ListadoFichasAyuntamientoComponent
+    ControlFichasComponent
   },
   data() {
     return {
@@ -45,12 +43,7 @@ export default {
     };
   },
   computed: { 
-    titulo: function(){
-      return (this.user.tipo_usuario == 1) ? "Bandeja de entrada" : "Listado de fichas técnicas"
-    },
-    subtitulo: function(){
-      return (this.user.tipo_usuario == 1) ? "Listado de fichas técnicas asignadas" : "Detalle de las fichas técnicas registradas"
-    }
+    
   },
   watch: {
   },

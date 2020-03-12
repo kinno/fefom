@@ -62,7 +62,7 @@ Router.post("/buscar_ficha", (req, res) => {
 
 Router.post("/buscar_ficha_fefom", (req, res) => {
   var data = req.body;
-  console.log(data.usuario);
+  // console.log(data.usuario);
   var subCondicion = "";
   if (data.usuario.tipo_rol == 1) {
     subCondicion = `and asignacion.id_usuario_destinatario = ${data.usuario.id_usuario}`;
@@ -184,6 +184,27 @@ Router.post("/buscar_anexo_nueve", (req, res) => {
   });
 });
 
+Router.post("/buscar_fichas_tecnicas", (req, res) => {
+  var data = req.body;
+  query = `
+        SELECT 
+        ficha.*,cartera.nombre_proyecto
+        FROM
+        fefom_db.tbl_ficha_tecnica AS ficha
+          LEFT JOIN
+        tbl_anexo_uno AS uno ON ficha.id_anexo_uno = uno.id_anexo_uno
+          LEFT JOIN
+        tbl_cartera_proyectos AS cartera ON uno.id_cartera_proyecto = cartera.id_cartera_proyecto
+        WHERE
+        ficha.id_ayuntamiento = ?
+        ORDER BY ficha.id_ficha_tecnica DESC;
+           `;
+  // console.log(query, data.id_usuario)
+  connection.query(query, [data.id_ayuntamiento], (err, rows, fields) => {
+    if (err) return res.status(500).send("Error del servidor." + err);
+    res.status(200).send(rows);
+  });
+});
 Router.post("/buscar_asignaciones", (req, res) => {
   var data = req.body;
   query = `
@@ -211,6 +232,43 @@ Router.post("/buscar_asignaciones", (req, res) => {
         asignacion.id_usuario_destinatario = ?
             AND ficha.estatus in (2,3,4)
       ORDER BY fecha_asignacion DESC;
+           `;
+  // console.log(query, data.id_usuario)
+  connection.query(query, [data.id_usuario], (err, rows, fields) => {
+    if (err) return res.status(500).send("Error del servidor." + err);
+    res.status(200).send(rows);
+  });
+});
+
+Router.post("/buscar_detalle_fichas", (req, res) => {
+  var data = req.body;
+  query = `
+          SELECT 
+            usuario.nombre,
+            ficha.id_ficha_tecnica,
+            ficha.version,
+            ficha.fecha_ficha,
+            ficha.fecha_envio,
+            ficha.fecha_revision,
+            ficha.fecha_validacion,
+            ficha.fecha_dictaminacion,
+            ficha.estatus,
+            municipio.descripcion AS ayuntamiento,
+            cartera.nombre_proyecto,
+            ficha.monto_con_iva
+          FROM
+            fefom_db.tbl_ficha_tecnica AS ficha
+                LEFT JOIN
+            tbl_anexo_uno AS uno ON ficha.id_anexo_uno = uno.id_anexo_uno
+                LEFT JOIN
+            tbl_cartera_proyectos AS cartera ON uno.id_cartera_proyecto = cartera.id_cartera_proyecto
+                LEFT JOIN
+            cat_municipio AS municipio ON ficha.id_ayuntamiento = municipio.id_municipio
+                LEFT JOIN
+            cat_usuario usuario ON ficha.id_analista_asignado = usuario.id_usuario
+          WHERE
+            ficha.id_analista_asignado IS NOT NULL
+            ORDER BY usuario.nombre DESC, ficha.fecha_envio DESC ; 
            `;
   // console.log(query, data.id_usuario)
   connection.query(query, [data.id_usuario], (err, rows, fields) => {
@@ -278,7 +336,7 @@ Router.post("/guardar_anexo_uno", (req, res) => {
         query = `insert into tbl_ficha_tecnica
           (ejercicio, id_ayuntamiento, estatus, fecha_ficha, fecha_creacion, version,monto_con_iva, id_anexo_uno)
           values
-          (?, ?, 1, NOW(), NOW(), 1,?, ?)`;
+          (?, ?, 0, NOW(), NOW(), 1,?, ?)`;
 
         connection.query(
           query,
@@ -707,32 +765,67 @@ Router.post("/guardar_anexo_nueve", (req, res) => {
 });
 
 Router.post("/cerrar_ficha", (req, res) => {
-  var queryAnalistaDisponible = `
-  SELECT 
-    gen.id_usuario, COUNT(gen.id_ficha_tecnica) AS total
-  FROM
-    (SELECT 
-        usuario.id_usuario, fichas.*
+  var data = req.body;
+  var id_analista = 0;
+  if(data.id_analista_asignado==null){
+    var queryAnalistaDisponible = `
+    SELECT 
+      gen.id_usuario, COUNT(gen.id_ficha_tecnica) AS total
     FROM
-        cat_usuario AS usuario
-    LEFT JOIN (SELECT 
-        *
-    FROM
-        tbl_ficha_tecnica
-    WHERE
-        estatus = 2) AS fichas ON usuario.id_usuario = fichas.id_analista_asignado
-    WHERE
-        usuario.tipo_rol = 1) AS gen
-  GROUP BY gen.id_usuario
-  ORDER BY total
-  LIMIT 1;
-  `;
+      (SELECT 
+          usuario.id_usuario, fichas.*
+      FROM
+          cat_usuario AS usuario
+      LEFT JOIN (SELECT 
+          *
+      FROM
+          tbl_ficha_tecnica
+      WHERE
+          estatus = 2) AS fichas ON usuario.id_usuario = fichas.id_analista_asignado
+      WHERE
+          usuario.tipo_rol = 1) AS gen
+    GROUP BY gen.id_usuario
+    ORDER BY total
+    LIMIT 1;
+    `;
+  
+    connection.query(queryAnalistaDisponible, (err, rows, fields) => {
+      if (err) return res.status(500).send("Error del servidor." + err);
+      id_analista = rows[0].id_usuario;
+      query = `
+            UPDATE tbl_ficha_tecnica SET
+              estatus = 2,
+              fecha_envio = now(),
+              version = ?,
+              id_analista_asignado = ?
+            WHERE 
+              id_ficha_tecnica=?
+                  `;
+    connection.query(
+      query,
+      [data.version + 1, id_analista, data.id_ficha_tecnica],
+      (err, rows, fields) => {
+        if (err) return res.status(500).send("Error del servidor." + err);
 
-  connection.query(queryAnalistaDisponible, (err, rows, fields) => {
-    if (err) return res.status(500).send("Error del servidor." + err);
-    var id_analista = rows[0].id_usuario;
-    var data = req.body;
-    // console.log(data)
+        var queryAsignacion = `
+                INSERT INTO tbl_asignaciones
+                  (id_ficha_tecnica, id_usuario_destinatario, id_usuario_remitente, fecha_asignacion)
+                VALUES
+                  (?,?,?,NOW())
+              `;
+        connection.query(
+          queryAsignacion,
+          [data.id_ficha_tecnica, id_analista, data.id_usuario],
+          (err, rows, fields) => {
+            if (err) return res.status(500).send("Error del servidor." + err);
+            res.status(200).send(rows);
+          }
+        );
+      }
+    );
+    });
+  }else{
+    id_analista = data.id_analista_asignado
     query = `
             UPDATE tbl_ficha_tecnica SET
               estatus = 2,
@@ -764,25 +857,11 @@ Router.post("/cerrar_ficha", (req, res) => {
         );
       }
     );
-  });
+  }
+ 
 
-  // var data = req.body;
-  // console.log(data)
-  // query = `
-  //   UPDATE tbl_ficha_tecnica SET
-  //     estatus = 3,
-  //     version = ?
-  //   WHERE
-  //     id_ficha_tecnica=?
-  //          `;
-  // connection.query(
-  // query,
-  // [(data.version + 1),data.id_ficha_tecnica],
-  //   (err, rows, fields) => {
-  //     if (err) return res.status(500).send("Error del servidor." + err);
-  //     res.status(200).send(rows);
-  //   }
-  // );
+  
+ 
 });
 
 Router.post("/guardar_observaciones_anexo_uno", (req, res) => {
@@ -1155,6 +1234,7 @@ Router.post("/cerrar_revision", (req, res) => {
     if (rows.length == 0) {
       return res.status(202).send({ error: 1 });
     } else {
+      var campoFecha = ""
       switch (data.tipo_envio) {
         case 1:
           //REGRESAR A AYUNTAMIENTO
@@ -1162,6 +1242,7 @@ Router.post("/cerrar_revision", (req, res) => {
           var id_usuario_destinatario = data.id_ayuntamiento;
           var id_usuario_remitente = data.id_usuario;
           var statusCode = 201;
+          campoFecha = ", fecha_envio = now()"
           break;
         case 2:
           //ENVIAR A VALIDACIÓN
@@ -1169,6 +1250,7 @@ Router.post("/cerrar_revision", (req, res) => {
           var id_usuario_destinatario = 0;
           var id_usuario_remitente = data.id_usuario;
           var statusCode = 200;
+          campoFecha = ", fecha_revision = now()"
           var querySubdirectorDisponible = `
           SELECT 
             gen.id_usuario, COUNT(gen.id_ficha_tecnica) AS total
@@ -1189,11 +1271,21 @@ Router.post("/cerrar_revision", (req, res) => {
           ORDER BY total
           LIMIT 1;
           `;
-
+            
           connection.query(querySubdirectorDisponible, (err, rows, fields) => {
             if (err) return res.status(500).send("Error del servidor." + err);
             id_usuario_destinatario = rows[0].id_usuario;
           });
+          break;
+
+        case 3:
+          //ENVIAR A VALIDACIÓN
+          var estatus = 2;
+          var id_usuario_destinatario = data.id_analista_asignado;
+          var id_usuario_remitente = data.id_usuario;
+          var statusCode = 203;
+          campoFecha = ", fecha_revision = null"
+          
           break;
 
         default:
@@ -1201,8 +1293,8 @@ Router.post("/cerrar_revision", (req, res) => {
       }
       queryUpdate = `
       UPDATE tbl_ficha_tecnica SET
-        estatus = ${estatus},
-        fecha_envio = now()
+        estatus = ${estatus}
+        ${campoFecha}
       WHERE 
         id_ficha_tecnica=?
             `;

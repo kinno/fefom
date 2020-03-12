@@ -117,7 +117,7 @@
                             class="ma-2 tile white--text"
                             small
                             v-on="on"
-                            @click="buscar()"
+                            @click="cerrarFicha(3)"
                           >
                             <v-icon center dark>mdi-file-restore-outline</v-icon>
                           </v-btn>
@@ -765,7 +765,8 @@ export default {
           tipo_envio: tipo_envio,
           id_ficha_tecnica: this.id_ficha_tecnica,
           id_usuario: this.user.id_usuario,
-          id_ayuntamiento: this.ficha_tecnica.id_ayuntamiento
+          id_ayuntamiento: this.ficha_tecnica.id_ayuntamiento,
+          id_analista_asignado: this.ficha_tecnica.id_analista_asignado
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
@@ -777,7 +778,9 @@ export default {
                   "La revisión de la ficha ha concluido con éxito, todas las secciones han sido validadas.",
                 confirmButtonText: "Cerrar",
                 confirmButtonColor: "#d33"
-              });
+              }).then(r => {
+                  this.$router.push({path: "/listado_ficha_tecnica"})
+                });
               break;
             case 201:
               this.$fire({
@@ -786,7 +789,9 @@ export default {
                   "La ficha ha sido regresada al Ayuntamiento con observaciones para su atención.",
                 confirmButtonText: "Cerrar",
                 confirmButtonColor: "#d33"
-              });
+              }).then(r => {
+                  this.$router.push({path: "/listado_ficha_tecnica"})
+                });
               break;
             case 202:
               this.$fire({
@@ -797,6 +802,17 @@ export default {
                 confirmButtonText: "Cerrar",
                 confirmButtonColor: "#d33"
               });
+              break;
+            case 203:
+              this.$fire({
+               type: "success",
+                title:
+                  "La ficha ha sido regresada al analista para su atención.",
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              }).then(r => {
+                  this.$router.push({path: "/listado_ficha_tecnica"})
+                });
               break;
 
             default:
