@@ -23,16 +23,17 @@
             </td>
             <!-- <td class="text-center">{{ item.fecha_envio }}</td> -->
             <td class="text-left">
+              <br><span style="font-size: 10px !important; ">Primer Ingreso: {{item.fecha_primer_ingreso}}</span>
               <br><span style="font-size: 10px !important; ">Fecha de Envío: {{item.fecha_envio}}</span>
               <br><span style="font-size: 10px !important; ">Fecha de Revisión: {{item.fecha_revision}}</span>
               <br><span style="font-size: 10px !important; ">Fecha de Validación: {{item.fecha_validacion}}</span>
               <br><span style="font-size: 10px !important; ">Fecha de Dictaminación: {{item.fecha_dictaminacion}}</span>
             </td>
             <td class="text-center font-weight-black">{{ item.estatus_texto }}</td>
-            <!-- <td class="text-center">
+            <td class="text-center">
               <v-row  no-gutters>
                 <v-col cols="12">
-                  <v-tooltip bottom v-if="item.estatus == 1 || item.estatus == 5">
+                  <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                       <v-btn
                       v-if="botonVisible"
@@ -40,16 +41,16 @@
                       class="ma-2 white--text"
                       small
                       v-on="on"
-                     @click="revisarFicha(item.id_ficha_tecnica)"
+                     @click="imprimirObservaciones(item.id_ficha_tecnica)"
                     >
-                      <v-icon center dark>mdi-file-document-edit-outline</v-icon>
+                      <v-icon center dark>mdi-printer-settings</v-icon>
                     </v-btn>
                     </template>
-                    <span>Editar ficha técnica</span>
+                    <span>Imprimir observaciones</span>
                   </v-tooltip>
                 </v-col>
               </v-row>
-            </td> -->
+            </td>
           </tr>
         </template>
         <template v-slot:no-data>No hay asignaciones registradas</template>
@@ -81,6 +82,7 @@ export default {
           { text: 'Resúmen', value: 'folio', sortable: false,align: 'center',},
           { text: 'Fechas', value: 'fecha_asignacion', sortable: false,align: 'left',},
           { text: 'Estatus Ficha', value: 'estatus', sortable: true,align: 'center',},
+          { text: 'Acciones', value: 'acciones', sortable: false,align: 'center',},
         ],
         asignaciones:[],
     };
@@ -100,12 +102,12 @@ export default {
         .then(response => {
           EventBus.$emit("cierraLoading");
           if (response.status == 200) {
-            // console.log(response.data[0]);
+            //  console.log(response.data);
             response.data.forEach(element => {
               var estat = ""
               var iconoEstatus = ""
               var color = ""
-              console.log(element.estatus)
+              // console.log(element.estatus)
               switch (element.estatus) {
                 case 1:
                   estat = "Edición / Presentación"
@@ -142,6 +144,9 @@ export default {
                                     ).format("LL"),
                 nombre_proyecto: element.nombre_proyecto,
                 monto: element.monto_con_iva,
+                fecha_primer_ingreso: (element.fecha_primer_ingreso !== null) ? moment(
+                                    element.fecha_primer_ingreso
+                                    ).format("LL") : "--",
                 fecha_envio: (element.fecha_envio !== null) ? moment(
                                     element.fecha_envio
                                     ).format("LL") : "--",
@@ -172,6 +177,45 @@ export default {
     revisarFicha(id_ficha_tecnica) {
      this.$router.push({name: "Registro-Ficha", params: {id_ficha_tecnica: id_ficha_tecnica}})
     },
+    imprimirObservaciones(id_ficha_tecnica){
+      EventBus.$emit("abreLoading");
+      this.$http
+        .get("/ficha_tecnica/imprimir_observaciones_ficha", {responseType: 'arraybuffer',params:{
+          id_ficha_tecnica: id_ficha_tecnica,
+        }})
+        .then(response => {
+          // console.log(response);
+          EventBus.$emit("cierraLoading");
+          if (response.status == 200) {
+             
+           var blob = new Blob([response.data], {type: 'application/pdf'});
+
+            var link = document.createElement('a');
+            link.href = window.URL.createObjectURL(blob);
+            link.target = "_blank"
+            // link.download = "filename.pdf";
+            link.click();
+          } else {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: response.err,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          }
+        })
+        .catch(error => {
+           EventBus.$emit("cierraLoading");
+          this.$fire({
+            type: "error",
+            title: "Error",
+            text: error,
+            confirmButtonText: "Cerrar",
+            confirmButtonColor: "#d33"
+          });
+        });
+    }
   },
   beforeDestroy() {
     EventBus.$off("buscarFicha");

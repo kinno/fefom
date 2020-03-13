@@ -248,6 +248,7 @@ Router.post("/buscar_detalle_fichas", (req, res) => {
             ficha.id_ficha_tecnica,
             ficha.version,
             ficha.fecha_ficha,
+            ficha.fecha_primer_ingreso,
             ficha.fecha_envio,
             ficha.fecha_revision,
             ficha.fecha_validacion,
@@ -795,6 +796,7 @@ Router.post("/cerrar_ficha", (req, res) => {
       query = `
             UPDATE tbl_ficha_tecnica SET
               estatus = 2,
+              fecha_primer_ingreso = now(),
               fecha_envio = now(),
               version = ?,
               id_analista_asignado = ?
@@ -1446,7 +1448,7 @@ Router.get("/imprimir_ficha", (req, res) => {
            `;
   connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
     if (err) return res.status(500).send("Error del servidor." + err);
-    var html = formatoFicha(rows);
+    var html = formatoFicha.formatoFicha(rows);
     //  console.log(path.join(__dirname,'../../public/uploads/'))
     var config = {
       format: "Letter", // allowed units: A3, A4, A5, Legal, Letter, Tabloid
@@ -1489,6 +1491,97 @@ Router.get("/imprimir_ficha", (req, res) => {
       res.setHeader("Content-type", "application/pdf");
       stream.pipe(res);
     });
+  });
+});
+
+Router.get("/imprimir_observaciones_ficha", (req, res) => {
+  // console.log(req.query)
+  var data = req.query;
+  query = `
+        SELECT
+          ficha.id_ficha_tecnica,
+          ayuntamiento.descripcion,  
+          uno.observaciones AS observaciones_uno,
+          dos.observaciones AS observaciones_dos,
+          tres.observaciones AS observaciones_tres,
+          cuatro.observaciones AS observaciones_cuatro,
+          cinco.observaciones AS observaciones_cinco,
+          seis.observaciones AS observaciones_seis,
+          siete.observaciones AS observaciones_siete,
+          nueve.observaciones AS observaciones_nueve
+        FROM
+          fefom_db.tbl_ficha_tecnica ficha
+              LEFT JOIN
+          cat_municipio ayuntamiento ON ficha.id_ayuntamiento = ayuntamiento.id_municipio
+              LEFT JOIN
+          tbl_anexo_uno uno ON ficha.id_anexo_uno = uno.id_anexo_uno
+              LEFT JOIN
+          tbl_anexo_dos dos ON ficha.id_anexo_dos = dos.id_anexo_dos
+              LEFT JOIN
+          tbl_anexo_tres tres ON ficha.id_anexo_tres = tres.id_anexo_tres
+              LEFT JOIN
+          tbl_anexo_cuatro cuatro ON ficha.id_anexo_cuatro = cuatro.id_anexo_cuatro
+              LEFT JOIN
+          tbl_anexo_cinco cinco ON ficha.id_anexo_cinco = cinco.id_anexo_cinco
+              LEFT JOIN
+          tbl_anexo_seis seis ON ficha.id_anexo_seis = seis.id_anexo_seis
+              LEFT JOIN
+          tbl_anexo_siete siete ON ficha.id_anexo_siete = siete.id_anexo_siete
+              LEFT JOIN
+          tbl_anexo_nueve nueve ON ficha.id_anexo_nueve = nueve.id_anexo_nueve
+            where ficha.id_ficha_tecnica = ?
+           `;
+  connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
+    if (err) return res.status(500).send("Error del servidor." + err);
+    var querySugerencias = `
+      select * from cat_sugerencias
+    `
+    connection.query(querySugerencias,[],(error,rows2,fields)=>{
+      if (err) return res.status(500).send("Error del servidor." + err);
+      var html = formatoFicha.formatoObservaciones(rows,rows2);
+      //  console.log(path.join(__dirname,'../../public/uploads/'))
+      var config = {
+        format: "Letter", // allowed units: A3, A4, A5, Legal, Letter, Tabloid
+        border: {
+          top: "1.5cm", // default is 0, units: mm, cm, in, px
+          right: "1.5cm",
+          bottom: "1.5cm",
+          left: "1.5cm"
+        },
+        // "border": {
+        //   "top": "50px", // default is 0, units: mm, cm, in, px
+        //   "right": "50px",
+        //   "bottom": "50px",
+        //   "left": "50px",
+        // },
+
+        paginationOffset: 0, // Override the initial pagination number
+        footer: {
+          height: "0.5cm"
+        }
+        // "header": {
+        //   "height": "45mm",
+        //   "contents": '<div style="text-align: center;">Author: Marc Bachmann</div>'
+        // },
+        // "footer": {
+        //   "height": "28mm",
+        //   "contents": {
+        //     first: 'Cover page',
+        //     2: 'Second page', // Any page number is working. 1-based index
+        //     default: '<span style="color: #444;">{{page}}</span>/<span>{{pages}}</span>', // fallback value
+        //     last: 'Last Page'
+        //   }
+        // },
+      };
+      pdf.create(html, config).toStream(function(err, stream) {
+        res.setHeader(
+          "Content-disposition",
+          "attachment; filename=ficha_tecnica.pdf"
+        );
+        res.setHeader("Content-type", "application/pdf");
+        stream.pipe(res);
+      });
+    })
   });
 });
 
