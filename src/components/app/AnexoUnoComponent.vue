@@ -463,6 +463,9 @@
                       <td class="text-right font-weight-black">
                         {{ totalCalendario | currency }}
                       </td>
+                      <td class="text-right font-weight-black">
+                      
+                      </td>
                     </tr>
                   </template>
                 </v-data-table>
@@ -716,6 +719,13 @@ export default {
         sortable: false,
         value: "monto",
         width: "75%"
+      },
+      {
+        text: "",
+        align: "center",
+        sortable: false,
+        value: "accion",
+        width: "5%"
       }
     ],
     snack: false,
@@ -915,7 +925,9 @@ export default {
       this.snackText = "Dato guardado";
     },
     saveCalendarioMonto(val, item) {
-      if (+this.totalCalendario + val <= this.monto_con_iva) {
+      val = parseFloat(val)
+      
+      if (+this.totalCalendario + parseFloat(val) <= this.monto_con_iva) {
         this.totalCalendario = +this.totalCalendario + val;
         this.snack = true;
         this.snackColor = "success";
@@ -961,6 +973,7 @@ export default {
           .post("/ficha_tecnica/guardar_anexo_uno", {
             id_ficha_tecnica: data.id_ficha_tecnica,
             id_ayuntamiento: this.user.id_municipio,
+            id_usuario: this.user.id_usuario,
             ejercicio: this.ejercicioSeleccionado,
             id_cartera_proyecto:
               typeof this.id_cartera_proyecto == "number"

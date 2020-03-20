@@ -7,6 +7,7 @@ const path = require("path");
 const fs = require("fs");
 var pdf = require("html-pdf");
 var formatoFicha = require("../formatoFicha");
+var fechaLimite = require("../fechaLimite");
 
 app = express();
 var baseURL = "";
@@ -205,6 +206,7 @@ Router.post("/buscar_fichas_tecnicas", (req, res) => {
     res.status(200).send(rows);
   });
 });
+
 Router.post("/buscar_asignaciones", (req, res) => {
   var data = req.body;
   query = `
@@ -215,7 +217,9 @@ Router.post("/buscar_asignaciones", (req, res) => {
         cartera.nombre_proyecto,
         ficha.monto_con_iva,
         usuario.nombre,
-        asignacion.fecha_asignacion
+        usuario.tipo_usuario,
+        asignacion.fecha_asignacion,
+        asignacion.observacion
       FROM
         fefom_db.tbl_ficha_tecnica AS ficha
             LEFT JOIN
@@ -253,6 +257,8 @@ Router.post("/buscar_detalle_fichas", (req, res) => {
             ficha.fecha_revision,
             ficha.fecha_validacion,
             ficha.fecha_dictaminacion,
+            ficha.fecha_limite_ayuntamiento,
+            ficha.fecha_limite_revision,
             ficha.estatus,
             municipio.descripcion AS ayuntamiento,
             cartera.nombre_proyecto,
@@ -273,6 +279,33 @@ Router.post("/buscar_detalle_fichas", (req, res) => {
            `;
   // console.log(query, data.id_usuario)
   connection.query(query, [data.id_usuario], (err, rows, fields) => {
+    if (err) return res.status(500).send("Error del servidor." + err);
+    res.status(200).send(rows);
+  });
+});
+
+Router.post("/buscar_historial", (req, res) => {
+  var data = req.body;
+  query = `
+        SELECT 
+          asignaciones.id_usuario_destinatario,
+          destinatario.nombre as nombre_destinatario,
+          asignaciones.id_usuario_remitente,
+          remitente.nombre as nombre_remitente,
+          asignaciones.fecha_asignacion,
+          asignaciones.observacion
+        FROM
+          fefom_db.tbl_asignaciones asignaciones
+              LEFT JOIN
+          cat_usuario destinatario ON destinatario.id_usuario = asignaciones.id_usuario_destinatario
+              LEFT JOIN
+          cat_usuario remitente ON remitente.id_usuario = asignaciones.id_usuario_remitente
+        WHERE
+          id_ficha_tecnica = ?
+        ORDER BY fecha_asignacion DESC; 
+           `;
+  // console.log(query, data.id_usuario)
+  connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
     if (err) return res.status(500).send("Error del servidor." + err);
     res.status(200).send(rows);
   });
@@ -335,15 +368,16 @@ Router.post("/guardar_anexo_uno", (req, res) => {
       if (err) return res.status(500).send(err);
       if (data.id_ficha_tecnica == null) {
         query = `insert into tbl_ficha_tecnica
-          (ejercicio, id_ayuntamiento, estatus, fecha_ficha, fecha_creacion, version,monto_con_iva, id_anexo_uno)
+          (ejercicio, id_ayuntamiento, id_usuario, estatus, fecha_ficha, fecha_creacion, version,monto_con_iva, id_anexo_uno)
           values
-          (?, ?, 0, NOW(), NOW(), 1,?, ?)`;
+          (?, ?, ?, 0, NOW(), NOW(), 1,?, ?)`;
 
         connection.query(
           query,
           [
             data.ejercicio,
             data.id_ayuntamiento,
+            data.id_usuario,
             data.monto_con_iva,
             rows.insertId
           ],
@@ -793,11 +827,15 @@ Router.post("/cerrar_ficha", (req, res) => {
     connection.query(queryAnalistaDisponible, (err, rows, fields) => {
       if (err) return res.status(500).send("Error del servidor." + err);
       id_analista = rows[0].id_usuario;
+      
       query = `
             UPDATE tbl_ficha_tecnica SET
               estatus = 2,
               fecha_primer_ingreso = now(),
               fecha_envio = now(),
+              fecha_revision = null,
+              fecha_limite_ayuntamiento = null,
+              fecha_limite_revision = '${fechaLimite(12)}',
               version = ?,
               id_analista_asignado = ?
             WHERE 
@@ -832,6 +870,9 @@ Router.post("/cerrar_ficha", (req, res) => {
             UPDATE tbl_ficha_tecnica SET
               estatus = 2,
               fecha_envio = now(),
+              fecha_revision = null,
+              fecha_limite_ayuntamiento = null,
+              fecha_limite_revision = '${fechaLimite(12)}',
               version = ?,
               id_analista_asignado = ?
             WHERE 
@@ -860,10 +901,6 @@ Router.post("/cerrar_ficha", (req, res) => {
       }
     );
   }
- 
-
-  
- 
 });
 
 Router.post("/guardar_observaciones_anexo_uno", (req, res) => {
@@ -1129,6 +1166,7 @@ Router.post("/validar_anexo_siete", (req, res) => {
     res.status(200).send("ok");
   });
 });
+
 Router.post("/validar_anexo_ocho", (req, res) => {
   var data = req.body;
   var query = "";
@@ -1144,6 +1182,7 @@ Router.post("/validar_anexo_ocho", (req, res) => {
     res.status(200).send("ok");
   });
 });
+
 Router.post("/validar_anexo_nueve", (req, res) => {
   var data = req.body;
   var query = "";
@@ -1241,10 +1280,47 @@ Router.post("/cerrar_revision", (req, res) => {
         case 1:
           //REGRESAR A AYUNTAMIENTO
           var estatus = 5;
-          var id_usuario_destinatario = data.id_ayuntamiento;
+          var id_usuario_destinatario = data.id_usuario_ayuntamiento;
           var id_usuario_remitente = data.id_usuario;
           var statusCode = 201;
-          campoFecha = ", fecha_envio = now()"
+          var observacion = data.observacion
+          // console.log(fecha_limite)
+          campoFecha = `, fecha_envio = now(),fecha_limite_revision = null,fecha_limite_ayuntamiento = '${(fechaLimite(10))}'`
+          queryUpdate = `
+            UPDATE tbl_ficha_tecnica SET
+              estatus = ${estatus}
+              ${campoFecha}
+            WHERE 
+              id_ficha_tecnica=?
+                  `;
+            connection.query(
+              queryUpdate,
+              [data.id_ficha_tecnica],
+              function (err, rows, fields) {
+                // console.log(this.sql)
+                if (err) return res.status(500).send("Error del servidor." + err);
+                  
+                var queryAsignacion = `
+                INSERT INTO tbl_asignaciones
+                  (id_ficha_tecnica, id_usuario_destinatario, id_usuario_remitente, fecha_asignacion, observacion)
+                VALUES
+                  (?,?,?,NOW(),?)
+              `;
+                connection.query(
+                  queryAsignacion,
+                  [
+                    data.id_ficha_tecnica,
+                    id_usuario_destinatario,
+                    id_usuario_remitente,
+                    observacion
+                  ],
+                  (err, rows, fields) => {
+                    if (err) return res.status(500).send("Error del servidor." + err);
+                    res.status(statusCode).send("ok");
+                  }
+                );
+              }
+            );
           break;
         case 2:
           //ENVIAR A VALIDACIÓN
@@ -1252,181 +1328,164 @@ Router.post("/cerrar_revision", (req, res) => {
           var id_usuario_destinatario = 0;
           var id_usuario_remitente = data.id_usuario;
           var statusCode = 200;
-          campoFecha = ", fecha_revision = now()"
-          var querySubdirectorDisponible = `
-          SELECT 
-            gen.id_usuario, COUNT(gen.id_ficha_tecnica) AS total
-          FROM
-            (SELECT 
-                usuario.id_usuario, fichas.*
-            FROM
-                cat_usuario AS usuario
-            LEFT JOIN (SELECT 
-                *
-            FROM
-                tbl_ficha_tecnica
-            WHERE
-                estatus = 3) AS fichas ON usuario.id_usuario = fichas.id_analista_asignado
-            WHERE
-                usuario.tipo_rol = 2) AS gen
-          GROUP BY gen.id_usuario
-          ORDER BY total
-          LIMIT 1;
-          `;
-            
-          connection.query(querySubdirectorDisponible, (err, rows, fields) => {
-            if (err) return res.status(500).send("Error del servidor." + err);
-            id_usuario_destinatario = rows[0].id_usuario;
-          });
+          
+          var observacion = data.observacion
+          if(data.id_subdirector_asignado == null){
+            var querySubdirectorDisponible = `
+              SELECT 
+                gen.id_usuario, COUNT(gen.id_ficha_tecnica) AS total
+              FROM
+                (SELECT 
+                  usuario.id_usuario, fichas.id_ficha_tecnica
+                FROM
+                    cat_usuario AS usuario
+                LEFT JOIN (SELECT 
+                                *
+                            FROM
+                                tbl_ficha_tecnica
+                            WHERE
+                                estatus = 3) AS fichas ON usuario.id_usuario = fichas.id_subdirector_asignado
+              WHERE
+                  usuario.tipo_rol = 2) AS gen
+              GROUP BY gen.id_usuario
+              ORDER BY total
+              LIMIT 1;
+              `;
+                
+              connection.query(querySubdirectorDisponible, (err, rows, fields) => {
+                if (err) return res.status(500).send("Error del servidor." + err);
+                id_usuario_destinatario = rows[0].id_usuario;
+                campoFecha = `, fecha_revision = now(), id_subdirector_asignado = ${id_usuario_destinatario}`
+                console.log(id_usuario_destinatario)
+                // CREAR OTRA FUNCION PARA ENCADENAR LOS SQL YA QUE NO SE ACTUALIZA EN LA FICHA EL SUBDIRECTOR ASIGNADO
+                queryUpdate = `
+                  UPDATE tbl_ficha_tecnica SET
+                    estatus = ${estatus}
+                    ${campoFecha}
+                  WHERE 
+                    id_ficha_tecnica=?
+                        `;
+                  connection.query(
+                    queryUpdate,
+                    [data.id_ficha_tecnica],
+                    function (err, rows, fields) {
+                      if (err) return res.status(500).send("Error del servidor." + err);
+                        console.log(this.sql)
+                      var queryAsignacion = `
+                      INSERT INTO tbl_asignaciones
+                        (id_ficha_tecnica, id_usuario_destinatario, id_usuario_remitente, fecha_asignacion, observacion)
+                      VALUES
+                        (?,?,?,NOW(),?)
+                    `;
+                      connection.query(
+                        queryAsignacion,
+                        [
+                          data.id_ficha_tecnica,
+                          id_usuario_destinatario,
+                          id_usuario_remitente,
+                          observacion
+                        ],
+                        (err, rows, fields) => {
+                          if (err) return res.status(500).send("Error del servidor." + err);
+                          res.status(statusCode).send("ok");
+                        }
+                      );
+                    }
+                  );
+              });
+          }else{
+            id_usuario_destinatario = data.id_subdirector_asignado
+            console.log(id_usuario_destinatario)
+            campoFecha = `, fecha_revision = now(), id_subdirector_asignado = ${id_usuario_destinatario}`
+            queryUpdate = `
+              UPDATE tbl_ficha_tecnica SET
+                estatus = ${estatus}
+                ${campoFecha}
+              WHERE 
+                id_ficha_tecnica=?
+                    `;
+              connection.query(
+                queryUpdate,
+                [data.id_ficha_tecnica],
+                function (err, rows, fields) {
+                  if (err) return res.status(500).send("Error del servidor." + err);
+                    console.log(this.sql)
+                  var queryAsignacion = `
+                  INSERT INTO tbl_asignaciones
+                    (id_ficha_tecnica, id_usuario_destinatario, id_usuario_remitente, fecha_asignacion, observacion)
+                  VALUES
+                    (?,?,?,NOW(),?)
+                `;
+                  connection.query(
+                    queryAsignacion,
+                    [
+                      data.id_ficha_tecnica,
+                      id_usuario_destinatario,
+                      id_usuario_remitente,
+                      observacion
+                    ],
+                    (err, rows, fields) => {
+                      if (err) return res.status(500).send("Error del servidor." + err);
+                      res.status(statusCode).send("ok");
+                    }
+                  );
+                }
+              );
+          }
+          
           break;
 
         case 3:
-          //ENVIAR A VALIDACIÓN
+          //REGRESAR A REVISIÓN
           var estatus = 2;
           var id_usuario_destinatario = data.id_analista_asignado;
           var id_usuario_remitente = data.id_usuario;
           var statusCode = 203;
+          var observacion = data.observacion
           campoFecha = ", fecha_revision = null"
-          
+          queryUpdate = `
+            UPDATE tbl_ficha_tecnica SET
+              estatus = ${estatus}
+              ${campoFecha}
+            WHERE 
+              id_ficha_tecnica=?
+                  `;
+            connection.query(
+              queryUpdate,
+              [data.id_ficha_tecnica],
+              function (err, rows, fields) {
+                if (err) return res.status(500).send("Error del servidor." + err);
+                  console.log(this.sql)
+                var queryAsignacion = `
+                INSERT INTO tbl_asignaciones
+                  (id_ficha_tecnica, id_usuario_destinatario, id_usuario_remitente, fecha_asignacion, observacion)
+                VALUES
+                  (?,?,?,NOW(),?)
+              `;
+                connection.query(
+                  queryAsignacion,
+                  [
+                    data.id_ficha_tecnica,
+                    id_usuario_destinatario,
+                    id_usuario_remitente,
+                    observacion
+                  ],
+                  (err, rows, fields) => {
+                    if (err) return res.status(500).send("Error del servidor." + err);
+                    res.status(statusCode).send("ok");
+                  }
+                );
+              }
+            );
           break;
 
         default:
           break;
       }
-      queryUpdate = `
-      UPDATE tbl_ficha_tecnica SET
-        estatus = ${estatus}
-        ${campoFecha}
-      WHERE 
-        id_ficha_tecnica=?
-            `;
-      connection.query(
-        queryUpdate,
-        [data.id_ficha_tecnica],
-        (err, rows, fields) => {
-          if (err) return res.status(500).send("Error del servidor." + err);
-
-          var queryAsignacion = `
-          INSERT INTO tbl_asignaciones
-            (id_ficha_tecnica, id_usuario_destinatario, id_usuario_remitente, fecha_asignacion)
-          VALUES
-            (?,?,?,NOW())
-        `;
-          connection.query(
-            queryAsignacion,
-            [
-              data.id_ficha_tecnica,
-              id_usuario_destinatario,
-              id_usuario_remitente
-            ],
-            (err, rows, fields) => {
-              if (err) return res.status(500).send("Error del servidor." + err);
-              res.status(statusCode).send("ok");
-            }
-          );
-        }
-      );
+      
     }
   });
 });
-
-// Router.post("/cerrar_revision", (req, res) => {
-//   var data = req.body;
-//   var query = "";
-//   query = `
-//     SELECT 
-//     ficha.id_ficha_tecnica,
-//       uno.estatus AS estatus_uno,
-//       dos.estatus AS estatus_dos,
-//       tres.estatus AS estatus_tres,
-//       cuatro.estatus AS estatus_cuatro,
-//       cinco.estatus AS estatus_cinco,
-//       seis.estatus AS estatus_seis,
-//       siete.estatus AS estatus_siete,
-//       nueve.estatus AS estatus_nueve,
-//   FROM
-//       tbl_ficha_tecnica AS ficha
-//           JOIN
-//       tbl_anexo_uno AS uno ON uno.id_anexo_uno = ficha.id_anexo_uno
-//           JOIN
-//       tbl_anexo_dos AS dos ON dos.id_anexo_dos = ficha.id_anexo_dos
-//           JOIN
-//       tbl_anexo_tres AS tres ON tres.id_anexo_tres = ficha.id_anexo_tres
-//           JOIN
-//       tbl_anexo_cuatro AS cuatro ON cuatro.id_anexo_cuatro = ficha.id_anexo_cuatro
-//           JOIN
-//       tbl_anexo_cinco AS cinco ON cinco.id_anexo_cinco = ficha.id_anexo_cinco
-//           JOIN
-//       tbl_anexo_seis AS seis ON seis.id_anexo_seis = ficha.id_anexo_seis
-//           JOIN
-//       tbl_anexo_siete AS siete ON siete.id_anexo_siete = ficha.id_anexo_siete
-//           JOIN
-//       tbl_anexo_nueve AS nueve ON nueve.id_anexo_nueve = ficha.id_anexo_nueve
-//   WHERE
-//       id_ficha_tecnica = ?
-//           AND (uno.estatus != 1 AND dos.estatus != 1
-//           AND tres.estatus != 1
-//           AND cuatro.estatus != 1
-//           AND cinco.estatus != 1
-//           AND seis.estatus != 1
-//           AND siete.estatus != 1
-//           AND nueve.estatus != 1)
-//            `;
-//   connection.query(query, [data.id_ficha_tecnica], (err, rows, fields) => {
-//     if (err) return res.status(500).send(err);
-//     if (rows.length == 0) {
-//       return res.status(202).send({ error: 1 });
-//     } else {
-//       console.log(rows);
-//       if (
-//         rows[0].estatus_uno == 2 &&
-//         rows[0].estatus_dos == 2 &&
-//         rows[0].estatus_tres == 2 &&
-//         rows[0].estatus_cuatro == 2 &&
-//         rows[0].estatus_cinco == 2 &&
-//         rows[0].estatus_seis == 2 &&
-//         rows[0].estatus_siete == 2 &&
-//         rows[0].estatus_nueve == 2
-//       ) {
-//         //Todas las secciones validadas
-//         // console.log("Todas las secciones validadas")
-//         var query = "";
-//         query = `
-//               UPDATE tbl_ficha_tecnica SET
-//                 estatus = 2
-//               WHERE 
-//                   id_ficha_tecnica=?;
-//                 `;
-//         connection.query(
-//           query,
-//           [data.id_ficha_tecnica],
-//           (err, rows, fields) => {
-//             if (err) return res.status(500).send(err);
-//             res.status(200).send("ok");
-//           }
-//         );
-//       } else {
-//         //Alguna sin validar
-//         // console.log("Regresar a ayuntamiento")
-//         var query = "";
-//         query = `
-//               UPDATE tbl_ficha_tecnica SET
-//                 estatus = 4
-//               WHERE 
-//                   id_ficha_tecnica=?;
-//                 `;
-//         connection.query(
-//           query,
-//           [data.id_ficha_tecnica],
-//           (err, rows, fields) => {
-//             if (err) return res.status(500).send(err);
-//             res.status(201).send("ok");
-//           }
-//         );
-//       }
-//     }
-//   });
-// });
 
 Router.get("/imprimir_ficha", (req, res) => {
   // console.log(req.query)

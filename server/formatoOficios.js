@@ -32,8 +32,8 @@ function formatoTecho(datos) {
   //     </tr>
   var tablaTechos = `
   <style type="text/css">
-    .tl  {border-collapse:collapse;border-spacing:0;}
-    .tl td{font-family:Arial, sans-serif;font-size:14px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black; padding: 5px !important;}
+    .tl  {border-collapse:collapse;border-spacing:0; margin-top: -30px !important; margin-bottom: -30px !important;}
+    .tl td{font-family:Arial, sans-serif;font-size:14px;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black; padding:5px !important;}
     .tl th{font-family:Arial, sans-serif;font-size:14px;font-weight:normal;border-style:solid;border-width:1px;overflow:hidden;word-break:normal;border-color:black;}
     .tl .tg-6bfr{background-color:#9b9b9b;color:#000000;text-align:center;vertical-align:bottom}
     .tl .tg-pykm{font-weight:bold;background-color:#9b9b9b;text-align:center;vertical-align:top}

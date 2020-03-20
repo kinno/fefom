@@ -8,11 +8,12 @@
         class="elevation-1 pl-0 tablaTechos"
         locale="es-MX"
         :search="search"
+               
       >
         <template v-slot:item="{ item }">
-          <tr :style="'background-color:'+item.color">
+          <tr>
             <td class="text-center">{{ item.id_ficha_tecnica }}</td>
-            <td class="text-center">{{ item.version }}</td>
+            <td class="text-center" style="width:1%;">{{ item.version }}</td>
             <td class="text-center">
              {{item.nombre_proyecto}}
             </td>
@@ -22,18 +23,27 @@
             <td class="text-center">
               {{item.fecha_ficha}}
             </td>
-            <td class="text-center">
-              {{item.fecha_envio}}
-            </td>
+           
             <td class="text-center">
               <v-row no-gutters>
                 <v-col cols="2" class="mt-2">
-                  <v-icon size="large">{{item.icono}}</v-icon>
+                  <v-icon :color="item.color" size="large">{{item.icono}}</v-icon>
                 </v-col>
-                <v-col cols="10">
+                <v-col cols="10" class="font-weight-black">
                   {{item.estatus_texto}}
                 </v-col>
               </v-row>
+            </td>
+             <td class="text-center">
+              {{item.fecha_envio}}
+            </td>
+            <td class="text-center">
+              <div  v-if="item.fecha_limite_ayuntamiento !== null">
+                <v-icon small center :color="item.semaforo">mdi-circle-slice-8</v-icon>
+                <br><span style="font-size: 10px !important; ">{{item.fecha_limite_ayuntamiento}}</span>
+                <br><span style="font-size: 10px !important;" class="font-weight-black">
+                {{item.dias_restantes}} días restantes</span>
+              </div>
             </td>
             <td class="text-center">
               <v-row  no-gutters>
@@ -43,12 +53,12 @@
                       <v-btn
                       v-if="botonVisible"
                       color="green"
-                      class="ma-2 white--text"
+                      class="white--text"
                       v-on="on"
-                      small
+                      x-small
                      @click="revisarFicha(item.id_ficha_tecnica)"
                     >
-                      <v-icon center dark>mdi-file-document-edit-outline</v-icon>
+                      <v-icon small center dark>mdi-file-document-edit-outline</v-icon>
                     </v-btn>
                     </template>
                     <span>Editar ficha técnica</span>
@@ -58,12 +68,12 @@
                       <v-btn
                       v-if="botonVisible"
                       color="green"
-                      class="ma-2 white--text"
-                      small
+                      class="white--text"
+                      x-small
                       v-on="on"
                      @click="imprimirObservaciones(item.id_ficha_tecnica)"
                     >
-                      <v-icon center dark>mdi-printer-settings</v-icon>
+                      <v-icon small center dark>mdi-printer-settings</v-icon>
                     </v-btn>
                     </template>
                     <span>Imprimir observaciones</span>
@@ -80,6 +90,7 @@
 </template>
 <script>
 import { EventBus } from "../../utils/event-bus";
+import { calculaFecha } from "../../utils/calculaFecha";
 import moment from "moment";
 export default {
   mounted() {
@@ -107,8 +118,9 @@ export default {
           { text: 'Proyecto', value: 'nombre_proyecto', sortable: false,align: 'center',},
           { text: 'Monto', value: 'monto', sortable: false,align: 'right',},
           { text: 'Fecha creacion', value: 'fecha_creacion', sortable: false, align: 'center',},
-          { text: 'Fecha envío', value: 'fecha_envio', sortable: false, align: 'center',},
           { text: 'Estatus', value: 'fecha_envio', sortable: false, align: 'center',},
+          { text: 'Fecha envío', value: 'fecha_envio', sortable: false, align: 'center',},
+          { text: 'Fecha Límite', value: '', sortable: false, align: 'center',},
           { text: 'Acciones', value: 'action', sortable: false,align: 'center',},
         ],
         asignaciones:[],
@@ -134,7 +146,9 @@ export default {
               var estat = ""
               var iconoEstatus = ""
               var color = ""
-              console.log(element.estatus)
+              var diasRestantes = 0
+              var semaforo = ""
+              // console.log(element.estatus)
               switch (element.estatus) {
                 case 1:
                   estat = "Edición / Presentación"
@@ -156,6 +170,15 @@ export default {
                   estat = "Regresada con Observaciones"
                    iconoEstatus = "mdi-comment-alert"
                    color = "#EF9A9A"
+                   diasRestantes = calculaFecha(element.fecha_limite_ayuntamiento)
+                   
+                   if(diasRestantes > 3){
+                    semaforo = "green lighten-1"
+                   }else if(diasRestantes>0 && diasRestantes<3){
+                     semaforo =" yellow lighteen-1"
+                   }else{
+                     semaforo = "red lighten-1"
+                   }
                   break;
               
                 default:
@@ -173,6 +196,11 @@ export default {
                 fecha_envio:  moment(
                                     element.fecha_envio
                                     ).format("LL"),
+                fecha_limite_ayuntamiento: (element.fecha_limite_ayuntamiento!==null) ? moment(
+                                    element.fecha_limite_ayuntamiento
+                                    ).format("LL") : null,
+                dias_restantes: (element.fecha_limite_ayuntamiento !== null) ? calculaFecha(element.fecha_limite_ayuntamiento) : null,
+                semaforo: semaforo,
                 estatus: element.estatus,
                 estatus_texto: estat,
                 icono: iconoEstatus,
@@ -189,6 +217,9 @@ export default {
              EventBus.$emit("cierraLoading");
           console.error(error);
         });
+    },
+    calcularSemaforo(){
+
     },
     revisarFicha(id_ficha_tecnica) {
      this.$router.push({name: "Registro-Ficha", params: {id_ficha_tecnica: id_ficha_tecnica}})

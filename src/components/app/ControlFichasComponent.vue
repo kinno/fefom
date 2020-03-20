@@ -8,6 +8,7 @@
         class="elevation-1 pl-0 tablaTechos"
         locale="es-MX"
         :search="search"
+        style="line-height:1.2em"
       >
         <template v-slot:item="{ item }">
           <tr :style="'background-color:'+item.color">
@@ -29,7 +30,13 @@
               <br><span style="font-size: 10px !important; ">Fecha de Validación: {{item.fecha_validacion}}</span>
               <br><span style="font-size: 10px !important; ">Fecha de Dictaminación: {{item.fecha_dictaminacion}}</span>
             </td>
-            <td class="text-center font-weight-black">{{ item.estatus_texto }}</td>
+            <td class="text-center font-weight-black">
+              {{ item.estatus_texto }}
+            </td>
+            <td class="text-center font-weight-black" style="width:8%;">
+              <v-icon small center :color="item.semaforo">mdi-circle-slice-8</v-icon>
+              <br><span style="font-size: 10px !important; ">{{item.dias_restantes}} días restantes</span></br>
+            </td>
             <td class="text-center">
               <v-row  no-gutters>
                 <v-col cols="12">
@@ -38,15 +45,30 @@
                       <v-btn
                       v-if="botonVisible"
                       color="green"
-                      class="ma-2 white--text"
-                      small
+                      class="white--text"
+                       x-small
                       v-on="on"
                      @click="imprimirObservaciones(item.id_ficha_tecnica)"
                     >
-                      <v-icon center dark>mdi-printer-settings</v-icon>
+                      <v-icon small center dark>mdi-printer-settings</v-icon>
                     </v-btn>
                     </template>
                     <span>Imprimir observaciones</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                      v-if="botonVisible"
+                      color="green"
+                      class="white--text"
+                       x-small
+                      v-on="on"
+                     @click="verHistorial(item.id_ficha_tecnica)"
+                    >
+                      <v-icon small center dark>mdi-lan</v-icon>
+                    </v-btn>
+                    </template>
+                    <span>Ver historial</span>
                   </v-tooltip>
                 </v-col>
               </v-row>
@@ -56,11 +78,112 @@
         <template v-slot:no-data>No hay asignaciones registradas</template>
       </v-data-table>
     </v-col>
+    <v-dialog v-model="dialogHistorial" max-width="700px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          Historial de asignaciones
+        </v-card-title>
+
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <v-simple-table>
+                <template v-slot:default>
+                  <thead>
+                    <tr>
+                      <th class="text-center">Usuario Asignado</th>
+                      <th class="text-center">Usuario Remitente</th>
+                      <th class="text-center">Fecha de asignacion</th>
+                      <th class="text-center"></th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr v-for="item in historial" :key="item.name">
+                      <td class="text-center">{{ item.nombre_destinatario }}</td>
+                      <td class="text-center">{{ item.nombre_remitente }}</td>
+                      <td class="text-center">{{ item.fecha_asignacion }}</td>
+                      <td class="text-center">
+                        <v-tooltip bottom>
+                          <template v-slot:activator="{ on }">
+                            <v-btn
+                            v-if="item.observacion !== null"
+                            color="green"
+                            class="white--text"
+                            x-small
+                            v-on="on"
+                            @click="observacion = item.observacion,dialogObservacionAnalista = true"
+                          >
+                            <v-icon small center dark>mdi-comment-alert-outline</v-icon>
+                          </v-btn>
+                          </template>
+                          <span>Ver comentarios/observaciones</span>
+                        </v-tooltip>
+                      </td>
+                    </tr>
+                  </tbody>
+                </template>
+              </v-simple-table>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="
+              (dialogHistorial = false), historial = []
+            "
+          >
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogObservacionAnalista" min-width="500px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          Comentario/Observación:
+        </v-card-title>
+
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <!-- <v-textarea
+                outlined
+                label="Observación"
+                v-model="descripcionObservacionAnalista"
+              ></v-textarea> -->
+              <p style="white-space: pre-line !important;">{{(this.observacion)}}</p>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="
+              (dialogObservacionAnalista = false), observacion= null
+            "
+          >
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <script>
 import { EventBus } from "../../utils/event-bus";
 import moment from "moment";
+import { calculaFecha } from "../../utils/calculaFecha";
 export default {
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user"));
@@ -76,15 +199,20 @@ export default {
       update: 0,
       botonVisible: true,
       search: null,
+      dialogHistorial: false,
+      dialogObservacionAnalista: false,
       headers: [
           { text: 'Folio', value: 'folio', sortable: false,align: 'center',},
           { text: 'Analista asignado', value: 'nombre', sortable: true,align: 'center',},
           { text: 'Resúmen', value: 'folio', sortable: false,align: 'center',},
           { text: 'Fechas', value: 'fecha_asignacion', sortable: false,align: 'left',},
           { text: 'Estatus Ficha', value: 'estatus', sortable: true,align: 'center',},
+          { text: '', value: '', sortable: false,align: 'center',},
           { text: 'Acciones', value: 'acciones', sortable: false,align: 'center',},
         ],
         asignaciones:[],
+        historial: [],
+        observacion: null,
     };
   },
   computed: {
@@ -107,6 +235,8 @@ export default {
               var estat = ""
               var iconoEstatus = ""
               var color = ""
+              var semaforo = "blue lighteen-1"
+              var diasRestantes = "-"
               // console.log(element.estatus)
               switch (element.estatus) {
                 case 1:
@@ -114,8 +244,17 @@ export default {
                   iconoEstatus = "mdi-file-document-edit"
                   break;
                 case 2:
-                  estat = "En Revisión"
+                   estat = "En Revisión"
                    iconoEstatus = "mdi-timeline-clock"
+                   diasRestantes = calculaFecha(element.fecha_limite_revision)
+                   
+                   if(diasRestantes > 3){
+                    semaforo = "green lighten-1"
+                   }else if(diasRestantes>0 && diasRestantes<3){
+                     semaforo =" yellow lighteen-1"
+                   }else{
+                     semaforo = "red lighten-1"
+                   }
                   break;
                 case 3:
                   estat = "En Validación"
@@ -126,7 +265,7 @@ export default {
                    iconoEstatus = "mdi-timeline-clock"
                   break;
                 case 5:
-                  estat = "Regresada con Observaciones"
+                  estat = "Regresada al Ayuntamiento con Observaciones"
                    iconoEstatus = "mdi-comment-alert"
                    color = "#EF9A9A"
                   break;
@@ -134,6 +273,8 @@ export default {
                 default:
                   break;
               }
+
+
                 this.asignaciones.push({
                   nombre: element.nombre,
                 id_ficha_tecnica: element.id_ficha_tecnica,
@@ -161,6 +302,8 @@ export default {
                                     ).format("LL") : "--",
                 estatus: element.estatus,
                 estatus_texto: estat,
+                semaforo: semaforo,
+                dias_restantes: diasRestantes
                 })
                
             });
@@ -214,6 +357,39 @@ export default {
             confirmButtonText: "Cerrar",
             confirmButtonColor: "#d33"
           });
+        });
+    },
+    verHistorial(id_ficha_tecnica){
+      EventBus.$emit("abreLoading");
+      this.$http
+        .post("/ficha_tecnica/buscar_historial", {
+          id_ficha_tecnica: id_ficha_tecnica
+        })
+        .then(response => {
+          EventBus.$emit("cierraLoading");
+          if (response.status == 200) {
+            // console.log(response.data);
+            response.data.forEach(element => {
+                this.historial.push({
+                  id_usuario_destinatario: element.id_usuario_destinatario,
+                  nombre_destinatario: element.nombre_destinatario,
+                  id_usuario_remitente: element.id_usuario_remitente,
+                  nombre_remitente: element.nombre_remitente,
+                  fecha_asignacion: moment(
+                                    element.fecha_asignacion
+                                    ).format("LL"),
+                  observacion: element.observacion
+                })
+            });
+            this.dialogHistorial = true
+          } else {
+               EventBus.$emit("cierraLoading");
+            console.log("Error", response.err);
+          }
+        })
+        .catch(error => {
+             EventBus.$emit("cierraLoading");
+          console.error(error);
         });
     }
   },

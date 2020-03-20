@@ -48,35 +48,54 @@ Router.post("/crear_oficio", async (req, res) => {
       if (rows.length == 0) return res.status(201).send("No hay datos");
       texto = rows[0];
       //   console.log(texto)
-      var query = `
-            insert into tbl_principal_oficio
-            (id_tipo_oficio, ejercicio, id_municipio, clave_oficio, estatus, fecha_oficio, fecha_creacion, titulo, texto, id_techo_financiero)
-            values
-            (?,?,?,'ClaveOficioTest',1,NOW(),NOW(),?,?,?)
-        `;
+      var queryUltimoFolio = `
+      SELECT 
+          MAX(folio) + 1 as folio
+      FROM
+          tbl_principal_oficio
+      WHERE
+          ejercicio = ?;
+      ` 
       connection.query(
-        query,
-        [data.tipo_oficio, data.ejercicio, data.municipio.id_municipio, titulo, texto.texto, data.id_techo],
-        (err, result) => {
+        queryUltimoFolio,
+        [data.ejercicio],
+        function (err, rows, fields){
           if (err) return res.status(500).send("Error del servidor." + err);
-          switch (data.tipo_oficio) {
-            case 2:
-              var proyectos = [];
-              data.cartera.forEach(element => {
-                proyectos.push([result.insertId, element.id_cartera_proyecto]);
-              });
-              var sql = "INSERT INTO tbl_detalle_oficio (id_principal_oficio, id_cartera_proyecto) VALUES ?";
-              connection.query(sql, [proyectos], function (err, result) {
-                if (err) return res.status(500).send("Error del servidor." + err);
-              });
-              break;
+          var folio;
+          (rows[0].folio !== null) ? folio = rows[0].folio : folio = 1
+          // console.log(folio)
+          // return res.status(500).send("Error del servidor." + err);
+          var claveOficio = `20704000l/FEFOM-${folio}/${data.ejercicio}`
+          var query = `
+            insert into tbl_principal_oficio
+            (id_tipo_oficio, ejercicio, id_municipio, clave_oficio,folio, estatus, fecha_oficio, fecha_creacion, titulo, texto, id_techo_financiero)
+            values
+            (?,?,?,?,?,1,NOW(),NOW(),?,?,?)
+        `;
+          connection.query(
+            query,
+            [data.tipo_oficio, data.ejercicio, data.municipio.id_municipio,claveOficio,folio,titulo, texto.texto, data.id_techo],
+            (err, result) => {
+              if (err) return res.status(500).send("Error del servidor." + err);
+              switch (data.tipo_oficio) {
+                case 2:
+                  var proyectos = [];
+                  data.cartera.forEach(element => {
+                    proyectos.push([result.insertId, element.id_cartera_proyecto]);
+                  });
+                  var sql = "INSERT INTO tbl_detalle_oficio (id_principal_oficio, id_cartera_proyecto) VALUES ?";
+                  connection.query(sql, [proyectos], function (err, result) {
+                    if (err) return res.status(500).send("Error del servidor." + err);
+                  });
+                  break;
 
-            default:
-              break;
-          }
-          res.status(200).send("Ok");
-        }
-      );
+                default:
+                  break;
+              }
+              res.status(200).send("Ok");
+            }
+          );
+        });
     }
   );
 });

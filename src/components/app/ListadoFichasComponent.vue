@@ -1,6 +1,5 @@
 <template>
-  <v-container fluid class="pa-0">
-    
+  <v-container fluid fill-height class="pa-0">
     <v-col cols="12" class="pa-0">
       <v-data-table
         :headers="headers"
@@ -8,6 +7,7 @@
         class="elevation-1 pl-0 tablaTechos"
         locale="es-MX"
         :search="search"
+        style="line-height:1.2em"
       >
         <template v-slot:item="{ item }">
           <tr>
@@ -22,26 +22,41 @@
             <td class="text-right">
              {{ item.monto | currency}}
             </td>
-            <td class="text-center">
+            <td class="text-center font-weight-black">
               {{item.procedencia}}
             </td>
             <td class="text-center">
               {{item.fecha_asignacion}}
             </td>
             <td class="text-center">
-              <v-row  no-gutters>
+              <v-row no-gutters>
                 <v-col cols="12">
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                      v-if="item.observacion !== null"
+                      color="green"
+                      class="white--text"
+                      x-small
+                      v-on="on"
+                     @click="observacion = item.observacion,dialogObservacionAnalista = true"
+                    >
+                      <v-icon small center dark>mdi-comment-alert-outline</v-icon>
+                    </v-btn>
+                    </template>
+                    <span>Ver comentarios/observaciones</span>
+                  </v-tooltip>
                   <v-tooltip bottom>
                     <template v-slot:activator="{ on }">
                       <v-btn
                       v-if="botonVisible"
                       color="green"
-                      class="ma-2 white--text"
-                      small
+                      class="white--text"
+                      x-small
                       v-on="on"
                      @click="revisarFicha(item.id_ficha_tecnica)"
                     >
-                      <v-icon center dark>mdi-file-document-edit-outline</v-icon>
+                      <v-icon small center dark>mdi-file-document-edit-outline</v-icon>
                     </v-btn>
                     </template>
                     <span>Revisar ficha técnica</span>
@@ -54,15 +69,54 @@
         <template v-slot:no-data>No hay asignaciones registradas</template>
       </v-data-table>
     </v-col>
+    <v-dialog v-model="dialogObservacionAnalista" min-width="500px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          Comentario/Observación para el Analista:
+        </v-card-title>
+
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <!-- <v-textarea
+                outlined
+                label="Observación"
+                v-model="descripcionObservacionAnalista"
+              ></v-textarea> -->
+              <p style="white-space: pre-line !important;">{{(this.observacion)}}</p>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="
+              (dialogObservacionAnalista = false)
+            "
+          >
+            Cerrar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
   </v-container>
 </template>
 <script>
 import { EventBus } from "../../utils/event-bus";
 import moment from "moment";
 export default {
+  beforeMount(){
+    
+    
+  },
   mounted() {
     this.user = JSON.parse(localStorage.getItem("user"));
-    this.buscarAsignaciones()
+    this.buscarAsignaciones();   
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
     });
     
@@ -74,6 +128,8 @@ export default {
       update: 0,
       botonVisible: true,
       search: null,
+      dialogObservacionAnalista: false,
+      observacion: null,
       headers: [
           {
             text: 'Folio',
@@ -107,7 +163,7 @@ export default {
         .then(response => {
           EventBus.$emit("cierraLoading");
           if (response.status == 200) {
-            // console.log(response.data[0]);
+            console.log(response.data[0]);
             response.data.forEach(element => {
                 this.asignaciones.push({
                 id_ficha_tecnica: element.id_ficha_tecnica,
@@ -116,9 +172,11 @@ export default {
                 nombre_proyecto: element.nombre_proyecto,
                 monto: element.monto_con_iva,
                 procedencia: element.nombre,
+                tipo_usuario: element.tipo_usuario,
                 fecha_asignacion:  moment(
                                     element.fecha_asignacion
-                                    ).format("LL")
+                                    ).format("LL"),
+                observacion: element.observacion
                 })
             });
           } else {

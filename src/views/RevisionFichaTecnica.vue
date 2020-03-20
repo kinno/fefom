@@ -14,7 +14,7 @@
               <v-row>
                 <v-col cols="12" class="pt-0">
                   <v-toolbar flat color="grey lighten-3">
-                    <v-col cols="12" sm="6" md="2">
+                    <v-col cols="12" md="2">
                       <v-text-field
                         v-model="id_ficha_tecnica"
                         label="No. Ficha Técnica:"
@@ -23,7 +23,7 @@
                         v-on:keyup.enter="buscar"
                       ></v-text-field>
                     </v-col>
-                    <v-col cols="12" sm="6" md="2">
+                    <v-col cols="12" md="1" >
                       <v-text-field
                         v-model="ficha_tecnica.version"
                         label="Version:"
@@ -117,7 +117,7 @@
                             class="ma-2 tile white--text"
                             small
                             v-on="on"
-                            @click="cerrarFicha(3)"
+                            @click="dialogObservacionAnalista = true"
                           >
                             <v-icon center dark>mdi-file-restore-outline</v-icon>
                           </v-btn>
@@ -248,6 +248,44 @@
             Cancelar
           </v-btn>
           <v-btn color="primary" text @click="emitirObservaciones()">
+            Aceptar
+          </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+    <v-dialog v-model="dialogObservacionAnalista" min-width="500px" persistent>
+      <v-card>
+        <v-card-title class="headline grey lighten-2" primary-title>
+          Comentario/Observación para el Analista:
+        </v-card-title>
+
+        <v-card-text>
+          <v-row>
+            <v-col cols="12">
+              <v-textarea
+                outlined
+                label="Observación"
+                v-model="descripcionObservacionAnalista"
+              ></v-textarea>
+            </v-col>
+          </v-row>
+        </v-card-text>
+
+        <v-divider></v-divider>
+
+        <v-card-actions>
+          <v-spacer></v-spacer>
+          <v-btn
+            color="primary"
+            text
+            @click="
+              (dialogObservacionAnalista = false),
+                (descripcionObservacionAnalista = null)
+            "
+          >
+            Cancelar
+          </v-btn>
+          <v-btn color="primary" text @click="cerrarFicha(3)">
             Aceptar
           </v-btn>
         </v-card-actions>
@@ -422,10 +460,12 @@ export default {
         id_anexo_nueve: null,
       },
       dialogObservaciones: false,
+      dialogObservacionAnalista: false,
       seccionObservacion: "",
       catalogoObservaciones: [],
       observacionSeleccionada: null,
-      descripcionObservacion: null
+      descripcionObservacion: null,
+      descripcionObservacionAnalista: null,
     };
   },
   computed: {
@@ -766,7 +806,10 @@ export default {
           id_ficha_tecnica: this.id_ficha_tecnica,
           id_usuario: this.user.id_usuario,
           id_ayuntamiento: this.ficha_tecnica.id_ayuntamiento,
-          id_analista_asignado: this.ficha_tecnica.id_analista_asignado
+          id_usuario_ayuntamiento: this.ficha_tecnica.id_usuario,
+          id_analista_asignado: this.ficha_tecnica.id_analista_asignado,
+          id_subdirector_asignado: this.ficha_tecnica.id_subdirector_asignado,
+          observacion: this.descripcionObservacionAnalista
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
