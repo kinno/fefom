@@ -1,4 +1,7 @@
 var path = require('path');
+var realFs = require('fs')
+var gracefulFs = require('graceful-fs')
+gracefulFs.gracefulify(realFs)
 
 module.exports = {
 publicPath: "",
