@@ -4,7 +4,7 @@ var gracefulFs = require('graceful-fs')
 gracefulFs.gracefulify(realFs)
 
 module.exports = {
-publicPath: "",
+publicPath: "/",
 lintOnSave: false,
 devServer: {
     disableHostCheck: true,

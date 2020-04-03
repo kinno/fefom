@@ -21,6 +21,7 @@ if ((process.env.NODE_ENV || "").trim() === "production") {
 var storage = multer.diskStorage({
   destination: function(req, file, cb) {
     cb(null, baseURL + "/uploads/imgfichas/");
+    // cb(null, "./uploads/imgfichas/");
   },
   filename: function(req, file, cb) {
     cb(
@@ -37,7 +38,8 @@ Router.post("/upload", upload.single("file"), async (req, res) => {
 
 Router.post("/delete", (req, res) => {
   console.log(req.body.imagen);
-  fs.unlink(baseURL + "/uploads/imgfichas/" + req.body.imagen, err => {
+  fs.unlink(baseURL + "./uploads/imgfichas/" + req.body.imagen, err => {
+  // fs.unlink(baseURL + "./uploads/imgfichas/" + req.body.imagen, err => {
     if (err) throw err;
     // if no error, file has been deleted successfully
     // console.log('File deleted!');
@@ -799,6 +801,7 @@ Router.post("/guardar_anexo_nueve", (req, res) => {
   );
 });
 
+
 Router.post("/cerrar_ficha", (req, res) => {
   var data = req.body;
   var id_analista = 0;
@@ -901,6 +904,24 @@ Router.post("/cerrar_ficha", (req, res) => {
       }
     );
   }
+});
+
+Router.post("/cancelar_ficha", (req, res) => {
+  var data = req.body;
+  query = `
+    UPDATE tbl_ficha_tecnica SET
+      estatus = 6
+    WHERE 
+      id_ficha_tecnica=?
+           `;
+  connection.query(
+    query,
+    [data.id_ficha_tecnica],
+    (err, rows, fields) => {
+      if (err) return res.status(500).send("Error del servidor." + err);
+      res.status(200).send(rows);
+    }
+  );
 });
 
 Router.post("/guardar_observaciones_anexo_uno", (req, res) => {

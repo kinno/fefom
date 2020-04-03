@@ -206,7 +206,10 @@ export default {
                 icono: iconoEstatus,
                 color: color
                 })
-               
+                console.log(this.asignaciones[this.asignaciones.length - 1].dias_restantes)
+               if(this.asignaciones[this.asignaciones.length - 1].dias_restantes == 0){
+                 this.asignaciones[this.asignaciones.length - 1].estatus_texto = 'Cancelada'
+               }
             });
           } else {
                EventBus.$emit("cierraLoading");

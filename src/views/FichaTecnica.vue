@@ -191,6 +191,7 @@ import AnexoSieteComponent from "../components/app/AnexoSieteComponent";
 import AnexoOchoComponent from "../components/app/AnexoOchoComponent";
 import AnexoNueveComponent from "../components/app/AnexoNueveComponent";
 import { EventBus } from "../utils/event-bus";
+import { calculaFecha } from "../utils/calculaFecha";
 export default {
   beforeMount(){
      this.user = JSON.parse(localStorage.getItem("user"));
@@ -306,6 +307,10 @@ export default {
         {
           estatus: 5,
           descripcion: 'Corrección con observaciones'
+        },
+        {
+          estatus: 6,
+          descripcion: 'Cancelada'
         },
       ],
       items: [
@@ -601,8 +606,13 @@ export default {
                this.currentTab = "anexo-uno-component";
                 this.ficha_tecnica = response.data[0];
                 this.update += 1;
-                if(response.data[0].estatus==2 || response.data[0].estatus==3 || response.data[0].estatus==4){
+                if(response.data[0].estatus==2 || response.data[0].estatus==3 || response.data[0].estatus==4 || response.data[0].estatus==6){
                   this.botonVisible = false;
+                }
+                if(response.data[0].estatus == 5){
+                 if(calculaFecha(response.data[0].fecha_limite_ayuntamiento)==0){
+                   this.cancelarFicha(this.ficha_tecnica.id_ficha_tecnica)
+                 }
                 }
             }else{
               this.$fire({
@@ -632,6 +642,35 @@ export default {
             confirmButtonColor: "#d33"
           });
         });
+    },
+    cancelarFicha(id_ficha_tecnica){
+      EventBus.$emit("abreLoading");
+      this.$http
+          .post("/ficha_tecnica/cancelar_ficha", {
+            id_ficha_tecnica: id_ficha_tecnica,
+          })
+          .then(response => {
+            if (response.status == 200) {
+              this.buscar()
+            } else {
+              this.$fire({
+                type: "error",
+                title: "Error",
+                text: response.err,
+                confirmButtonText: "Cerrar",
+                confirmButtonColor: "#d33"
+              });
+            }
+          })
+          .catch(error => {
+            this.$fire({
+              type: "error",
+              title: "Error",
+              text: error,
+              confirmButtonText: "Cerrar",
+              confirmButtonColor: "#d33"
+            });
+          });
     },
     imprimirFicha() {
       EventBus.$emit("abreLoading");
