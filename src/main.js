@@ -9,7 +9,9 @@ import Axios from 'axios'
 import VueCurrencyFilter  from 'vue-currency-filter'
 import VueSimpleAlert from "vue-simple-alert";
 
-Axios.defaults.baseURL = 'http://localhost:8081/server'
+
+(process.env.NODE_ENV == "production") ? Axios.defaults.baseURL = 'http://sisfefom.edomex.gob.mx/server' : Axios.defaults.baseURL = 'http://localhost:8081/server'
+// Axios.defaults.baseURL = 'http://localhost:8081/server'
 // Axios.defaults.baseURL = 'http://10.10.31.97:8081/server'
 Axios.interceptors.request.use(function(config){
   const token = localStorage.getItem('jwt');
