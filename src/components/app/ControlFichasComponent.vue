@@ -10,6 +10,113 @@
         :search="search"
         style="line-height:1.2em"
       >
+      <template v-slot:top>
+        <v-expansion-panels focusable>
+          <v-expansion-panel>
+            <v-expansion-panel-header v-slot="{ open }">
+              <v-row no-gutters>
+                <v-col cols="4">Búsqueda Avanzada</v-col>
+                <v-col
+                  cols="8"
+                  class="text--secondary"
+                >
+                  <v-fade-transition leave-absolute>
+                    <span
+                      v-if="open"
+                      key="0"
+                    >
+                      Ingresa los parámetros de búsqueda
+                    </span>
+                    <span
+                      v-else
+                      key="1"
+                    >
+                      
+                    </span>
+                  </v-fade-transition>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-card
+                  flat
+                  tile
+                >
+               <v-card-text>
+                 <v-row>
+                   <v-col cols="12" md="2">
+                     <v-text-field
+                      label="Folio"
+                      placeholder="Folio"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="8">
+                     <v-text-field
+                      label="Nombre del proyecto"
+                      placeholder="Nombre del proyecto"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="2">
+                     <v-text-field
+                      label="Monto"
+                      placeholder="Monto"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                 </v-row>
+                 <v-row>
+                   <v-col cols="12" md="5">
+                     <v-text-field
+                      label="Municipio"
+                      placeholder="Municipio"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="5">
+                     <v-text-field
+                      label="Unidad Ejecutora"
+                      placeholder="Unidad Ejecutora"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="2">
+                     <v-text-field
+                      label="Fecha de Captura"
+                      placeholder="Fecha de Captura"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                 </v-row>
+               </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                <v-btn
+                  text
+                  color="secondary"
+                >
+                  Limpiar
+                </v-btn>
+                <v-btn
+                  text
+                  color="primary"
+                >
+                  Buscar
+                </v-btn>
+              </v-card-actions>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </template>
         <template v-slot:item="{ item }">
           <tr :style="'background-color:'+item.color">
             <td class="text-center font-weight-black" style="width:5%">
@@ -269,6 +376,12 @@ export default {
                    iconoEstatus = "mdi-comment-alert"
                    color = "#EF9A9A"
                   break;
+                case 6:
+                  estat = "Cancelada"
+                   iconoEstatus = "mdi-cancel"
+                   color = "#EF9A9A"
+                   semaforo = "gray lighten-1"
+                  break;
               
                 default:
                   break;
@@ -303,7 +416,8 @@ export default {
                 estatus: element.estatus,
                 estatus_texto: estat,
                 semaforo: semaforo,
-                dias_restantes: diasRestantes
+                dias_restantes: diasRestantes,
+                color: color
                 })
                
             });
