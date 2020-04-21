@@ -46,6 +46,7 @@
                  <v-row>
                    <v-col cols="12" md="2">
                      <v-text-field
+                     v-model="filtros.folio"
                       label="Folio"
                       placeholder="Folio"
                       outlined
@@ -54,6 +55,7 @@
                    </v-col>
                    <v-col cols="12" md="8">
                      <v-text-field
+                     v-model="filtros.nombreProyecto"
                       label="Nombre del proyecto"
                       placeholder="Nombre del proyecto"
                       outlined
@@ -62,6 +64,7 @@
                    </v-col>
                    <v-col cols="12" md="2">
                      <v-text-field
+                     v-model="filtros.monto"
                       label="Monto"
                       placeholder="Monto"
                       outlined
@@ -72,6 +75,7 @@
                  <v-row>
                    <v-col cols="12" md="5">
                      <v-text-field
+                     v-model="filtros.municipio"
                       label="Municipio"
                       placeholder="Municipio"
                       outlined
@@ -80,6 +84,7 @@
                    </v-col>
                    <v-col cols="12" md="5">
                      <v-text-field
+                     v-model="filtros.unidadEjecutora"
                       label="Unidad Ejecutora"
                       placeholder="Unidad Ejecutora"
                       outlined
@@ -88,6 +93,7 @@
                    </v-col>
                    <v-col cols="12" md="2">
                      <v-text-field
+                     v-model="filtros.fechaCaptura"
                       label="Fecha de Captura"
                       placeholder="Fecha de Captura"
                       outlined
@@ -99,18 +105,34 @@
 
               <v-card-actions>
                 <v-spacer></v-spacer>
-                <v-btn
-                  text
-                  color="secondary"
-                >
-                  Limpiar
-                </v-btn>
-                <v-btn
-                  text
-                  color="primary"
-                >
-                  Buscar
-                </v-btn>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                        color="green"
+                        class="ma-2 tile white--text"
+                        small
+                        v-on="on"
+                        @click="busquedaAvanzada()"
+                      >
+                        <v-icon center dark>mdi-magnify</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Buscar</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="green"
+                            class="ma-2 tile white--text"
+                            small
+                            v-on="on"
+                            @click="buscarAsignaciones()"
+                          >
+                            <v-icon center dark>mdi-autorenew</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Limpiar</span>
+                      </v-tooltip>
               </v-card-actions>
               </v-card>
             </v-expansion-panel-content>
@@ -292,12 +314,14 @@ import { EventBus } from "../../utils/event-bus";
 import moment from "moment";
 import { calculaFecha } from "../../utils/calculaFecha";
 export default {
-  mounted() {
+  beforeMount(){
     this.user = JSON.parse(localStorage.getItem("user"));
+    // this.cargaCatalogos()
     this.buscarAsignaciones()
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
     });
-    
+  },
+  mounted() {
   },
   data() {
     return {
@@ -305,6 +329,14 @@ export default {
       tab: null,
       update: 0,
       botonVisible: true,
+      filtros:{
+        folio: null,
+        nombreProyecto: null,
+        monto: null,
+        municipio: null,
+        unidadEjecutora: null,
+        fechaCaptura: null
+      },
       search: null,
       dialogHistorial: false,
       dialogObservacionAnalista: false,
@@ -328,8 +360,116 @@ export default {
   watch: {
   },
   methods: {
-      buscarAsignaciones() {
-      EventBus.$emit("abreLoading");
+    
+    buscarAsignaciones() {
+        this.asignaciones = []
+        this.historial = []
+        EventBus.$emit("abreLoading");
+        this.$http
+          .post("/ficha_tecnica/buscar_detalle_fichas", {
+            id_ayuntamiento: this.user.id_municipio
+          })
+          .then(response => {
+            EventBus.$emit("cierraLoading");
+            if (response.status == 200) {
+              //  console.log(response.data);
+              response.data.forEach(element => {
+                var estat = ""
+                var iconoEstatus = ""
+                var color = ""
+                var semaforo = "blue lighteen-1"
+                var diasRestantes = "-"
+                // console.log(element.estatus)
+                switch (element.estatus) {
+                  case 1:
+                    estat = "Edición / Presentación"
+                    iconoEstatus = "mdi-file-document-edit"
+                    break;
+                  case 2:
+                    estat = "En Revisión"
+                    iconoEstatus = "mdi-timeline-clock"
+                    diasRestantes = calculaFecha(element.fecha_limite_revision)
+                    
+                    if(diasRestantes > 3){
+                      semaforo = "green lighten-1"
+                    }else if(diasRestantes>0 && diasRestantes<3){
+                      semaforo =" yellow lighteen-1"
+                    }else{
+                      semaforo = "red lighten-1"
+                    }
+                    break;
+                  case 3:
+                    estat = "En Validación"
+                    iconoEstatus = "mdi-timeline-clock"
+                    break;
+                  case 4:
+                    estat = "En Dictaminación"
+                    iconoEstatus = "mdi-timeline-clock"
+                    break;
+                  case 5:
+                    estat = "Regresada al Ayuntamiento con Observaciones"
+                    iconoEstatus = "mdi-comment-alert"
+                    color = "#EF9A9A"
+                    break;
+                  case 6:
+                    estat = "Cancelada"
+                    iconoEstatus = "mdi-cancel"
+                    color = "#EF9A9A"
+                    semaforo = "gray lighten-1"
+                    break;
+                
+                  default:
+                    break;
+                }
+
+
+                  this.asignaciones.push({
+                    nombre: element.nombre,
+                  id_ficha_tecnica: element.id_ficha_tecnica,
+                  version: element.version,
+                  ayuntamiento: element.ayuntamiento,
+                  fecha_ficha: moment(
+                                      element.fecha_ficha
+                                      ).format("LL"),
+                  nombre_proyecto: element.nombre_proyecto,
+                  monto: element.monto_con_iva,
+                  fecha_primer_ingreso: (element.fecha_primer_ingreso !== null) ? moment(
+                                      element.fecha_primer_ingreso
+                                      ).format("LL") : "--",
+                  fecha_envio: (element.fecha_envio !== null) ? moment(
+                                      element.fecha_envio
+                                      ).format("LL") : "--",
+                  fecha_revision: (element.fecha_revision !== null) ? moment(
+                                      element.fecha_revision
+                                      ).format("LL") : "--",
+                  fecha_validacion:  (element.fecha_validacion !== null) ? moment(
+                                      element.fecha_validacion
+                                      ).format("LL") : "--",
+                  fecha_dictaminacion: (element.fecha_dictaminacion !== null) ? moment(
+                                      element.fecha_dictaminacion
+                                      ).format("LL") : "--",
+                  estatus: element.estatus,
+                  estatus_texto: estat,
+                  semaforo: semaforo,
+                  dias_restantes: diasRestantes,
+                  color: color
+                  })
+                
+              });
+            } else {
+                EventBus.$emit("cierraLoading");
+              console.log("Error", response.err);
+            }
+          })
+          .catch(error => {
+              EventBus.$emit("cierraLoading");
+            console.error(error);
+          });
+    },
+    busquedaAvanzada(){
+      this.asignaciones = []
+        this.historial = []
+        EventBus.$emit("abreLoading");
       this.$http
         .post("/ficha_tecnica/buscar_detalle_fichas", {
           id_ayuntamiento: this.user.id_municipio

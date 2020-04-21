@@ -23,35 +23,35 @@ app.use(history())
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(bodyParser.json());
 
-// var requestTime = function (req, res, next) {
-//   // console.log(req.originalUrl)
-//   if(req.originalUrl != '/server/login/'){
-//     // console.log("Entro al middleware")
-//     if(!req.headers.authorization) {
-//       return res
-//         .status(403)
-//         .send({message: "Tu petición no tiene cabecera de autorización"});
-//     }
+var requestTime = function (req, res, next) {
+  // console.log(req.originalUrl)
+  if(req.originalUrl != '/server/login/'){
+    // console.log("Entro al middleware")
+    if(!req.headers.authorization) {
+      return res
+        .status(403)
+        .send({message: "Tu peticiï¿½n no tiene cabecera de autorizaciï¿½n"});
+    }
     
-//     var token = req.headers.authorization.split(" ")[1];
-//     var payload = jwt.decode(token, config.TOKEN_SECRET);
+    var token = req.headers.authorization.split(" ")[1];
+    var payload = jwt.decode(token, config.TOKEN_SECRET);
 
-//     // console.log(payload.exp, moment().unix())
+    // console.log(payload.exp, moment().unix())
     
-//     if(payload.exp <= moment().unix()) {
-//        return res
-//          .status(401)
-//           .send({message: "El token ha expirado"});
-//     }
+    if(payload.exp <= moment().unix()) {
+       return res
+         .status(401)
+          .send({message: "El token ha expirado"});
+    }
     
-//     req.user = payload.sub;
-//     next();
-//   }else{
-//     next()
-//   }
+    req.user = payload.sub;
+    next();
+  }else{
+    next()
+  }
    
-//   };
-// app.use(requestTime) 
+  };
+app.use(requestTime) 
 app.use("/server/login", loginRoutes);
 app.use("/server/catalogos", catalogosRoutes);
 app.use("/server/techos_financieros", techosRoutes);
