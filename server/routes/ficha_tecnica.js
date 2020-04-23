@@ -248,6 +248,17 @@ Router.post("/buscar_asignaciones", (req, res) => {
 
 Router.post("/buscar_detalle_fichas", (req, res) => {
   var data = req.body;
+  // console.log(data)
+  var where = ``; 
+  if(data.filtros){
+    if (data.filtros.folio!==null && data.filtros.folio!=="")  where+=`and ficha.id_ficha_tecnica = ${data.filtros.folio}` 
+    if (data.filtros.nombreProyecto!==null && data.filtros.nombreProyecto!=="")  where+=` and cartera.nombre_proyecto like '%${data.filtros.nombreProyecto}%'` 
+    if (data.filtros.monto!==null && data.filtros.monto!=="")  where+=` and ficha.monto_con_iva = ${data.filtros.monto}` 
+    if (data.filtros.municipio!==null && data.filtros.municipio!=="")  where+=` and municipio.id_municipio = ${data.filtros.municipio}` 
+    if (data.filtros.fechaCaptura!==null && data.filtros.fechaCaptura!=="")  where+=` and ficha.fecha_ficha = ${data.filtros.fechaCaptura}` 
+  }
+  
+  // if (data.filtros.unidadEjecutora!==null)  where+=` and municipio.id_ayuntamiento = ${data.filtros.municipio}` 
   query = `
           SELECT 
             usuario.nombre,
@@ -277,9 +288,10 @@ Router.post("/buscar_detalle_fichas", (req, res) => {
             cat_usuario usuario ON ficha.id_analista_asignado = usuario.id_usuario
           WHERE
             ficha.id_analista_asignado IS NOT NULL
-            ORDER BY usuario.nombre DESC, ficha.fecha_envio DESC ; 
+            ${where}
+            ORDER BY usuario.nombre DESC, ficha.fecha_envio DESC; 
            `;
-  // console.log(query, data.id_usuario)
+  //  console.log(query)
   connection.query(query, [data.id_usuario], (err, rows, fields) => {
     if (err) return res.status(500).send("Error del servidor." + err);
     res.status(200).send(rows);

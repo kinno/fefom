@@ -18,6 +18,7 @@ Router.get("/get_municipios", (req, res) => {
   connection.query("Select * from cat_municipio join cat_cargo on cat_municipio.id_cargo = cat_cargo.id_cargo", (err, rows, fields) => {
     if (err) return res.status(500).send('Error del servidor.' + err);
     if (rows.length < 1) return res.status(404).send('Datos Incorrentos.');
+    // console.log(rows)
     res.status(200).json({
       rows
     });

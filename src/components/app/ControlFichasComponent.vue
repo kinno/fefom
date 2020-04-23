@@ -74,13 +74,16 @@
                  </v-row>
                  <v-row>
                    <v-col cols="12" md="5">
-                     <v-text-field
-                     v-model="filtros.municipio"
-                      label="Municipio"
+                    <v-autocomplete
+                    v-model="filtros.municipio"
+                      :items="municipios"
+                      item-text="descripcion"
+                      item-value="id_municipio"
+                       label="Municipio"
                       placeholder="Municipio"
                       outlined
                       dense
-                    ></v-text-field>
+                    ></v-autocomplete>
                    </v-col>
                    <v-col cols="12" md="5">
                      <v-text-field
@@ -92,13 +95,27 @@
                     ></v-text-field>
                    </v-col>
                    <v-col cols="12" md="2">
-                     <v-text-field
-                     v-model="filtros.fechaCaptura"
-                      label="Fecha de Captura"
-                      placeholder="Fecha de Captura"
-                      outlined
-                      dense
-                    ></v-text-field>
+                     <v-menu
+                      v-model="menuCalendario"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="290px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          v-model="filtros.fechaCaptura"
+                           label="Fecha de Captura"
+                            placeholder="Fecha de Captura"
+                          readonly
+                           outlined
+                          dense
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker no-title locale="Es" v-model="filtros.fechaCaptura" @input="menuCalendario = false"></v-date-picker>
+                    </v-menu>
                    </v-col>
                  </v-row>
                </v-card-text>
@@ -316,12 +333,13 @@ import { calculaFecha } from "../../utils/calculaFecha";
 export default {
   beforeMount(){
     this.user = JSON.parse(localStorage.getItem("user"));
-    // this.cargaCatalogos()
+     this.initialize();
     this.buscarAsignaciones()
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
     });
   },
   mounted() {
+   
   },
   data() {
     return {
@@ -337,6 +355,9 @@ export default {
         unidadEjecutora: null,
         fechaCaptura: null
       },
+      municipios: [],
+      isEditing: null,
+      menuCalendario: false,
       search: null,
       dialogHistorial: false,
       dialogObservacionAnalista: false,
@@ -360,10 +381,28 @@ export default {
   watch: {
   },
   methods: {
-    
+    initialize() {
+      this.$http
+        .get("/catalogos/get_municipios")
+        .then(response => {
+          response.data.rows.forEach(element => {
+            // console.log(element)
+            this.municipios.push(element);
+          });
+        })
+        .catch(err => {});
+    },
     buscarAsignaciones() {
         this.asignaciones = []
         this.historial = []
+        this.filtros={
+        folio: null,
+        nombreProyecto: null,
+        monto: null,
+        municipio: null,
+        unidadEjecutora: null,
+        fechaCaptura: null
+      },
         EventBus.$emit("abreLoading");
         this.$http
           .post("/ficha_tecnica/buscar_detalle_fichas", {
@@ -472,7 +511,7 @@ export default {
         EventBus.$emit("abreLoading");
       this.$http
         .post("/ficha_tecnica/buscar_detalle_fichas", {
-          id_ayuntamiento: this.user.id_municipio
+          filtros: this.filtros
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
