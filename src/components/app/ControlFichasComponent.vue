@@ -181,7 +181,7 @@
             </td>
             <td class="text-center font-weight-black" style="width:8%;">
               <v-icon small center :color="item.semaforo">mdi-circle-slice-8</v-icon>
-              <br><span style="font-size: 10px !important; ">{{item.dias_restantes}} días restantes</span></br>
+              <br><span style="font-size: 10px !important; ">{{item.dias_restantes}} días restantes</span><br>
             </td>
             <td class="text-center">
               <v-row  no-gutters>

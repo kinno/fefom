@@ -823,7 +823,7 @@ Router.post("/cerrar_ficha", (req, res) => {
       gen.id_usuario, COUNT(gen.id_ficha_tecnica) AS total
     FROM
       (SELECT 
-          usuario.id_usuario, fichas.*
+          usuario.id_usuario, fichas.id_ficha_tecnica
       FROM
           cat_usuario AS usuario
       LEFT JOIN (SELECT 
@@ -840,7 +840,7 @@ Router.post("/cerrar_ficha", (req, res) => {
     `;
   
     connection.query(queryAnalistaDisponible, (err, rows, fields) => {
-      if (err) return res.status(500).send("Error del servidor." + err);
+      if (err) return res.status(500).send("Error del servidor al buscar analista disponible." + err);
       id_analista = rows[0].id_usuario;
       
       query = `
