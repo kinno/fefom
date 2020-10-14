@@ -30,7 +30,7 @@ app.use(bodyParser.json());
 //     if(!req.headers.authorization) {
 //       return res
 //         .status(403)
-//         .send({message: "Tu petición no tiene cabecera de autorización"});
+//         .send({message: "Tu peticiï¿½n no tiene cabecera de autorizaciï¿½n"});
 //     }
     
 //     var token = req.headers.authorization.split(" ")[1];

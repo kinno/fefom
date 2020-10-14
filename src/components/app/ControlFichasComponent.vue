@@ -10,6 +10,152 @@
         :search="search"
         style="line-height:1.2em"
       >
+      <template v-slot:top>
+        <v-expansion-panels focusable>
+          <v-expansion-panel>
+            <v-expansion-panel-header v-slot="{ open }">
+              <v-row no-gutters>
+                <v-col cols="4">Búsqueda Avanzada</v-col>
+                <v-col
+                  cols="8"
+                  class="text--secondary"
+                >
+                  <v-fade-transition leave-absolute>
+                    <span
+                      v-if="open"
+                      key="0"
+                    >
+                      Ingresa los parámetros de búsqueda
+                    </span>
+                    <span
+                      v-else
+                      key="1"
+                    >
+                      
+                    </span>
+                  </v-fade-transition>
+                </v-col>
+              </v-row>
+            </v-expansion-panel-header>
+            <v-expansion-panel-content>
+              <v-card
+                  flat
+                  tile
+                >
+               <v-card-text>
+                 <v-row>
+                   <v-col cols="12" md="2">
+                     <v-text-field
+                     v-model="filtros.folio"
+                      label="Folio"
+                      placeholder="Folio"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="8">
+                     <v-text-field
+                     v-model="filtros.nombreProyecto"
+                      label="Nombre del proyecto"
+                      placeholder="Nombre del proyecto"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="2">
+                     <v-text-field
+                     v-model="filtros.monto"
+                      label="Monto"
+                      placeholder="Monto"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                 </v-row>
+                 <v-row>
+                   <v-col cols="12" md="5">
+                    <v-autocomplete
+                    v-model="filtros.municipio"
+                      :items="municipios"
+                      item-text="descripcion"
+                      item-value="id_municipio"
+                       label="Municipio"
+                      placeholder="Municipio"
+                      outlined
+                      dense
+                    ></v-autocomplete>
+                   </v-col>
+                   <v-col cols="12" md="5">
+                     <v-text-field
+                     v-model="filtros.unidadEjecutora"
+                      label="Unidad Ejecutora"
+                      placeholder="Unidad Ejecutora"
+                      outlined
+                      dense
+                    ></v-text-field>
+                   </v-col>
+                   <v-col cols="12" md="2">
+                     <v-menu
+                      v-model="menuCalendario"
+                      :close-on-content-click="false"
+                      :nudge-right="40"
+                      transition="scale-transition"
+                      offset-y
+                      min-width="290px"
+                    >
+                      <template v-slot:activator="{ on }">
+                        <v-text-field
+                          v-model="filtros.fechaCaptura"
+                           label="Fecha de Captura"
+                            placeholder="Fecha de Captura"
+                          readonly
+                           outlined
+                          dense
+                          v-on="on"
+                        ></v-text-field>
+                      </template>
+                      <v-date-picker no-title locale="Es" v-model="filtros.fechaCaptura" @input="menuCalendario = false"></v-date-picker>
+                    </v-menu>
+                   </v-col>
+                 </v-row>
+               </v-card-text>
+
+              <v-card-actions>
+                <v-spacer></v-spacer>
+                  <v-tooltip bottom>
+                    <template v-slot:activator="{ on }">
+                      <v-btn
+                        color="green"
+                        class="ma-2 tile white--text"
+                        small
+                        v-on="on"
+                        @click="busquedaAvanzada()"
+                      >
+                        <v-icon center dark>mdi-magnify</v-icon>
+                      </v-btn>
+                    </template>
+                    <span>Buscar</span>
+                  </v-tooltip>
+                  <v-tooltip bottom>
+                        <template v-slot:activator="{ on }">
+                          <v-btn
+                            color="green"
+                            class="ma-2 tile white--text"
+                            small
+                            v-on="on"
+                            @click="buscarAsignaciones()"
+                          >
+                            <v-icon center dark>mdi-autorenew</v-icon>
+                          </v-btn>
+                        </template>
+                        <span>Limpiar</span>
+                      </v-tooltip>
+              </v-card-actions>
+              </v-card>
+            </v-expansion-panel-content>
+          </v-expansion-panel>
+        </v-expansion-panels>
+      </template>
         <template v-slot:item="{ item }">
           <tr :style="'background-color:'+item.color">
             <td class="text-center font-weight-black" style="width:5%">
@@ -185,12 +331,15 @@ import { EventBus } from "../../utils/event-bus";
 import moment from "moment";
 import { calculaFecha } from "../../utils/calculaFecha";
 export default {
-  mounted() {
+  beforeMount(){
     this.user = JSON.parse(localStorage.getItem("user"));
+     this.initialize();
     this.buscarAsignaciones()
     EventBus.$on("actualizaPropAnexoDos", id_anexo_dos => {
     });
-    
+  },
+  mounted() {
+   
   },
   data() {
     return {
@@ -198,6 +347,17 @@ export default {
       tab: null,
       update: 0,
       botonVisible: true,
+      filtros:{
+        folio: null,
+        nombreProyecto: null,
+        monto: null,
+        municipio: null,
+        unidadEjecutora: null,
+        fechaCaptura: null
+      },
+      municipios: [],
+      isEditing: null,
+      menuCalendario: false,
       search: null,
       dialogHistorial: false,
       dialogObservacionAnalista: false,
@@ -221,11 +381,137 @@ export default {
   watch: {
   },
   methods: {
-      buscarAsignaciones() {
-      EventBus.$emit("abreLoading");
+    initialize() {
+      this.$http
+        .get("/catalogos/get_municipios")
+        .then(response => {
+          response.data.rows.forEach(element => {
+            // console.log(element)
+            this.municipios.push(element);
+          });
+        })
+        .catch(err => {});
+    },
+    buscarAsignaciones() {
+        this.asignaciones = []
+        this.historial = []
+        this.filtros={
+        folio: null,
+        nombreProyecto: null,
+        monto: null,
+        municipio: null,
+        unidadEjecutora: null,
+        fechaCaptura: null
+      },
+        EventBus.$emit("abreLoading");
+        this.$http
+          .post("/ficha_tecnica/buscar_detalle_fichas", {
+            id_ayuntamiento: this.user.id_municipio
+          })
+          .then(response => {
+            EventBus.$emit("cierraLoading");
+            if (response.status == 200) {
+              //  console.log(response.data);
+              response.data.forEach(element => {
+                var estat = ""
+                var iconoEstatus = ""
+                var color = ""
+                var semaforo = "blue lighteen-1"
+                var diasRestantes = "-"
+                // console.log(element.estatus)
+                switch (element.estatus) {
+                  case 1:
+                    estat = "Edición / Presentación"
+                    iconoEstatus = "mdi-file-document-edit"
+                    break;
+                  case 2:
+                    estat = "En Revisión"
+                    iconoEstatus = "mdi-timeline-clock"
+                    diasRestantes = calculaFecha(element.fecha_limite_revision)
+                    
+                    if(diasRestantes > 3){
+                      semaforo = "green lighten-1"
+                    }else if(diasRestantes>0 && diasRestantes<3){
+                      semaforo =" yellow lighteen-1"
+                    }else{
+                      semaforo = "red lighten-1"
+                    }
+                    break;
+                  case 3:
+                    estat = "En Validación"
+                    iconoEstatus = "mdi-timeline-clock"
+                    break;
+                  case 4:
+                    estat = "En Dictaminación"
+                    iconoEstatus = "mdi-timeline-clock"
+                    break;
+                  case 5:
+                    estat = "Regresada al Ayuntamiento con Observaciones"
+                    iconoEstatus = "mdi-comment-alert"
+                    color = "#EF9A9A"
+                    break;
+                  case 6:
+                    estat = "Cancelada"
+                    iconoEstatus = "mdi-cancel"
+                    color = "#EF9A9A"
+                    semaforo = "gray lighten-1"
+                    break;
+                
+                  default:
+                    break;
+                }
+
+
+                  this.asignaciones.push({
+                    nombre: element.nombre,
+                  id_ficha_tecnica: element.id_ficha_tecnica,
+                  version: element.version,
+                  ayuntamiento: element.ayuntamiento,
+                  fecha_ficha: moment(
+                                      element.fecha_ficha
+                                      ).format("LL"),
+                  nombre_proyecto: element.nombre_proyecto,
+                  monto: element.monto_con_iva,
+                  fecha_primer_ingreso: (element.fecha_primer_ingreso !== null) ? moment(
+                                      element.fecha_primer_ingreso
+                                      ).format("LL") : "--",
+                  fecha_envio: (element.fecha_envio !== null) ? moment(
+                                      element.fecha_envio
+                                      ).format("LL") : "--",
+                  fecha_revision: (element.fecha_revision !== null) ? moment(
+                                      element.fecha_revision
+                                      ).format("LL") : "--",
+                  fecha_validacion:  (element.fecha_validacion !== null) ? moment(
+                                      element.fecha_validacion
+                                      ).format("LL") : "--",
+                  fecha_dictaminacion: (element.fecha_dictaminacion !== null) ? moment(
+                                      element.fecha_dictaminacion
+                                      ).format("LL") : "--",
+                  estatus: element.estatus,
+                  estatus_texto: estat,
+                  semaforo: semaforo,
+                  dias_restantes: diasRestantes,
+                  color: color
+                  })
+                
+              });
+            } else {
+                EventBus.$emit("cierraLoading");
+              console.log("Error", response.err);
+            }
+          })
+          .catch(error => {
+              EventBus.$emit("cierraLoading");
+            console.error(error);
+          });
+    },
+    busquedaAvanzada(){
+      this.asignaciones = []
+        this.historial = []
+        EventBus.$emit("abreLoading");
       this.$http
         .post("/ficha_tecnica/buscar_detalle_fichas", {
-          id_ayuntamiento: this.user.id_municipio
+          filtros: this.filtros
         })
         .then(response => {
           EventBus.$emit("cierraLoading");
@@ -269,6 +555,12 @@ export default {
                    iconoEstatus = "mdi-comment-alert"
                    color = "#EF9A9A"
                   break;
+                case 6:
+                  estat = "Cancelada"
+                   iconoEstatus = "mdi-cancel"
+                   color = "#EF9A9A"
+                   semaforo = "gray lighten-1"
+                  break;
               
                 default:
                   break;
@@ -303,7 +595,8 @@ export default {
                 estatus: element.estatus,
                 estatus_texto: estat,
                 semaforo: semaforo,
-                dias_restantes: diasRestantes
+                dias_restantes: diasRestantes,
+                color: color
                 })
                
             });
